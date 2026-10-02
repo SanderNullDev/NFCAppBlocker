@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Registers the NFC Forum Type 4 NDEF application AID. Category "other" because this is
+     neither a payment service nor something that needs to be the default for a category.
+     Works on the lock screen too; the screen still has to be on for HCE. -->
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/service_description"
+    android:requireDeviceUnlock="false">
+    <aid-group
+        android:category="other"
+        android:description="@string/aid_group_description">
+        <aid-filter android:name="D2760000850101" />
+    </aid-group>
+</host-apdu-service>

@@ -24,4 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "NFC App Blocker"
 include(":app")
+include(":core:tag-format")
+include(":hce-emulator")
  

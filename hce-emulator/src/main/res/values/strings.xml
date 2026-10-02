@@ -1,0 +1,35 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">NFC Tag Emulator</string>
+    <string name="service_description">NFC App Blocker test tag</string>
+    <string name="aid_group_description">NFC Forum Type 4 NDEF tag</string>
+
+    <string name="nfc_missing">This phone has no NFC hardware, so it can\'t emulate a tag.</string>
+    <string name="nfc_off">NFC is turned off. Turn it on to emulate a tag.</string>
+    <string name="nfc_open_settings">Open NFC settings</string>
+
+    <string name="emulation_title">Emulation</string>
+    <string name="emulation_on">On. This phone answers as a tag when the screen is on.</string>
+    <string name="emulation_off">Off. This phone doesn\'t respond to readers.</string>
+
+    <string name="section_tag">Emulated tag</string>
+    <string name="uuid_label">UUID</string>
+    <string name="uuid_error" tools:ignore="TypographyDashes">Use the format 8-4-4-4-12 hexadecimal digits</string>
+    <string name="uuid_save">Save UUID</string>
+    <string name="uuid_generate">Generate new UUID</string>
+    <plurals name="ndef_preview_title">
+        <item quantity="one">NDEF message, %1$d byte</item>
+        <item quantity="other">NDEF message, %1$d bytes</item>
+    </plurals>
+
+    <string name="section_log">APDU log</string>
+    <string name="log_clear">Clear log</string>
+    <string name="log_empty">No reads yet. Hold a reader phone against the back of this one.</string>
+    <string name="log_kind_received">RX</string>
+    <string name="log_kind_sent">TX</string>
+    <string name="log_kind_event">•</string>
+    <string name="log_received_description">Received: %1$s</string>
+    <string name="log_sent_description">Sent: %1$s</string>
+    <string name="log_event_description">Event: %1$s</string>
+
+    <string name="loading">Loading presets…</string>
+</resources>
