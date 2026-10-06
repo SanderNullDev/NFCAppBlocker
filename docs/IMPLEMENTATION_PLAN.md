@@ -104,6 +104,7 @@ Status (2026-10-06):
 - [x] Profile editor: name, apps, linked tags (moving a tag from another profile asks first), delete with confirmation.
 - [x] Linking a tag from its details, and right after pairing.
 - Checked on an emulator with simulated tags, and on the Samsung for the database and app list (device tests).
+- [x] Follow-up after trying it (2026-10-06): the editor saves explicitly with a Save button and asks before discarding changes (D-025, supersedes D-021); "Scan a tag" in the editor links a paired tag or pairs a new one on the spot.
 
 ## Phase 3 — Blocking engine
 

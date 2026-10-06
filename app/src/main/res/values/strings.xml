@@ -31,6 +31,9 @@
     <string name="profile_no_tags">No tags linked. Scanning a linked tag will turn this profile on or off.</string>
     <string name="profile_unlink_tag">Unlink</string>
     <string name="profile_link_tag">Link a tag</string>
+    <string name="profile_scan_tag">Scan a tag</string>
+    <string name="profile_scan_already_here">\u201c%1$s\u201d is already in this profile.</string>
+    <string name="profile_scan_add_to_profile">Add to profile</string>
     <string name="profile_tag_in_other">Now in \u201c%1$s\u201d</string>
     <string name="profile_move_tag_title">Move \u201c%1$s\u201d here?</string>
     <string name="profile_move_tag_body">It\'s linked to \u201c%1$s\u201d now. A tag controls one profile at a time.</string>

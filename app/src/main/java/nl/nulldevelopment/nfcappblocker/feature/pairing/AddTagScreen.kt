@@ -82,77 +82,38 @@ fun AddTagScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                when (val s = state) {
-                    PairingState.WaitingForTag -> Message(stringResource(R.string.add_waiting))
-                    PairingState.Writing -> {
-                        CircularProgressIndicator()
-                        Message(stringResource(R.string.add_writing))
-                    }
-                    is PairingState.ConfirmOverwrite -> ConfirmOverwrite(
-                        content = s.content,
-                        onOverwrite = viewModel::confirmOverwrite,
-                        onCancel = viewModel::restart,
-                    )
-                    is PairingState.WaitingForSameTag -> {
-                        Message(stringResource(R.string.add_hold_same_tag))
-                        if (s.otherTagTapped) Message(stringResource(R.string.add_other_tag))
-                        OutlinedAction(stringResource(R.string.add_cancel), viewModel::restart)
-                    }
-                    is PairingState.AlreadyPaired -> {
-                        Message(stringResource(R.string.add_already_paired, s.tag.name))
-                        PrimaryAction(stringResource(R.string.add_open_tag)) { onOpenTag(s.tag.uuid) }
-                        OutlinedAction(stringResource(R.string.add_another), viewModel::restart)
-                    }
-                    is PairingState.OursNotPaired -> {
-                        Message(stringResource(R.string.add_ours_not_paired))
-                        PrimaryAction(stringResource(R.string.add_adopt), viewModel::adopt)
-                        if (s.canOverwrite) OutlinedAction(stringResource(R.string.add_new_id), viewModel::confirmOverwrite)
-                    }
-                    is PairingState.Paired -> NameNewTag(
-                        uuid = s.tag.uuid,
-                        initialName = s.tag.name,
-                        profiles = profiles,
-                        onDone = { name, profileId ->
-                            viewModel.finish(s.tag.uuid, name, profileId)
-                            onBack()
-                        },
-                    )
-                    is PairingState.Failed -> {
-                        Message(failureText(s.reason))
-                        PrimaryAction(stringResource(R.string.add_try_again), viewModel::restart)
-                    }
-                }
+                PairingStepContent(
+                    state = state,
+                    onConfirmOverwrite = viewModel::confirmOverwrite,
+                    onAdopt = viewModel::adopt,
+                    onRestart = viewModel::restart,
+                    alreadyPaired = { tag ->
+                        PairingMessage(stringResource(R.string.add_already_paired, tag.name))
+                        PairingPrimaryAction(stringResource(R.string.add_open_tag)) { onOpenTag(tag.uuid) }
+                        PairingSecondaryAction(stringResource(R.string.add_another), viewModel::restart)
+                    },
+                    paired = { tag ->
+                        NameNewTag(
+                            uuid = tag.uuid,
+                            initialName = tag.name,
+                            profiles = profiles,
+                            onDone = { name, profileId ->
+                                viewModel.finish(tag.uuid, name, profileId)
+                                onBack()
+                            },
+                        )
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ConfirmOverwrite(content: TagContent, onOverwrite: () -> Unit, onCancel: () -> Unit) {
-    Text(
-        stringResource(R.string.add_confirm_title),
-        style = MaterialTheme.typography.titleLarge,
-        textAlign = TextAlign.Center,
-    )
-    Message(
-        stringResource(
-            when (content) {
-                is TagContent.UnsupportedVersion -> R.string.add_confirm_newer
-                TagContent.Unreadable -> R.string.add_confirm_unreadable
-                else -> R.string.add_confirm_foreign
-            },
-        ),
-    )
-    Message(stringResource(R.string.add_confirm_body))
-    PrimaryAction(stringResource(R.string.add_overwrite), onOverwrite)
-    OutlinedAction(stringResource(R.string.add_cancel), onCancel)
-}
-
-@Composable
 private fun NameNewTag(uuid: UUID, initialName: String, profiles: List<Profile>, onDone: (String, Long?) -> Unit) {
     var name by rememberSaveable(uuid) { mutableStateOf(initialName) }
     var profileId by rememberSaveable(uuid) { mutableStateOf<Long?>(null) }
-    Message(stringResource(R.string.add_paired))
+    PairingMessage(stringResource(R.string.add_paired))
     OutlinedTextField(
         value = name,
         onValueChange = { name = it },
@@ -169,34 +130,10 @@ private fun NameNewTag(uuid: UUID, initialName: String, profiles: List<Profile>,
             .semantics { heading() },
     )
     if (profiles.isEmpty()) {
-        Message(stringResource(R.string.link_no_profiles))
+        PairingMessage(stringResource(R.string.link_no_profiles))
     } else {
         ProfileRadioList(profiles, profileId, onSelect = { profileId = it }, modifier = Modifier.fillMaxWidth())
     }
-    PrimaryAction(stringResource(R.string.add_done)) { onDone(name, profileId) }
+    PairingPrimaryAction(stringResource(R.string.add_done)) { onDone(name, profileId) }
 }
 
-@Composable
-private fun failureText(reason: PairingFailure): String = when (reason) {
-    PairingFailure.ReadOnly -> stringResource(R.string.add_failed_read_only)
-    is PairingFailure.TooSmall -> stringResource(R.string.add_failed_too_small, reason.capacity, reason.needed)
-    PairingFailure.NotNdefCapable -> stringResource(R.string.add_failed_not_ndef)
-    PairingFailure.TagLost -> stringResource(R.string.add_failed_tag_lost)
-    PairingFailure.NotVerified -> stringResource(R.string.add_failed_not_verified)
-    is PairingFailure.Other -> stringResource(R.string.add_failed_other, reason.message)
-}
-
-@Composable
-private fun Message(text: String) {
-    Text(text, style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center)
-}
-
-@Composable
-private fun PrimaryAction(label: String, onClick: () -> Unit) {
-    Button(onClick = onClick, modifier = Modifier.heightIn(min = 48.dp)) { Text(label) }
-}
-
-@Composable
-private fun OutlinedAction(label: String, onClick: () -> Unit) {
-    OutlinedButton(onClick = onClick, modifier = Modifier.heightIn(min = 48.dp)) { Text(label) }
-}

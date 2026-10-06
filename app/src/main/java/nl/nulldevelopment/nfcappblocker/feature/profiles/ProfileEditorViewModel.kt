@@ -6,6 +6,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,10 @@ import nl.nulldevelopment.nfcappblocker.apps.appPickerItems
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
+import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingFlow
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingState
+import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
 import nl.nulldevelopment.nfcappblocker.util.DefaultNameFormats
 import nl.nulldevelopment.nfcappblocker.util.firstUnusedName
 import java.util.UUID
@@ -53,6 +59,21 @@ sealed interface ProfileEditorState {
     ) : ProfileEditorState
 }
 
+/** "Scan a tag" in the profile editor; null when not scanning. */
+sealed interface EditorScan {
+    /** A step of pairing a new or unknown tag (D-019). */
+    data class Pairing(val state: PairingState) : EditorScan
+
+    /** The scanned tag is already in this profile; still listening. */
+    data class AlreadyHere(val tagName: String) : EditorScan
+
+    /** The scanned tag belongs to another profile; moving it needs the user's OK (D-003). */
+    data class ConfirmMove(val tag: PairedTag, val fromProfile: String) : EditorScan
+
+    /** A tag was just paired; it gets a name before it's linked. */
+    data class NameNewTag(val tag: PairedTag) : EditorScan
+}
+
 /**
  * Edits a draft of a profile; nothing is stored until [save] (D-025). [profileId] is null for a
  * new profile, which is only created on its first save.
@@ -64,6 +85,8 @@ class ProfileEditorViewModel @AssistedInject constructor(
     private val tags: TagRepository,
     private val apps: InstalledAppsSource,
     private val names: DefaultNameFormats,
+    private val tagEvents: NfcTagEvents,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -153,6 +176,77 @@ class ProfileEditorViewModel @AssistedInject constructor(
     fun linkTag(uuid: UUID) = editDraft { it.copy(tagUuids = it.tagUuids + uuid) }
 
     fun unlinkTag(uuid: UUID) = editDraft { it.copy(tagUuids = it.tagUuids - uuid) }
+
+    private val _scan = MutableStateFlow<EditorScan?>(null)
+    val scan: StateFlow<EditorScan?> = _scan.asStateFlow()
+    private var scanJob: Job? = null
+    private var pairing: PairingFlow? = null
+
+    /** Listens for a tag: a paired one is linked, an unknown one is paired first. */
+    fun startScan() {
+        stopScan()
+        val flow = PairingFlow(tags, names::tag, ioDispatcher)
+        pairing = flow
+        scanJob = viewModelScope.launch {
+            launch { tagEvents.scans.collect { tag -> launch { flow.onTagScanned(tag) } } }
+            flow.state.collect { state ->
+                when (state) {
+                    is PairingState.AlreadyPaired -> onKnownTag(state.tag)
+                    is PairingState.Paired -> _scan.value = EditorScan.NameNewTag(state.tag)
+                    else -> _scan.value = EditorScan.Pairing(state)
+                }
+            }
+        }
+    }
+
+    fun stopScan() {
+        scanJob?.cancel()
+        scanJob = null
+        pairing = null
+        _scan.value = null
+    }
+
+    fun confirmOverwrite() = withPairing { it.confirmOverwrite() }
+    fun adopt() = withPairing { it.adopt() }
+    fun restartScan() = withPairing { it.restart() }
+
+    /** From [EditorScan.ConfirmMove]: link the tag here; it moves on save. */
+    fun confirmMove() {
+        val move = _scan.value as? EditorScan.ConfirmMove ?: return
+        linkTag(move.tag.uuid)
+        stopScan()
+    }
+
+    /** From [EditorScan.NameNewTag]: the new tag is already stored; name it and link it here. */
+    fun finishNewTag(name: String) {
+        val tag = (_scan.value as? EditorScan.NameNewTag)?.tag ?: return
+        viewModelScope.launch {
+            if (name.isNotBlank() && name.trim() != tag.name) tags.rename(tag.uuid, name.trim())
+        }
+        linkTag(tag.uuid)
+        stopScan()
+    }
+
+    private suspend fun onKnownTag(tag: PairedTag) {
+        val inDraft = draft.value?.tagUuids?.contains(tag.uuid) == true
+        val otherProfile = tag.profileId?.takeIf { it != profileId }
+        when {
+            inDraft -> _scan.value = EditorScan.AlreadyHere(tag.name)
+            otherProfile != null -> {
+                val name = profiles.observe(otherProfile).first()?.name.orEmpty()
+                _scan.value = EditorScan.ConfirmMove(tag, name)
+            }
+            else -> {
+                linkTag(tag.uuid)
+                stopScan()
+            }
+        }
+    }
+
+    private fun withPairing(action: suspend (PairingFlow) -> Unit) {
+        val flow = pairing ?: return
+        viewModelScope.launch { action(flow) }
+    }
 
     fun save() {
         val current = draft.value ?: return

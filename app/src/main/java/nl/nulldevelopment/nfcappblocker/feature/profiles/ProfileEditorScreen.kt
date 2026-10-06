@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -41,7 +42,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -53,8 +56,13 @@ import nl.nulldevelopment.nfcappblocker.R
 import nl.nulldevelopment.nfcappblocker.apps.AppPickerItem
 import nl.nulldevelopment.nfcappblocker.apps.NeverBlockReason
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingMessage
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingPrimaryAction
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingStepContent
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
+import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
+import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +76,7 @@ fun ProfileEditorScreen(
     ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val scan by viewModel.scan.collectAsStateWithLifecycle()
     val closed by viewModel.closed.collectAsStateWithLifecycle()
     // Saved, deleted or gone: close once.
     val shouldClose = closed || state == ProfileEditorState.Missing
@@ -117,7 +126,20 @@ fun ProfileEditorScreen(
             items(loaded.linkedTags, key = { "tag-${it.uuid}" }) { tag ->
                 LinkedTagRow(tag, onUnlink = { viewModel.unlinkTag(tag.uuid) })
             }
-            item { LinkTagButton(loaded.otherTags, onLink = viewModel::linkTag) }
+            item {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedButton(
+                        onClick = viewModel::startScan,
+                        enabled = scan == null,
+                        modifier = Modifier.heightIn(min = 48.dp),
+                    ) { Text(stringResource(R.string.profile_scan_tag)) }
+                    LinkTagButton(loaded.otherTags, onLink = viewModel::linkTag)
+                }
+            }
+            scan?.let { current -> item { ScanPanel(current, viewModel) } }
             item {
                 SectionHeading(
                     pluralStringResource(R.plurals.profile_apps_heading, loaded.selectedCount, loaded.selectedCount),
@@ -223,9 +245,7 @@ private fun LinkTagButton(choices: List<TagChoice>, onLink: (UUID) -> Unit) {
     OutlinedButton(
         onClick = { open = true },
         enabled = choices.isNotEmpty(),
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .heightIn(min = 48.dp),
+        modifier = Modifier.heightIn(min = 48.dp),
     ) { Text(stringResource(R.string.profile_link_tag)) }
 
     if (open) {
@@ -277,6 +297,66 @@ private fun LinkTagButton(choices: List<TagChoice>, onLink: (UUID) -> Unit) {
             dismissButton = { TextButton(onClick = { pendingMove = null }) { Text(stringResource(R.string.add_cancel)) } },
         )
     }
+}
+
+@Composable
+private fun ScanPanel(scan: EditorScan, viewModel: ProfileEditorViewModel) {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                // Polite live region: TalkBack announces each step as it changes.
+                .semantics { liveRegion = LiveRegionMode.Polite },
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            NfcStatusNotice(rememberNfcStatus())
+            when (scan) {
+                is EditorScan.Pairing -> PairingStepContent(
+                    state = scan.state,
+                    onConfirmOverwrite = viewModel::confirmOverwrite,
+                    onAdopt = viewModel::adopt,
+                    onRestart = viewModel::restartScan,
+                    // Handled by the ViewModel, which turns a known tag into a link or a question.
+                    alreadyPaired = {},
+                    paired = {},
+                )
+                is EditorScan.AlreadyHere -> {
+                    PairingMessage(stringResource(R.string.profile_scan_already_here, scan.tagName))
+                    PairingMessage(stringResource(R.string.add_waiting))
+                }
+                is EditorScan.ConfirmMove -> {
+                    PairingMessage(stringResource(R.string.profile_move_tag_title, scan.tag.name))
+                    PairingMessage(stringResource(R.string.profile_move_tag_body, scan.fromProfile))
+                    PairingPrimaryAction(stringResource(R.string.profile_move_tag), viewModel::confirmMove)
+                }
+                is EditorScan.NameNewTag -> NameScannedTag(scan.tag, onDone = viewModel::finishNewTag)
+            }
+            TextButton(onClick = viewModel::stopScan, modifier = Modifier.heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.add_cancel))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NameScannedTag(tag: PairedTag, onDone: (String) -> Unit) {
+    var name by rememberSaveable(tag.uuid) { mutableStateOf(tag.name) }
+    PairingMessage(stringResource(R.string.add_paired))
+    OutlinedTextField(
+        value = name,
+        onValueChange = { name = it },
+        label = { Text(stringResource(R.string.add_name_label)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
+        modifier = Modifier.fillMaxWidth(),
+    )
+    PairingPrimaryAction(stringResource(R.string.profile_scan_add_to_profile)) { onDone(name) }
 }
 
 @Composable

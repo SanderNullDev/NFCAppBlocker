@@ -1,9 +1,15 @@
 package nl.nulldevelopment.nfcappblocker.feature.profiles
 
 import app.cash.turbine.test
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import nl.nulldevelopment.nfcappblocker.apps.InstalledApp
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
+import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingState
+import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
+import nl.nulldevelopment.nfcappblocker.nfc.ScannedTag
+import nl.nulldevelopment.nfcappblocker.nfc.TagContent
+import nl.nulldevelopment.nfcappblocker.testing.FakeNdefTarget
 import nl.nulldevelopment.nfcappblocker.testing.FakeDefaultNameFormats
 import nl.nulldevelopment.nfcappblocker.testing.FakeInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.testing.FakeProfileRepository
@@ -38,7 +44,14 @@ class ProfileEditorViewModelTest {
     private val desk = UUID.fromString("00000000-0000-0000-0000-00000000000d")
     private val bed = UUID.fromString("00000000-0000-0000-0000-00000000000b")
 
-    private fun editor(profileId: Long?) = ProfileEditorViewModel(profileId, profiles, tags, apps, FakeDefaultNameFormats())
+    private val tagEvents = NfcTagEvents()
+
+    private fun editor(profileId: Long?) = ProfileEditorViewModel(
+        profileId, profiles, tags, apps, FakeDefaultNameFormats(), tagEvents, UnconfinedTestDispatcher(),
+    )
+
+    private fun tap(content: TagContent, uid: String = "04:AA") =
+        tagEvents.onSimulatedScan(ScannedTag(uid, content, isWritable = true, target = FakeNdefTarget()))
 
     private suspend fun ProfileEditorViewModel.loaded(): ProfileEditorState.Loaded {
         var result: ProfileEditorState.Loaded? = null
@@ -222,6 +235,97 @@ class ProfileEditorViewModelTest {
                 while (s == ProfileEditorState.Loading) s = awaitItem()
                 assertEquals(ProfileEditorState.Missing, s)
             }
+        }
+    }
+
+    @Nested
+    inner class ScanATag {
+        @Test
+        fun `a paired tag without a profile is linked in the draft and scanning stops`() = runTest {
+            tags.tags.value = listOf(PairedTag(desk, "Desk", null, Instant.EPOCH))
+            val vm = editor(profiles.create("Focus", emptySet()))
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Ours(desk))
+
+            assertNull(vm.scan.value)
+            assertEquals(listOf("Desk"), vm.loaded().linkedTags.map { it.name })
+            assertNull(tags.find(desk)?.profileId, "only linked when the profile is saved")
+        }
+
+        @Test
+        fun `a tag already in this profile is reported and scanning continues`() = runTest {
+            val id = profiles.create("Focus", emptySet())
+            tags.tags.value = listOf(PairedTag(desk, "Desk", null, Instant.EPOCH, profileId = id))
+            val vm = editor(id)
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Ours(desk))
+
+            assertEquals(EditorScan.AlreadyHere("Desk"), vm.scan.value)
+        }
+
+        @Test
+        fun `a tag of another profile is only moved after confirming`() = runTest {
+            val focus = profiles.create("Focus", emptySet())
+            val evening = profiles.create("Evening", emptySet())
+            tags.tags.value = listOf(PairedTag(bed, "Bed", null, Instant.EPOCH, profileId = evening))
+            val vm = editor(focus)
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Ours(bed))
+            assertEquals(EditorScan.ConfirmMove(tags.tags.value.single(), "Evening"), vm.scan.value)
+            assertTrue(vm.loaded().linkedTags.isEmpty())
+
+            vm.confirmMove()
+            assertEquals(listOf("Bed"), vm.loaded().linkedTags.map { it.name })
+            vm.save()
+            assertEquals(focus, tags.find(bed)?.profileId)
+        }
+
+        @Test
+        fun `a blank tag is paired, named and linked`() = runTest {
+            val vm = editor(null)
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Empty)
+            val naming = vm.scan.value as EditorScan.NameNewTag
+            assertEquals("Tag 1", naming.tag.name)
+
+            vm.finishNewTag("Desk")
+
+            assertNull(vm.scan.value)
+            assertEquals("Desk", tags.find(naming.tag.uuid)?.name)
+            assertEquals(listOf(naming.tag.uuid), vm.loaded().linkedTags.map { it.uuid })
+        }
+
+        @Test
+        fun `a tag with other content goes through the usual confirmation`() = runTest {
+            val vm = editor(null)
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Foreign)
+
+            assertEquals(EditorScan.Pairing(PairingState.ConfirmOverwrite(TagContent.Foreign)), vm.scan.value)
+        }
+
+        @Test
+        fun `after stopping, taps are ignored`() = runTest {
+            tags.tags.value = listOf(PairedTag(desk, "Desk", null, Instant.EPOCH))
+            val vm = editor(profiles.create("Focus", emptySet()))
+            vm.loaded()
+
+            vm.startScan()
+            vm.stopScan()
+            tap(TagContent.Ours(desk))
+
+            assertNull(vm.scan.value)
+            assertTrue(vm.loaded().linkedTags.isEmpty())
         }
     }
 }
