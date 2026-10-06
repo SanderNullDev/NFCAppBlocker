@@ -41,9 +41,14 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 
 Status (2026-10-06):
 - [x] Spike built in `:app` (`spike.blocking`): AccessibilityService listening for window state changes only, full-screen block activity, hard-coded test list (Instagram, Chrome), on/off switch persisted with DataStore, latency and service lifecycle shown on the main screen.
-- [x] On-device test (2026-10-06): blocking works, and keeps working after swiping the app from recents and after a reboot (the service reconnects by itself). Latency numbers not recorded yet.
-- [x] Instagram was briefly visible before the block screen, which slid in from the right. Most of that was the activity open animation, so the block screen now opens without animation.
-- [ ] Re-check the flash without the animation and record the latency. If still too visible, consider an instant accessibility overlay that covers the app until the block screen is up.
+- [x] On-device test (2026-10-06): blocking works, and keeps working after swiping the app from recents and after a reboot (the service reconnects by itself). The block screen is visible 80–95 ms after the blocked app opens; the first block after a while took 178 ms.
+- [x] Block screen look. Instagram is always visible for about one frame before the block screen; the event only arrives after the app has drawn. Tried in turn:
+  - Default slide-in: the slide is jarring.
+  - No animation: a single frame of Instagram followed by a hard cut, even more jarring.
+  - Translucent with background blur: the reference device doesn't support cross-window blur (`ro.surface_flinger.supports_background_blur=0`), so it only dims the app.
+  - Opaque with a fade-in: the fade had no visible effect for an activity started from the accessibility service; it looked like an instant cut.
+  - **Chosen:** translucent, with the blocked app dimmed behind a solid card. Covering the app reads as deliberate. The app is paused rather than stopped, so it could keep playing audio; accepted.
+  - Not tried: blurring a screenshot taken by the accessibility service. It would need the "take screenshots" capability, so it's only worth it if the dimmed look disappoints in daily use.
 - [ ] Survival after a long idle period (several hours or overnight).
 
 Findings:
@@ -62,7 +67,8 @@ Status (2026-10-06):
 - [x] Minimal reader in `:app`: `ScanActivity` handles tag dispatch via the MIME intent filter (cold launch and new intent); `MainActivity` scans with reader mode while in the foreground. Both show a debug screen with the result. Checked on an Android emulator only.
 - [x] Write spike: "Write test tag" on the scan screen writes our message with a fresh UUID to the next tag in reader mode and verifies it by reading back. Handles formatted and blank tags.
 - [x] Sticker test, part 1 (2026-10-06, Samsung SM-S948B, Android 16): writing and verifying works, rewriting a tag works, reader mode reads the new UUID, and the hardware UID stays the same across taps. The clone stickers present as `NfcA, MifareUltralight, Ndef`, so already NDEF-formatted.
-- [ ] Sticker test, part 2: cold launch via AAR with the app closed, and the new-intent path with `ScanActivity` open.
+- [x] Sticker test, part 2: with the app closed, a tap opens `ScanActivity` through tag dispatch with the right UUID. The process was usually still running, because the enabled accessibility service keeps it alive, so a truly cold start is rare.
+- [ ] New-intent path: tap again while `ScanActivity` is open.
 
 **Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end.
 

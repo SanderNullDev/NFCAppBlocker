@@ -3,8 +3,21 @@
 
     <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <!-- Block screen: no window animations, so it covers the blocked app in one frame. -->
+    <!-- Block screen: translucent, so the blocked app shows through dimmed (and blurred where
+         the device supports cross-window blur; the reference device doesn't, see D-016). -->
     <style name="Theme.NFCAppBlocker.Block">
-        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/BlockWindowAnimation</item>
+    </style>
+
+    <!-- The block screen starts in its own task, so both the activity and task variants are set. -->
+    <style name="BlockWindowAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:windowEnterAnimation">@anim/block_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/block_fade_out</item>
+        <item name="android:activityOpenEnterAnimation">@anim/block_fade_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/block_fade_out</item>
+        <item name="android:taskOpenEnterAnimation">@anim/block_fade_in</item>
+        <item name="android:taskCloseExitAnimation">@anim/block_fade_out</item>
     </style>
 </resources>
