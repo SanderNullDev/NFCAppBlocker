@@ -15,6 +15,31 @@
     <!-- Profiles -->
     <string name="profiles_title">Profiles</string>
     <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>
+    <string name="profiles_new">New profile</string>
+    <string name="profile_default_name">Profile %1$d</string>
+    <string name="profile_delete">Delete profile</string>
+    <string name="profile_delete_title">Delete \u201c%1$s\u201d?</string>
+    <string name="profile_delete_body">Its tags stay paired and can be linked to another profile.</string>
+    <string name="profile_name_required">Enter a name</string>
+    <string name="profile_tags_heading">Tags</string>
+    <string name="profile_no_tags">No tags linked. Scanning a linked tag will turn this profile on or off.</string>
+    <string name="profile_unlink_tag">Unlink</string>
+    <string name="profile_link_tag">Link a tag</string>
+    <string name="profile_tag_in_other">Now in \u201c%1$s\u201d</string>
+    <string name="profile_move_tag_title">Move \u201c%1$s\u201d here?</string>
+    <string name="profile_move_tag_body">It\'s linked to \u201c%1$s\u201d now. A tag controls one profile at a time.</string>
+    <string name="profile_move_tag">Move tag</string>
+    <plurals name="profile_apps_heading">
+        <item quantity="one">Apps to block: %1$d selected</item>
+        <item quantity="other">Apps to block: %1$d selected</item>
+    </plurals>
+    <string name="profile_search_apps">Search apps</string>
+    <string name="profile_app_not_installed">Not installed</string>
+    <string name="never_block_this_app">Can\'t be blocked: this app</string>
+    <string name="never_block_phone">Can\'t be blocked: phone app</string>
+    <string name="never_block_settings">Can\'t be blocked: Settings</string>
+    <string name="never_block_launcher">Can\'t be blocked: home screen</string>
+    <string name="never_block_always_allowed">Always allowed</string>
     <plurals name="profiles_app_count">
         <item quantity="one">%1$d app</item>
         <item quantity="other">%1$d apps</item>

@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object ProfilesRoute : NavKey
 
+@Serializable
+data class ProfileEditorRoute(val profileId: Long) : NavKey
+
 /** Tab: paired tags. */
 @Serializable
 data object TagListRoute : NavKey

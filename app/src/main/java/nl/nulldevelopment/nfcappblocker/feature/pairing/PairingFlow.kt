@@ -14,6 +14,7 @@ import nl.nulldevelopment.nfcappblocker.nfc.ScannedTag
 import nl.nulldevelopment.nfcappblocker.nfc.TagContent
 import nl.nulldevelopment.nfcappblocker.nfc.TagWriter
 import nl.nulldevelopment.nfcappblocker.nfc.WriteResult
+import nl.nulldevelopment.nfcappblocker.util.firstUnusedName
 import java.util.UUID
 
 sealed interface PairingState {
@@ -161,8 +162,6 @@ class PairingFlow(
         }
     }
 
-    private suspend fun nextDefaultName(): String {
-        val used = repository.observeAll().first().map { it.name }.toSet()
-        return generateSequence(1) { it + 1 }.map(defaultName).first { it !in used }
-    }
+    private suspend fun nextDefaultName(): String =
+        firstUnusedName(repository.observeAll().first().map { it.name }, defaultName)
 }
