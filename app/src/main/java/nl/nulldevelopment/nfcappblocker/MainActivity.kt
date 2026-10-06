@@ -10,31 +10,47 @@ import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
+import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileListScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagDetailsScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagListScreen
 import nl.nulldevelopment.nfcappblocker.navigation.AddTagRoute
+import nl.nulldevelopment.nfcappblocker.navigation.Navigator
+import nl.nulldevelopment.nfcappblocker.navigation.ProfilesRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagDetailsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagListRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TestToolsRoute
+import nl.nulldevelopment.nfcappblocker.navigation.rememberNavigationState
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
 import nl.nulldevelopment.nfcappblocker.nfc.TagScans
 import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockerAccessibilityService
@@ -62,41 +78,54 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NFCAppBlockerTheme {
-                val backStack = rememberNavBackStack(TagListRoute)
-                NavDisplay(
-                    backStack = backStack,
-                    onBack = { backStack.removeLastOrNull() },
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator(),
-                    ),
-                    entryProvider = entryProvider {
-                        entry<TagListRoute> {
-                            TagListScreen(
-                                onAddTag = { backStack.add(AddTagRoute) },
-                                onOpenTag = { uuid -> backStack.add(TagDetailsRoute(uuid.toString())) },
-                                onOpenTestTools = { backStack.add(TestToolsRoute) },
-                            )
+                val navigationState = rememberNavigationState(ProfilesRoute, TABS.keys)
+                val navigator = remember(navigationState) { Navigator(navigationState) }
+                val entryProvider = entryProvider {
+                    entry<ProfilesRoute> { ProfileListScreen() }
+                    entry<TagListRoute> {
+                        TagListScreen(
+                            onAddTag = { navigator.navigate(AddTagRoute) },
+                            onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
+                            onOpenTestTools = { navigator.navigate(TestToolsRoute) },
+                        )
+                    }
+                    entry<AddTagRoute> {
+                        AddTagScreen(
+                            onBack = navigator::goBack,
+                            // Replace "add tag" so Back from the details returns to the list.
+                            onOpenTag = { uuid -> navigator.replace(TagDetailsRoute(uuid.toString())) },
+                        )
+                    }
+                    entry<TagDetailsRoute> { route ->
+                        TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
+                    }
+                    entry<TestToolsRoute> { TestTools() }
+                }
+                Scaffold(
+                    bottomBar = {
+                        NavigationBar {
+                            TABS.forEach { (route, tab) ->
+                                NavigationBarItem(
+                                    selected = route == navigationState.topLevelRoute,
+                                    onClick = { navigator.navigate(route) },
+                                    // The label names the tab, so the icon needs no description.
+                                    icon = { Icon(tab.icon, contentDescription = null) },
+                                    label = { Text(stringResource(tab.label)) },
+                                )
+                            }
                         }
-                        entry<AddTagRoute> {
-                            AddTagScreen(
-                                onBack = { backStack.removeLastOrNull() },
-                                onOpenTag = { uuid ->
-                                    // Replace "add tag" so Back from the details returns to the list.
-                                    backStack.removeLastOrNull()
-                                    backStack.add(TagDetailsRoute(uuid.toString()))
-                                },
-                            )
-                        }
-                        entry<TagDetailsRoute> { route ->
-                            TagDetailsScreen(
-                                uuid = UUID.fromString(route.uuid),
-                                onBack = { backStack.removeLastOrNull() },
-                            )
-                        }
-                        entry<TestToolsRoute> { TestTools() }
                     },
-                )
+                ) { innerPadding ->
+                    // The bar covers the bottom inset; each screen's own top bar handles the top.
+                    val barPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
+                    NavDisplay(
+                        entries = navigationState.toDecoratedEntries(entryProvider),
+                        onBack = navigator::goBack,
+                        modifier = Modifier
+                            .padding(barPadding)
+                            .consumeWindowInsets(barPadding),
+                    )
+                }
             }
         }
     }
@@ -165,7 +194,14 @@ class MainActivity : ComponentActivity() {
         super.onPause()
     }
 
+    private class Tab(val icon: ImageVector, @StringRes val label: Int)
+
     private companion object {
+        val TABS: Map<NavKey, Tab> = linkedMapOf(
+            ProfilesRoute to Tab(Icons.AutoMirrored.Filled.List, R.string.tab_profiles),
+            TagListRoute to Tab(Icons.Filled.Lock, R.string.tab_tags),
+        )
+
         const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or
             NfcAdapter.FLAG_READER_NFC_B or
             NfcAdapter.FLAG_READER_NFC_F or

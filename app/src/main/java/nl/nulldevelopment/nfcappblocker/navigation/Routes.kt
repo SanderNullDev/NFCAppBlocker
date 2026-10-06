@@ -3,6 +3,11 @@ package nl.nulldevelopment.nfcappblocker.navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
+/** Tab: block profiles. The start tab. */
+@Serializable
+data object ProfilesRoute : NavKey
+
+/** Tab: paired tags. */
 @Serializable
 data object TagListRoute : NavKey
 

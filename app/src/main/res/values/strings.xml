@@ -8,6 +8,18 @@
     <string name="nfc_open_settings">Open NFC settings</string>
     <string name="tag_default_name">Tag %1$d</string>
 
+    <!-- Navigation -->
+    <string name="tab_profiles">Profiles</string>
+    <string name="tab_tags">Tags</string>
+
+    <!-- Profiles -->
+    <string name="profiles_title">Profiles</string>
+    <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>
+    <plurals name="profiles_app_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+
     <!-- Tag list -->
     <string name="tags_title">Tags</string>
     <string name="test_tools">Test tools</string>
