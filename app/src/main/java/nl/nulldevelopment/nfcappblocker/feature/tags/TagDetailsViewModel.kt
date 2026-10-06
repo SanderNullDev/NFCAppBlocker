@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
+import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
 import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
@@ -27,7 +29,8 @@ import java.util.UUID
 
 sealed interface TagDetailsState {
     data object Loading : TagDetailsState
-    data class Loaded(val tag: PairedTag) : TagDetailsState
+    /** [profiles] are the choices for linking; [profile] is the one this tag is linked to. */
+    data class Loaded(val tag: PairedTag, val profile: Profile?, val profiles: List<Profile>) : TagDetailsState
 
     /** Forgotten, wiped, or never existed. */
     data object Missing : TagDetailsState
@@ -44,6 +47,7 @@ sealed interface WipeState {
 class TagDetailsViewModel @AssistedInject constructor(
     @Assisted private val uuid: UUID,
     private val repository: TagRepository,
+    private val profileRepository: ProfileRepository,
     private val tagEvents: NfcTagEvents,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -53,9 +57,13 @@ class TagDetailsViewModel @AssistedInject constructor(
         fun create(uuid: UUID): TagDetailsViewModel
     }
 
-    val state: StateFlow<TagDetailsState> = repository.observe(uuid)
-        .map { tag -> if (tag == null) TagDetailsState.Missing else TagDetailsState.Loaded(tag) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TagDetailsState.Loading)
+    val state: StateFlow<TagDetailsState> = combine(repository.observe(uuid), profileRepository.observeAll()) { tag, profiles ->
+        if (tag == null) {
+            TagDetailsState.Missing
+        } else {
+            TagDetailsState.Loaded(tag, profiles.firstOrNull { it.id == tag.profileId }, profiles)
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TagDetailsState.Loading)
 
     private val _wipe = MutableStateFlow<WipeState>(WipeState.Idle)
     val wipe: StateFlow<WipeState> = _wipe.asStateFlow()
@@ -64,6 +72,11 @@ class TagDetailsViewModel @AssistedInject constructor(
     fun rename(name: String) {
         if (name.isBlank()) return
         viewModelScope.launch { repository.rename(uuid, name.trim()) }
+    }
+
+    /** Links this tag to a profile (moving it if needed, D-003), or unlinks it with null. */
+    fun setProfile(profileId: Long?) {
+        viewModelScope.launch { repository.setProfile(uuid, profileId) }
     }
 
     /** Removes the tag from the list; the tag itself keeps its content. */

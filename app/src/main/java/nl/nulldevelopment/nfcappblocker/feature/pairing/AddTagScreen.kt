@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -36,9 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.nulldevelopment.nfcappblocker.R
+import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import nl.nulldevelopment.nfcappblocker.nfc.TagContent
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
+import nl.nulldevelopment.nfcappblocker.ui.components.ProfileRadioList
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.util.UUID
 
@@ -50,6 +53,7 @@ fun AddTagScreen(
     viewModel: PairingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val profiles by viewModel.profiles.collectAsStateWithLifecycle()
     val nfcStatus = rememberNfcStatus()
 
     Scaffold(
@@ -107,8 +111,9 @@ fun AddTagScreen(
                     is PairingState.Paired -> NameNewTag(
                         uuid = s.tag.uuid,
                         initialName = s.tag.name,
-                        onDone = { name ->
-                            viewModel.rename(s.tag.uuid, name)
+                        profiles = profiles,
+                        onDone = { name, profileId ->
+                            viewModel.finish(s.tag.uuid, name, profileId)
                             onBack()
                         },
                     )
@@ -144,8 +149,9 @@ private fun ConfirmOverwrite(content: TagContent, onOverwrite: () -> Unit, onCan
 }
 
 @Composable
-private fun NameNewTag(uuid: UUID, initialName: String, onDone: (String) -> Unit) {
+private fun NameNewTag(uuid: UUID, initialName: String, profiles: List<Profile>, onDone: (String, Long?) -> Unit) {
     var name by rememberSaveable(uuid) { mutableStateOf(initialName) }
+    var profileId by rememberSaveable(uuid) { mutableStateOf<Long?>(null) }
     Message(stringResource(R.string.add_paired))
     OutlinedTextField(
         value = name,
@@ -155,7 +161,19 @@ private fun NameNewTag(uuid: UUID, initialName: String, onDone: (String) -> Unit
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
         modifier = Modifier.fillMaxWidth(),
     )
-    PrimaryAction(stringResource(R.string.add_done)) { onDone(name) }
+    Text(
+        stringResource(R.string.add_choose_profile),
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { heading() },
+    )
+    if (profiles.isEmpty()) {
+        Message(stringResource(R.string.link_no_profiles))
+    } else {
+        ProfileRadioList(profiles, profileId, onSelect = { profileId = it }, modifier = Modifier.fillMaxWidth())
+    }
+    PrimaryAction(stringResource(R.string.add_done)) { onDone(name, profileId) }
 }
 
 @Composable

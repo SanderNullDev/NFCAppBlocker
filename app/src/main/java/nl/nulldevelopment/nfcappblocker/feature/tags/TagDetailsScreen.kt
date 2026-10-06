@@ -42,6 +42,7 @@ import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.nfc.WipeResult
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
+import nl.nulldevelopment.nfcappblocker.ui.components.ProfileRadioList
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -63,7 +64,8 @@ fun TagDetailsScreen(
     // Forgotten or wiped: nothing left to show here.
     LaunchedEffect(state) { if (state == TagDetailsState.Missing) onBack() }
 
-    val tag = (state as? TagDetailsState.Loaded)?.tag
+    val loaded = state as? TagDetailsState.Loaded
+    val tag = loaded?.tag
     Scaffold(
         topBar = {
             TopAppBar(
@@ -72,7 +74,7 @@ fun TagDetailsScreen(
             )
         },
     ) { innerPadding ->
-        if (tag == null) return@Scaffold
+        if (loaded == null || tag == null) return@Scaffold
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,6 +85,7 @@ fun TagDetailsScreen(
         ) {
             NameEditor(tag, onSave = viewModel::rename)
             TagInfo(tag)
+            ProfileLink(loaded, onSelect = viewModel::setProfile)
             if (wipe == WipeState.Idle) {
                 Actions(tag, onForget = viewModel::forget, onWipe = viewModel::startWipe)
             } else {
@@ -121,6 +124,37 @@ private fun TagInfo(tag: PairedTag) {
             tag.hardwareUid?.let { stringResource(R.string.details_hardware_uid, it) }
                 ?: stringResource(R.string.details_hardware_uid_unknown),
             fontFamily = FontFamily.Monospace,
+        )
+    }
+}
+
+@Composable
+private fun ProfileLink(state: TagDetailsState.Loaded, onSelect: (Long?) -> Unit) {
+    var choosing by rememberSaveable { mutableStateOf(false) }
+    Text(
+        state.profile?.let { stringResource(R.string.details_profile, it.name) }
+            ?: stringResource(R.string.details_profile_none),
+        style = MaterialTheme.typography.bodyLarge,
+    )
+    if (state.profiles.isEmpty()) {
+        Text(stringResource(R.string.link_no_profiles), style = MaterialTheme.typography.bodyMedium)
+    } else {
+        OutlinedButton(onClick = { choosing = true }, modifier = Modifier.heightIn(min = 48.dp)) {
+            Text(stringResource(if (state.profile == null) R.string.details_link_profile else R.string.details_change_profile))
+        }
+    }
+    if (choosing) {
+        AlertDialog(
+            onDismissRequest = { choosing = false },
+            title = { Text(stringResource(R.string.details_choose_profile)) },
+            text = {
+                ProfileRadioList(state.profiles, state.profile?.id, onSelect = { id ->
+                    choosing = false
+                    onSelect(id)
+                })
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { choosing = false }) { Text(stringResource(R.string.add_cancel)) } },
         )
     }
 }

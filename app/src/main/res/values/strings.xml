@@ -82,7 +82,16 @@
     <string name="add_failed_not_verified">The tag didn\'t read back correctly after writing. Try again.</string>
     <string name="add_failed_other">Writing failed: %1$s</string>
 
+    <string name="add_choose_profile">Which profile should this tag control?</string>
+    <string name="link_no_profiles">No profiles yet. Create one in the Profiles tab, then link this tag.</string>
+    <string name="profile_none">No profile</string>
+
     <!-- Tag details -->
+    <string name="details_profile">Profile: %1$s</string>
+    <string name="details_profile_none">Profile: not linked</string>
+    <string name="details_link_profile">Link to a profile</string>
+    <string name="details_change_profile">Change profile</string>
+    <string name="details_choose_profile">Choose a profile</string>
     <string name="details_save_name">Save name</string>
     <string name="details_uuid">ID: %1$s</string>
     <string name="details_hardware_uid">Hardware ID: %1$s</string>
