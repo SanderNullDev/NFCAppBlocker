@@ -31,6 +31,31 @@ abstract class ProfileDao {
     @Insert
     protected abstract suspend fun insertApps(apps: List<ProfileAppEntity>)
 
+    @Query("UPDATE tags SET profile_id = NULL WHERE profile_id = :profileId AND uuid NOT IN (:keep)")
+    protected abstract suspend fun unlinkTagsExcept(profileId: Long, keep: List<String>)
+
+    @Query("UPDATE tags SET profile_id = :profileId WHERE uuid IN (:uuids)")
+    protected abstract suspend fun linkTags(profileId: Long, uuids: List<String>)
+
+    /**
+     * Saves a profile as edited in one transaction: name, apps, and exactly [tagUuids] as its
+     * tags (moving them from other profiles). Creates the profile when [id] is null.
+     * @return the profile's id.
+     */
+    @Transaction
+    open suspend fun save(id: Long?, name: String, createdAtEpochMillis: Long, packageNames: Set<String>, tagUuids: Set<String>): Long {
+        val profileId = if (id == null) {
+            insert(ProfileEntity(name = name, createdAtEpochMillis = createdAtEpochMillis))
+        } else {
+            rename(id, name)
+            id
+        }
+        replaceApps(profileId, packageNames)
+        unlinkTagsExcept(profileId, tagUuids.toList())
+        if (tagUuids.isNotEmpty()) linkTags(profileId, tagUuids.toList())
+        return profileId
+    }
+
     /** Replaces the profile's apps in one transaction. */
     @Transaction
     open suspend fun replaceApps(profileId: Long, packageNames: Set<String>) {

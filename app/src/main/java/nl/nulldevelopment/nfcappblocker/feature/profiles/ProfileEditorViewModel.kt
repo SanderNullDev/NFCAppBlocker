@@ -9,13 +9,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import nl.nulldevelopment.nfcappblocker.apps.AppPickerItem
 import nl.nulldevelopment.nfcappblocker.apps.InstalledApp
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
@@ -24,6 +23,8 @@ import nl.nulldevelopment.nfcappblocker.apps.appPickerItems
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
+import nl.nulldevelopment.nfcappblocker.util.DefaultNameFormats
+import nl.nulldevelopment.nfcappblocker.util.firstUnusedName
 import java.util.UUID
 
 /** A tag that could be linked to this profile, and the profile it currently belongs to, if any. */
@@ -36,7 +37,8 @@ sealed interface ProfileEditorState {
     data object Missing : ProfileEditorState
 
     data class Loaded(
-        val profileId: Long,
+        /** True until a new profile is saved for the first time. */
+        val isNew: Boolean,
         val name: String,
         /** Rows for the app list, already filtered by [query]. */
         val apps: List<AppPickerItem>,
@@ -44,93 +46,132 @@ sealed interface ProfileEditorState {
         val query: String,
         val linkedTags: List<PairedTag>,
         val otherTags: List<TagChoice>,
+        /** The user changed something since opening; leaving then asks to discard. */
+        val hasChanges: Boolean,
+        /** A new profile can be saved untouched; an existing one only after a change. */
+        val canSave: Boolean,
     ) : ProfileEditorState
 }
 
-/** Edits are saved as they're made; there's no separate save step. */
+/**
+ * Edits a draft of a profile; nothing is stored until [save] (D-025). [profileId] is null for a
+ * new profile, which is only created on its first save.
+ */
 @HiltViewModel(assistedFactory = ProfileEditorViewModel.Factory::class)
 class ProfileEditorViewModel @AssistedInject constructor(
-    @Assisted private val profileId: Long,
+    @Assisted private val profileId: Long?,
     private val profiles: ProfileRepository,
     private val tags: TagRepository,
     private val apps: InstalledAppsSource,
+    private val names: DefaultNameFormats,
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
-        fun create(profileId: Long): ProfileEditorViewModel
+        fun create(profileId: Long?): ProfileEditorViewModel
     }
+
+    private data class Draft(val name: String, val packageNames: Set<String>, val tagUuids: Set<UUID>)
 
     private class AppsData(val installed: List<InstalledApp>, val policy: NeverBlockPolicy)
 
+    /** What's stored; null while loading. */
+    private val saved = MutableStateFlow<Draft?>(null)
+    private val draft = MutableStateFlow<Draft?>(null)
     private val appsData = MutableStateFlow<AppsData?>(null)
     private val query = MutableStateFlow("")
+    private val missing = MutableStateFlow(false)
 
-    /** Serialises app toggles, so quick taps don't overwrite each other's change. */
-    private val appsMutex = Mutex()
+    private val _closed = MutableStateFlow(false)
+
+    /** True once saved or deleted: the screen should close. */
+    val closed: StateFlow<Boolean> = _closed.asStateFlow()
 
     init {
         viewModelScope.launch { appsData.value = AppsData(apps.launcherApps(), apps.neverBlockPolicy()) }
+        viewModelScope.launch {
+            val baseline = if (profileId == null) {
+                Draft(firstUnusedName(profiles.observeAll().first().map { it.name }, names::profile), emptySet(), emptySet())
+            } else {
+                val profile = profiles.observe(profileId).first()
+                if (profile == null) {
+                    missing.value = true
+                    return@launch
+                }
+                val linked = tags.observeAll().first().filter { it.profileId == profileId }.mapTo(mutableSetOf()) { it.uuid }
+                Draft(profile.name, profile.packageNames, linked)
+            }
+            saved.value = baseline
+            draft.value = baseline
+        }
     }
 
     val state: StateFlow<ProfileEditorState> = combine(
-        profiles.observe(profileId),
-        profiles.observeAll(),
+        combine(saved, draft, missing, ::Triple),
         tags.observeAll(),
+        profiles.observeAll(),
         appsData,
         query,
-    ) { profile, allProfiles, allTags, data, query ->
+    ) { (saved, draft, missing), allTags, allProfiles, data, query ->
         when {
-            profile == null -> ProfileEditorState.Missing
-            data == null -> ProfileEditorState.Loading
+            missing -> ProfileEditorState.Missing
+            // Deleted while open (only an existing profile can disappear).
+            profileId != null && saved != null && allProfiles.none { it.id == profileId } -> ProfileEditorState.Missing
+            saved == null || draft == null || data == null -> ProfileEditorState.Loading
             else -> {
                 val namesById = allProfiles.associate { it.id to it.name }
+                val hasChanges = draft.copy(name = draft.name.trim()) != saved
                 ProfileEditorState.Loaded(
-                    profileId = profile.id,
-                    name = profile.name,
-                    apps = appPickerItems(data.installed, profile.packageNames, data.policy, query),
-                    selectedCount = profile.packageNames.size,
+                    isNew = profileId == null,
+                    name = draft.name,
+                    apps = appPickerItems(data.installed, draft.packageNames, data.policy, query),
+                    selectedCount = draft.packageNames.size,
                     query = query,
-                    linkedTags = allTags.filter { it.profileId == profile.id },
-                    otherTags = allTags.filter { it.profileId != profile.id }
-                        .map { TagChoice(it, it.profileId?.let(namesById::get)) },
+                    linkedTags = allTags.filter { it.uuid in draft.tagUuids },
+                    otherTags = allTags.filter { it.uuid !in draft.tagUuids }
+                        .map { TagChoice(it, it.profileId?.takeIf { id -> id != profileId }?.let(namesById::get)) },
+                    hasChanges = hasChanges,
+                    canSave = (hasChanges || profileId == null) && draft.name.isNotBlank(),
                 )
             }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProfileEditorState.Loading)
 
-    fun rename(name: String) {
-        if (name.isBlank()) return
-        viewModelScope.launch { profiles.rename(profileId, name.trim()) }
-    }
+    fun setName(name: String) = editDraft { it.copy(name = name) }
 
     fun setQuery(text: String) {
         query.value = text
     }
 
     fun setAppSelected(packageName: String, selected: Boolean) {
+        // Protected apps can't be added, but can always be removed.
+        if (selected && appsData.value?.policy?.canBlock(packageName) == false) return
+        editDraft { it.copy(packageNames = if (selected) it.packageNames + packageName else it.packageNames - packageName) }
+    }
+
+    /** Links a tag in the draft; on save it moves here from any other profile (D-003). */
+    fun linkTag(uuid: UUID) = editDraft { it.copy(tagUuids = it.tagUuids + uuid) }
+
+    fun unlinkTag(uuid: UUID) = editDraft { it.copy(tagUuids = it.tagUuids - uuid) }
+
+    fun save() {
+        val current = draft.value ?: return
+        if (current.name.isBlank()) return
         viewModelScope.launch {
-            appsMutex.withLock {
-                val current = profiles.observe(profileId).filterNotNull().first().packageNames
-                val policy = appsData.value?.policy
-                // Protected apps can't be added, but can always be removed.
-                if (selected && policy != null && !policy.canBlock(packageName)) return@withLock
-                val updated = if (selected) current + packageName else current - packageName
-                if (updated != current) profiles.setApps(profileId, updated)
-            }
+            // A linked tag may have been forgotten meanwhile; only link tags that still exist.
+            val existing = tags.observeAll().first().mapTo(mutableSetOf()) { it.uuid }
+            profiles.save(profileId, current.name.trim(), current.packageNames, current.tagUuids intersect existing)
+            _closed.value = true
         }
     }
 
-    /** Links a tag to this profile, moving it from another profile if needed (D-003). */
-    fun linkTag(uuid: UUID) {
-        viewModelScope.launch { tags.setProfile(uuid, profileId) }
-    }
-
-    fun unlinkTag(uuid: UUID) {
-        viewModelScope.launch { tags.setProfile(uuid, null) }
-    }
-
     fun delete() {
-        viewModelScope.launch { profiles.delete(profileId) }
+        val id = profileId ?: return
+        viewModelScope.launch {
+            profiles.delete(id)
+            _closed.value = true
+        }
     }
+
+    private fun editDraft(change: (Draft) -> Draft) = draft.update { it?.let(change) }
 }

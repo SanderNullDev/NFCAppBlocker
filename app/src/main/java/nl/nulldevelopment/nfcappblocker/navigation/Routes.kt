@@ -7,8 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object ProfilesRoute : NavKey
 
+/** [profileId] is null for a new profile, which is only created when saved (D-025). */
 @Serializable
-data class ProfileEditorRoute(val profileId: Long) : NavKey
+data class ProfileEditorRoute(val profileId: Long?) : NavKey
 
 /** Tab: paired tags. */
 @Serializable

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Clock
 import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 
 class RoomProfileRepository @Inject constructor(
@@ -20,6 +21,9 @@ class RoomProfileRepository @Inject constructor(
         if (packageNames.isNotEmpty()) dao.replaceApps(id, packageNames)
         return id
     }
+
+    override suspend fun save(id: Long?, name: String, packageNames: Set<String>, tagUuids: Set<UUID>): Long =
+        dao.save(id, name, clock.millis(), packageNames, tagUuids.mapTo(mutableSetOf()) { it.toString() })
 
     override suspend fun rename(id: Long, name: String) = dao.rename(id, name)
 

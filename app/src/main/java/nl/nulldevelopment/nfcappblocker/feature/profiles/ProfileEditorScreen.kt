@@ -1,5 +1,6 @@
 package nl.nulldevelopment.nfcappblocker.feature.profiles
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -59,28 +60,44 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileEditorScreen(
-    profileId: Long,
+    /** Null for a new profile, which is only created when saved. */
+    profileId: Long?,
     onBack: () -> Unit,
     viewModel: ProfileEditorViewModel = hiltViewModel<ProfileEditorViewModel, ProfileEditorViewModel.Factory>(
         creationCallback = { factory -> factory.create(profileId) },
     ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(state) { if (state == ProfileEditorState.Missing) onBack() }
+    val closed by viewModel.closed.collectAsStateWithLifecycle()
+    // Saved, deleted or gone: close once.
+    val shouldClose = closed || state == ProfileEditorState.Missing
+    LaunchedEffect(shouldClose) { if (shouldClose) onBack() }
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
+    var confirmDiscard by rememberSaveable { mutableStateOf(false) }
     val loaded = state as? ProfileEditorState.Loaded
+    val hasChanges = loaded?.hasChanges == true
+    val leave = { if (hasChanges) confirmDiscard = true else onBack() }
+    // System Back asks too, so unsaved changes are never dropped silently.
+    BackHandler(enabled = hasChanges && !shouldClose) { confirmDiscard = true }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(loaded?.name.orEmpty()) },
-                navigationIcon = { BackButton(onBack) },
+                title = {
+                    Text(if (loaded?.isNew == true) stringResource(R.string.profile_new_title) else loaded?.name.orEmpty())
+                },
+                navigationIcon = { BackButton(leave) },
                 actions = {
-                    if (loaded != null) {
+                    if (loaded != null && !loaded.isNew) {
                         IconButton(onClick = { confirmDelete = true }) {
                             Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.profile_delete))
                         }
                     }
+                    TextButton(
+                        onClick = viewModel::save,
+                        enabled = loaded?.canSave == true,
+                        modifier = Modifier.heightIn(min = 48.dp),
+                    ) { Text(stringResource(R.string.profile_save)) }
                 },
             )
         },
@@ -92,7 +109,7 @@ fun ProfileEditorScreen(
                 bottom = innerPadding.calculateBottomPadding() + 16.dp,
             ),
         ) {
-            item { NameField(profileId, loaded.name, viewModel::rename) }
+            item { NameField(profileId, loaded.name, viewModel::setName) }
             item { SectionHeading(stringResource(R.string.profile_tags_heading)) }
             if (loaded.linkedTags.isEmpty()) {
                 item { Hint(stringResource(R.string.profile_no_tags)) }
@@ -127,11 +144,28 @@ fun ProfileEditorScreen(
             dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.add_cancel)) } },
         )
     }
+
+    if (confirmDiscard) {
+        AlertDialog(
+            onDismissRequest = { confirmDiscard = false },
+            title = { Text(stringResource(R.string.profile_discard_title)) },
+            text = { Text(stringResource(R.string.profile_discard_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDiscard = false
+                    onBack()
+                }) { Text(stringResource(R.string.profile_discard)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDiscard = false }) { Text(stringResource(R.string.profile_keep_editing)) }
+            },
+        )
+    }
 }
 
 @Composable
-private fun NameField(profileId: Long, savedName: String, onChange: (String) -> Unit) {
-    // Local text state: saving as you type must not move the cursor.
+private fun NameField(profileId: Long?, savedName: String, onChange: (String) -> Unit) {
+    // Local text state, so updates coming back from the ViewModel never move the cursor.
     var name by rememberSaveable(profileId) { mutableStateOf(savedName) }
     OutlinedTextField(
         value = name,

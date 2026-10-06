@@ -18,6 +18,8 @@ import nl.nulldevelopment.nfcappblocker.data.profiles.RoomProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.RoomTagRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.TagDao
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
+import nl.nulldevelopment.nfcappblocker.util.AndroidDefaultNameFormats
+import nl.nulldevelopment.nfcappblocker.util.DefaultNameFormats
 import java.time.Clock
 import javax.inject.Singleton
 
@@ -55,4 +57,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun installedAppsSource(impl: AndroidInstalledAppsSource): InstalledAppsSource
+
+    @Binds
+    abstract fun defaultNameFormats(impl: AndroidDefaultNameFormats): DefaultNameFormats
 }

@@ -33,6 +33,7 @@ import nl.nulldevelopment.nfcappblocker.R
 @Composable
 fun ProfileListScreen(
     onOpenProfile: (Long) -> Unit,
+    onNewProfile: () -> Unit,
     viewModel: ProfileListViewModel = hiltViewModel(),
 ) {
     val profiles by viewModel.profiles.collectAsStateWithLifecycle()
@@ -41,7 +42,7 @@ fun ProfileListScreen(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.profiles_title)) }) },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { viewModel.createProfile(onOpenProfile) },
+                onClick = onNewProfile,
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text(stringResource(R.string.profiles_new)) },
             )

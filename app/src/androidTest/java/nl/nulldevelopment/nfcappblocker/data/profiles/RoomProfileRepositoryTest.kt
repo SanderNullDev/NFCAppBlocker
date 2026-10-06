@@ -111,4 +111,43 @@ class RoomProfileRepositoryTest {
         tags.setProfile(uuid, null)
         assertNull(tags.find(uuid)?.profileId)
     }
+
+    @Test
+    fun saveCreatesAProfileWithAppsAndTagsInOneGo() = runTest {
+        val desk = UUID.randomUUID()
+        tags.add(desk, "Desk", null)
+
+        val id = profiles.save(null, "Focus", setOf(instagram), setOf(desk))
+
+        assertEquals(Profile(id, "Focus", setOf(instagram), clock.instant()), profiles.observe(id).first())
+        assertEquals(id, tags.find(desk)?.profileId)
+    }
+
+    @Test
+    fun saveSetsExactlyTheGivenTagsMovingAndUnlinking() = runTest {
+        val focus = profiles.create("Focus", emptySet())
+        val evening = profiles.create("Evening", emptySet())
+        val desk = UUID.randomUUID()
+        val bed = UUID.randomUUID()
+        val door = UUID.randomUUID()
+        tags.add(desk, "Desk", null)
+        tags.add(bed, "Bed", null)
+        tags.add(door, "Door", null)
+        tags.setProfile(desk, focus)
+        tags.setProfile(bed, evening)
+        tags.setProfile(door, evening)
+
+        // Keep Desk, take Bed over from Evening; Door stays with Evening.
+        profiles.save(focus, "Deep work", setOf(chrome), setOf(desk, bed))
+
+        assertEquals("Deep work", profiles.observe(focus).first()?.name)
+        assertEquals(setOf(chrome), profiles.observe(focus).first()?.packageNames)
+        assertEquals(focus, tags.find(desk)?.profileId)
+        assertEquals(focus, tags.find(bed)?.profileId)
+        assertEquals(evening, tags.find(door)?.profileId)
+
+        // Saving without Desk unlinks it.
+        profiles.save(focus, "Deep work", setOf(chrome), setOf(bed))
+        assertNull(tags.find(desk)?.profileId)
+    }
 }

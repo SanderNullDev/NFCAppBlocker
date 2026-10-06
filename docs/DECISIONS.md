@@ -187,7 +187,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-021 — Profile data model and saving as you edit
 
 - **Date:** 2026-10-06
-- **Status:** Accepted
+- **Status:** Superseded by D-025
 - **Decision:** A profile has a name and a set of apps, stored by package name (`profiles`, `profile_apps`). A tag links to at most one profile through a nullable `profile_id`. Deleting a profile keeps its tags and only unlinks them. "New profile" creates the profile straight away under a default name ("Profile N"), and every edit saves immediately; there's no separate save step.
 - **Why:** Package names are stable, while names and icons can change, so those are looked up live. Tags paired in Phase 1 have no profile yet, and a later scan of an unlinked tag can simply ask which profile it should control. Saving as you go matches tag pairing (D-019) and leaves nothing half-saved to lose.
 - **Alternatives:** Requiring a profile when pairing a tag; an explicit Save button with a "discard changes?" prompt.
@@ -219,3 +219,13 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Profiles and tags are both managed often and are equal in importance; tags without a profile need a home of their own.
 - **Alternatives:** One start screen with profiles, reaching tags only through a profile.
 - **Consequences:** Built after the Navigation 3 multiple-back-stacks recipe (D-018).
+
+## D-025 — Profile editor saves explicitly
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Supersedes:** D-021
+- **Decision:** The data model from D-021 stays: a profile has a name and a set of apps stored by package name, a tag links to at most one profile, and deleting a profile keeps its tags but unlinks them. What changes is saving: the profile editor works on a draft (name, apps, linked tags) and stores it only when the user presses Save, in one transaction. Leaving with unsaved changes asks whether to discard them. "New profile" creates nothing until it's saved. Deleting stays immediate, after a confirmation.
+- **Why:** Trying the editor showed that saving silently in the background left it unclear whether leaving the screen kept the changes. An explicit Save matches what the user expects, and it means backing out of "New profile" leaves no empty profile behind.
+- **Alternatives:** Keep saving as you edit, but show a "Saved" indicator and a Done button (D-021).
+- **Consequences:** Tag pairing still saves straight away (D-019). A tag paired from inside the profile editor is stored at once and only linked to the profile when the profile is saved. Phase 3 must still refuse to activate a profile without apps.

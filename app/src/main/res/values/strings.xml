@@ -17,6 +17,12 @@
     <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>
     <string name="profiles_new">New profile</string>
     <string name="profile_default_name">Profile %1$d</string>
+    <string name="profile_new_title">New profile</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_discard_title">Discard changes?</string>
+    <string name="profile_discard_body">Your changes to this profile haven\'t been saved.</string>
+    <string name="profile_discard">Discard</string>
+    <string name="profile_keep_editing">Keep editing</string>
     <string name="profile_delete">Delete profile</string>
     <string name="profile_delete_title">Delete \u201c%1$s\u201d?</string>
     <string name="profile_delete_body">Its tags stay paired and can be linked to another profile.</string>

@@ -84,7 +84,10 @@ class MainActivity : ComponentActivity() {
                 val navigator = remember(navigationState) { Navigator(navigationState) }
                 val entryProvider = entryProvider {
                     entry<ProfilesRoute> {
-                        ProfileListScreen(onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) })
+                        ProfileListScreen(
+                            onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) },
+                            onNewProfile = { navigator.navigate(ProfileEditorRoute(null)) },
+                        )
                     }
                     entry<ProfileEditorRoute> { route ->
                         ProfileEditorScreen(profileId = route.profileId, onBack = navigator::goBack)

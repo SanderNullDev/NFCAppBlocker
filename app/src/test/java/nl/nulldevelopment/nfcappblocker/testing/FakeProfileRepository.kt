@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import java.time.Instant
+import java.util.UUID
 
 /** In-memory profiles. Deleting unlinks tags in [tags], like the database's SET NULL rule. */
 class FakeProfileRepository(private val tags: FakeTagRepository? = null) : ProfileRepository {
@@ -20,6 +21,23 @@ class FakeProfileRepository(private val tags: FakeTagRepository? = null) : Profi
         val id = nextId++
         profiles.update { it + Profile(id, name, packageNames, Instant.EPOCH) }
         return id
+    }
+
+    override suspend fun save(id: Long?, name: String, packageNames: Set<String>, tagUuids: Set<UUID>): Long {
+        val profileId = if (id == null) create(name, packageNames) else {
+            edit(id) { it.copy(name = name, packageNames = packageNames) }
+            id
+        }
+        tags?.tags?.update { list ->
+            list.map {
+                when {
+                    it.uuid in tagUuids -> it.copy(profileId = profileId)
+                    it.profileId == profileId -> it.copy(profileId = null)
+                    else -> it
+                }
+            }
+        }
+        return profileId
     }
 
     override suspend fun rename(id: Long, name: String) = edit(id) { it.copy(name = name) }

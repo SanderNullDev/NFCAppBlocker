@@ -1,6 +1,7 @@
 package nl.nulldevelopment.nfcappblocker.data.profiles
 
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 interface ProfileRepository {
     /** All profiles, by name. */
@@ -10,6 +11,13 @@ interface ProfileRepository {
 
     /** @return the new profile's id. */
     suspend fun create(name: String, packageNames: Set<String>): Long
+
+    /**
+     * Saves an edited profile in one go: name, apps, and exactly [tagUuids] as its tags, moving
+     * them from other profiles (D-003). Creates the profile when [id] is null.
+     * @return the profile's id.
+     */
+    suspend fun save(id: Long?, name: String, packageNames: Set<String>, tagUuids: Set<UUID>): Long
 
     suspend fun rename(id: Long, name: String)
 
