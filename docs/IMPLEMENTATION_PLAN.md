@@ -68,9 +68,9 @@ Status (2026-10-06):
 - [x] Write spike: "Write test tag" on the scan screen writes our message with a fresh UUID to the next tag in reader mode and verifies it by reading back. Handles formatted and blank tags.
 - [x] Sticker test, part 1 (2026-10-06, Samsung SM-S948B, Android 16): writing and verifying works, rewriting a tag works, reader mode reads the new UUID, and the hardware UID stays the same across taps. The clone stickers present as `NfcA, MifareUltralight, Ndef`, so already NDEF-formatted.
 - [x] Sticker test, part 2: with the app closed, a tap opens `ScanActivity` through tag dispatch with the right UUID. The process was usually still running, because the enabled accessibility service keeps it alive, so a truly cold start is rare.
-- [ ] New-intent path: tap again while `ScanActivity` is open. The first try opened a new screen on every tap, because the NFC service starts each scan in a new task; `ScanActivity` now has its own task (`singleTask`). Verified with adb launches, still to confirm with a physical tap.
+- [x] New-intent path: a second tap while `ScanActivity` is open reaches the open screen (confirmed with a physical tap, 2026-10-06). The first try opened a new screen on every tap, because the NFC service starts each scan in a new task; `ScanActivity` now has its own task (`singleTask`).
 
-**Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end.
+**Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end. Met on 2026-10-06, except for the long-idle survival check under spike A.
 
 ## Phase 1 — Tag pairing
 
@@ -86,7 +86,7 @@ Status (2026-10-06):
 - [x] Pairing flow (D-019): blank tags written straight away, confirm-and-hold-again before overwriting, adopting our own tags, verified writes, duplicate scans dropped. Unit tested.
 - [x] Screens: tag list (start screen), add tag, tag details with rename, forget, and wipe and forget. The Phase 0 test screen moved behind "Test tools".
 - [x] Debug tag source over adb (D-020). Used to run the whole flow on an emulator.
-- [ ] On the Samsung with a physical sticker: add, recognise, wipe.
+- [x] On the Samsung with a physical sticker (2026-10-06): adopting the sticker written during spike B, recognising it on the next tap, wiping it, and pairing it again as a blank tag.
 - Not done: re-linking a tag to another profile; profiles arrive in Phase 2.
 
 ## Phase 2 — Block profiles
