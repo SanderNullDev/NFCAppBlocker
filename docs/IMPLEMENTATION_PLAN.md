@@ -46,6 +46,10 @@ Status (2026-10-06):
 - [ ] Re-check the flash without the animation and record the latency. If still too visible, consider an instant accessibility overlay that covers the app until the block screen is up.
 - [ ] Survival after a long idle period (several hours or overnight).
 
+Findings:
+- Force-stopping the app (App info → Force stop, or Android Studio's Run button, which force-stops before installing) makes Android remove the service from the enabled accessibility services. Blocking silently stops until the user turns the service on again. Accepted under D-007, but Phase 5 must detect this and tell the user, also outside the app. During development, install with `./gradlew :app:installDebug`, which updates the app without a force stop and keeps the service enabled.
+- Samsung freezes the app process in the background (`FreecessHandler`) and unfreezes it when an accessibility event arrives. Blocking still worked; watch for added latency or missed events in the long-idle test.
+
 **Spike B: NFC round trip (D-008)**
 - Second phone runs an HCE `HostApduService` serving a Type 4 NDEF tag (AID `D2760000850101`, CC file `E103`, NDEF file `E104`).
 - Confirm: reading the custom MIME record, cold app launch via AAR / MIME intent filter, foreground scanning via `NfcAdapter.enableReaderMode()`.
@@ -97,7 +101,7 @@ Status (2026-10-06):
 ## Phase 5 — Escape hatch and hardening
 
 - Countdown escape hatch: default 3 minutes, configurable 1–20 minutes in settings (D-006). Leaving the countdown screen cancels it.
-- Detect a disabled or killed AccessibilityService and surface it clearly instead of failing silently.
+- Detect a disabled or killed AccessibilityService and surface it clearly instead of failing silently. Force stop disables the service (see spike A findings), so this must also reach the user outside the app, e.g. through the status notification.
 - No tamper resistance: uninstalling the app or disabling the service is an accepted way out (D-007).
 
 ## Phase 6 — Polish
