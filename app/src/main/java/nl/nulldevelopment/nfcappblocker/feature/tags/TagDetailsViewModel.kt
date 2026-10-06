@@ -23,7 +23,6 @@ import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
 import nl.nulldevelopment.nfcappblocker.nfc.ScannedTag
 import nl.nulldevelopment.nfcappblocker.nfc.TagWiper
 import nl.nulldevelopment.nfcappblocker.nfc.WipeResult
-import nl.nulldevelopment.nfcappblocker.nfc.toScannedTag
 import java.util.UUID
 
 sealed interface TagDetailsState {
@@ -77,7 +76,7 @@ class TagDetailsViewModel @AssistedInject constructor(
         wipeJob?.cancel()
         _wipe.value = WipeState.WaitingForTag()
         wipeJob = viewModelScope.launch {
-            tagEvents.tags.collect { tag -> onTagForWipe(tag.toScannedTag()) }
+            tagEvents.scans.collect { tag -> onTagForWipe(tag) }
         }
     }
 

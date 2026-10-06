@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
         val events by BlockingSpike.events.collectAsStateWithLifecycle()
         // While shown, scans go to the spike's scan log (and write test) instead of a pairing flow.
         LaunchedEffect(Unit) {
-            tagEvents.tags.collect { tag -> withContext(Dispatchers.IO) { TagScans.onReaderModeTag(tag) } }
+            tagEvents.platformTags.collect { tag -> withContext(Dispatchers.IO) { TagScans.onReaderModeTag(tag) } }
         }
         val status = stringResource(
             when (readerStatus) {

@@ -12,7 +12,6 @@ import nl.nulldevelopment.nfcappblocker.R
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
 import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
-import nl.nulldevelopment.nfcappblocker.nfc.toScannedTag
 import java.util.UUID
 import javax.inject.Inject
 
@@ -35,7 +34,7 @@ class PairingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             // Each scan in its own coroutine, so PairingFlow can drop a scan that arrives mid-write.
-            tagEvents.tags.collect { tag -> launch { flow.onTagScanned(tag.toScannedTag()) } }
+            tagEvents.scans.collect { tag -> launch { flow.onTagScanned(tag) } }
         }
     }
 
