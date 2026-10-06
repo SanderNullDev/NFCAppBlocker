@@ -40,12 +40,16 @@
         </activity>
 
         <!-- Receives scans of our tags. The AAR on the tag makes Android pick this app without
-             a chooser and launch it when it's closed; the MIME filter routes the scan here. -->
+             a chooser and launch it when it's closed; the MIME filter routes the scan here.
+             The NFC service starts every scan in a fresh task, so singleTop alone never reuses
+             an open instance. A fixed affinity with singleTask keeps one instance in one task,
+             and later taps arrive through onNewIntent. -->
         <activity
             android:name=".ScanActivity"
             android:exported="true"
             android:excludeFromRecents="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
+            android:taskAffinity="nl.nulldevelopment.nfcappblocker.scan"
             android:theme="@style/Theme.NFCAppBlocker">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
