@@ -96,8 +96,18 @@ Status (2026-10-06):
 - Link tags to profiles: many tags → one profile; each tag belongs to exactly one profile (D-003).
 - Never-blockable apps: this app, dialer / emergency, Settings, the current launcher.
 
+Status (2026-10-06):
+- [x] Profiles in the database (D-021): name, apps by package name, optional tag link. Version 2 migration with a device test.
+- [x] App picker with launcher apps only (D-022), search that ignores case and accents, icons, and selected apps that were uninstalled.
+- [x] Never-block rule (D-023): this app, phone app, Settings, launchers, plus Google Maps, Gmail and Samsung Email. Shown disabled with the reason.
+- [x] Bottom bar with Profiles and Tags, a separate back stack per tab (D-024).
+- [x] Profile editor: name, apps, linked tags (moving a tag from another profile asks first), delete with confirmation.
+- [x] Linking a tag from its details, and right after pairing.
+- Checked on an emulator with simulated tags, and on the Samsung for the database and app list (device tests).
+
 ## Phase 3 — Blocking engine
 
+- Use the never-block rule (D-023) in the blocker, replacing the spike's own list. Refuse to activate a profile without apps (D-021).
 - Persist blocking state (active profile(s) + start time) so it survives process death.
 - Only one active profile at a time, but model the active state as a collection so multiple active profiles later is a logic change, not a data migration (D-004).
 - Enforcement via the AccessibilityService from spike A.

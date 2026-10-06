@@ -183,3 +183,39 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Pairing and the later scan-to-toggle phases can be tested on an emulator and scripted, without a physical tag for every check.
 - **Alternatives:** A debug menu in the app; relying on the HCE emulator, which needs a second phone and is read-only.
 - **Consequences:** Real and simulated scans share one path (`NfcTagEvents`), so the debug source tests the same code a real tap runs.
+
+## D-021 — Profile data model and saving as you edit
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** A profile has a name and a set of apps, stored by package name (`profiles`, `profile_apps`). A tag links to at most one profile through a nullable `profile_id`. Deleting a profile keeps its tags and only unlinks them. "New profile" creates the profile straight away under a default name ("Profile N"), and every edit saves immediately; there's no separate save step.
+- **Why:** Package names are stable, while names and icons can change, so those are looked up live. Tags paired in Phase 1 have no profile yet, and a later scan of an unlinked tag can simply ask which profile it should control. Saving as you go matches tag pairing (D-019) and leaves nothing half-saved to lose.
+- **Alternatives:** Requiring a profile when pairing a tag; an explicit Save button with a "discard changes?" prompt.
+- **Consequences:** An empty profile can exist; Phase 3 must refuse to activate a profile without apps. The database moved to version 2 with an automatic migration, covered by a device test.
+
+## D-022 — App picker shows launcher apps only
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** The app picker lists apps that have a launcher icon, found through a `<queries>` entry for the launcher intent. The app doesn't request `QUERY_ALL_PACKAGES`. Apps that are selected but no longer installed stay in the list, marked "Not installed", so they can be removed.
+- **Why:** Launcher apps are what users think of as their apps. Google Play restricts `QUERY_ALL_PACKAGES`, and listing all packages would bury the picker in system components.
+- **Alternatives:** All installed packages.
+- **Consequences:** An app without a launcher icon can't be picked. That's acceptable for blocking distractions.
+
+## D-023 — Apps that can never be blocked
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** One shared rule (`NeverBlockPolicy`) says which apps are never blocked: this app, the default phone app, Settings, and every launcher, plus Google Maps, Gmail and Samsung Email, which the user wants available at all times. The phone app and launchers are read live. The picker lists these apps disabled, with the reason in words; an app that's already selected can still be removed.
+- **Why:** The phone app keeps emergency calls possible, and Settings and the launcher mean the user is never trapped (plan, Phase 3: "never trap the user"). Showing the reason instead of hiding the app makes clear why it can't be picked.
+- **Alternatives:** Hiding protected apps from the picker; a user-editable allow list (possible later).
+- **Consequences:** The blocker in Phase 3 must use the same rule, replacing the spike's own list.
+
+## D-024 — Bottom bar with Profiles and Tags
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** The app's top level is a bottom bar with two tabs, Profiles (the start tab) and Tags. Each tab keeps its own back stack; the user always leaves the app through the Profiles tab. Phase 3 can add a third tab for the current blocking status.
+- **Why:** Profiles and tags are both managed often and are equal in importance; tags without a profile need a home of their own.
+- **Alternatives:** One start screen with profiles, reaching tags only through a profile.
+- **Consequences:** Built after the Navigation 3 multiple-back-stacks recipe (D-018).
