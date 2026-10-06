@@ -49,7 +49,7 @@ Status (2026-10-06):
   - Opaque with a fade-in: the fade had no visible effect for an activity started from the accessibility service; it looked like an instant cut.
   - **Chosen:** translucent, with the blocked app dimmed behind a solid card. Covering the app reads as deliberate. The app is paused rather than stopped, so it could keep playing audio; accepted.
   - Not tried: blurring a screenshot taken by the accessibility service. It would need the "take screenshots" capability, so it's only worth it if the dimmed look disappoints in daily use.
-- [ ] Survival after a long idle period (several hours or overnight).
+- [ ] Survival after a long idle period (several hours or overnight). Assumed fine for now, since reboot survival works; to be confirmed.
 
 Findings:
 - Force-stopping the app (App info → Force stop, or Android Studio's Run button, which force-stops before installing) makes Android remove the service from the enabled accessibility services. Blocking silently stops until the user turns the service on again. Accepted under D-007, but Phase 5 must detect this and tell the user, also outside the app. During development, install with `./gradlew :app:installDebug`, which updates the app without a force stop and keeps the service enabled.
@@ -68,7 +68,7 @@ Status (2026-10-06):
 - [x] Write spike: "Write test tag" on the scan screen writes our message with a fresh UUID to the next tag in reader mode and verifies it by reading back. Handles formatted and blank tags.
 - [x] Sticker test, part 1 (2026-10-06, Samsung SM-S948B, Android 16): writing and verifying works, rewriting a tag works, reader mode reads the new UUID, and the hardware UID stays the same across taps. The clone stickers present as `NfcA, MifareUltralight, Ndef`, so already NDEF-formatted.
 - [x] Sticker test, part 2: with the app closed, a tap opens `ScanActivity` through tag dispatch with the right UUID. The process was usually still running, because the enabled accessibility service keeps it alive, so a truly cold start is rare.
-- [ ] New-intent path: tap again while `ScanActivity` is open.
+- [ ] New-intent path: tap again while `ScanActivity` is open. The first try opened a new screen on every tap, because the NFC service starts each scan in a new task; `ScanActivity` now has its own task (`singleTask`). Verified with adb launches, still to confirm with a physical tap.
 
 **Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end.
 
@@ -80,6 +80,14 @@ Status (2026-10-06):
 - Recognize an already-paired tag and offer to re-link instead of creating a duplicate.
 - Tag management: list, rename, unlink, "forget and wipe tag".
 - Debug tag source (dev menu button + `adb shell am broadcast` receiver) so later phases don't depend on physical scanning.
+
+Status (2026-10-06):
+- [x] Room 3 storage for tags (D-017), Hilt and Navigation 3 (D-018).
+- [x] Pairing flow (D-019): blank tags written straight away, confirm-and-hold-again before overwriting, adopting our own tags, verified writes, duplicate scans dropped. Unit tested.
+- [x] Screens: tag list (start screen), add tag, tag details with rename, forget, and wipe and forget. The Phase 0 test screen moved behind "Test tools".
+- [x] Debug tag source over adb (D-020). Used to run the whole flow on an emulator.
+- [ ] On the Samsung with a physical sticker: add, recognise, wipe.
+- Not done: re-linking a tag to another profile; profiles arrive in Phase 2.
 
 ## Phase 2 — Block profiles
 
@@ -132,7 +140,7 @@ Status (2026-10-06):
 ## Project layout
 
 - `docs/` — this plan, the decision log, and later the architecture document.
-- `:app` — the blocker app (`nl.nulldevelopment.nfcappblocker`, minSdk 30).
+- `:app` — the blocker app (`nl.nulldevelopment.nfcappblocker`, minSdk 30). Packages: `data/` (Room, repositories), `feature/<name>/` (screens and ViewModels), `nfc/` (tag reading and writing), `ui/`, `di/`, and `spike/` for Phase 0 code that later phases replace.
 - `:core:tag-format` — pure Kotlin/JVM module with the tag format and NDEF codec, shared by `:app` and `:hce-emulator` (D-012).
 - `:hce-emulator` — HCE tag emulator test app for a second phone (D-011).
 - All Android modules compile against SDK 37.1 (required by core-ktx 1.19 and lifecycle 2.11) and target SDK 36.

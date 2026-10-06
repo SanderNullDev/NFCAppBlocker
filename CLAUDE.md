@@ -24,7 +24,7 @@ Read before working:
 ## Stack
 
 - Kotlin, Jetpack Compose, Material 3. AndroidX only.
-- ViewModel + StateFlow, coroutines and Flow. Hilt once DI is introduced in `:app`.
+- ViewModel + StateFlow, coroutines and Flow. Hilt for DI, Navigation 3, Room 3 (D-017, D-018).
 - Accessibility first: TalkBack labels, touch targets of at least 48dp, state never conveyed by color alone.
 - Tests: JUnit 5 (Jupiter) for local unit tests via `useJUnitPlatform()`, without the android-junit5 plugin. MockK and Turbine when needed. Instrumented tests stay on the AndroidX JUnit 4 runner.
 
@@ -32,7 +32,7 @@ Read before working:
 
 | Module | What it is |
 |---|---|
-| `:app` | The blocker app, `nl.nulldevelopment.nfcappblocker`, minSdk 30 |
+| `:app` | The blocker app, `nl.nulldevelopment.nfcappblocker`, minSdk 30. Packages: `data/`, `feature/<name>/`, `nfc/`, `ui/`, `di/`, `spike/` (D-018) |
 | `:core:tag-format` | Pure Kotlin/JVM: tag MIME type, payload format and NDEF encoding/decoding. Shared by `:app` and `:hce-emulator`, so the format is defined in one place. No Android dependencies. |
 | `:hce-emulator` | Test tool for a second phone: emulates an NFC Forum Type 4 tag via HCE, serving our NDEF message. `nl.nulldevelopment.nfcappblocker.hceemulator`, minSdk 30 |
 
@@ -46,6 +46,18 @@ Read before working:
 ./gradlew :app:testDebugUnitTest
 ./gradlew :app:installDebug
 ./gradlew :app:lintDebug
+```
+
+Device tests (Room) need a connected device or emulator:
+
+```bash
+./gradlew :app:connectedDebugAndroidTest
+```
+
+Simulate holding a tag against the phone (debug builds only, D-020). `content` is `blank`, `foreign`, `unreadable` or `ours:<uuid>`; without it, the existing virtual tag with that UID is tapped:
+
+```bash
+adb shell am broadcast -a nl.nulldevelopment.nfcappblocker.debug.TAP_TAG -p nl.nulldevelopment.nfcappblocker --es uid 04:00:00:00:00:00:01 --es content blank
 ```
 
 Install `:app` with `./gradlew :app:installDebug`, not Android Studio's Run button. Run force-stops the app before installing, and Android then turns off the app's accessibility service, so blocking silently stops until it's re-enabled in Settings → Accessibility.

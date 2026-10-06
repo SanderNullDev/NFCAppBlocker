@@ -141,3 +141,45 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** It's the only test device available, and the app is for personal use on exactly this phone. Samsung is also one of the stricter OEMs about background work, so passing here is a meaningful bar.
 - **Alternatives:** Borrow or buy a second device (e.g. a Pixel) for a second OEM data point.
 - **Consequences:** Behaviour on other OEMs is untested; moving to another phone, or ever publishing, means repeating spike A's measurements there. Detecting a disabled or killed AccessibilityService (D-001, Phase 5) matters even more, because it's the safety net for behaviour we haven't seen.
+
+## D-017 — Room 3 for local storage
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Store app data (paired tags now, profiles later) in a Room 3 database (`androidx.room3`) using the framework SQLite driver. Schemas are exported to `app/schemas`. The rest of the app uses repository interfaces, not DAOs.
+- **Why:** Tags, profiles and their links (D-003) are relational. Room gives Flow-based queries and migrations. Room 3 is the current line for new projects: coroutines-first and KSP-only.
+- **Alternatives:** Room 2.8 — still supported, but older APIs for a new codebase. DataStore — fine for settings, not for related records.
+- **Consequences:** DAO tests run on a device (instrumented, JUnit 4 per D-014). Logic above the repositories is tested on the JVM with fakes.
+
+## D-018 — App structure: Hilt, Navigation 3, packages in `:app`
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Dependency injection with Hilt. Screens navigate with Navigation 3, using serializable route keys. Features live in packages inside `:app` (`data/`, `feature/<name>/`, `nfc/`, `ui/`), not in separate Gradle modules.
+- **Why:** Hilt is the standard Jetpack DI and was planned for this phase. Navigation 3 is the current Compose navigation library, with the back stack as plain state. Separate modules add build setup with little benefit for a one-person app.
+- **Alternatives:** Manual DI; Navigation Compose 2; feature modules from the start.
+- **Consequences:** Hilt and Room need KSP; they were verified to build with AGP 9's built-in Kotlin before feature code relied on them. Packages can be split into modules later if build times grow.
+
+## D-019 — Tag pairing rules
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:**
+  - A blank tag is written and saved straight away under a default name ("Tag N", first unused number); renaming comes after.
+  - A tag with other content is only overwritten after the user confirms and then holds the same tag (same hardware UID) again.
+  - A tag with our UUID that isn't stored can be adopted without writing; if it's writable, it can instead get a new UUID.
+  - A write is only stored after reading it back confirms our content.
+  - A scan that arrives while another is being handled is dropped, not queued.
+  - "Wipe and forget" only wipes the tag being viewed, verified by its UUID.
+- **Why:** Saving right after the write means a cancelled naming step can't leave a written tag the app doesn't know. The confirm-and-hold-again rule keeps a different tag from being overwritten by accident. Adopting covers app data being cleared, tags written during the spikes, and read-only tags such as the HCE emulator. Dropping scans stops one tap that registers twice from acting twice.
+- **Alternatives:** Name first, then write; overwrite right after confirming with the tag still in the field; treating every tag of ours that isn't stored as foreign.
+- **Consequences:** The pairing logic is a plain state machine (`PairingFlow`), tested without Android.
+
+## D-020 — Debug tag source over adb
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** Debug builds include a broadcast receiver that simulates holding a tag against the phone: blank, foreign, unreadable or one of our UUIDs, optionally read-only. Simulated tags keep what's written to them. The receiver requires the `DUMP` permission, so only adb and the system can send it, and release builds don't contain it.
+- **Why:** Pairing and the later scan-to-toggle phases can be tested on an emulator and scripted, without a physical tag for every check.
+- **Alternatives:** A debug menu in the app; relying on the HCE emulator, which needs a second phone and is read-only.
+- **Consequences:** Real and simulated scans share one path (`NfcTagEvents`), so the debug source tests the same code a real tap runs.
