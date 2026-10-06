@@ -1,6 +1,67 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">NFC App Blocker</string>
 
+    <!-- Common -->
+    <string name="navigate_back">Back</string>
+    <string name="nfc_missing">This phone has no NFC hardware, so it can\'t read tags.</string>
+    <string name="nfc_off">NFC is turned off. Turn it on to use tags.</string>
+    <string name="nfc_open_settings">Open NFC settings</string>
+    <string name="tag_default_name">Tag %1$d</string>
+
+    <!-- Tag list -->
+    <string name="tags_title">Tags</string>
+    <string name="test_tools">Test tools</string>
+    <string name="tags_add">Add tag</string>
+    <string name="tags_empty">No tags yet. Add a tag to get started.</string>
+    <string name="tags_added_on">Added %1$s</string>
+
+    <!-- Add tag -->
+    <string name="add_tag_title">Add tag</string>
+    <string name="add_waiting">Hold a tag flat against the back of the phone.</string>
+    <string name="add_writing">Writing to the tag. Keep holding it still.</string>
+    <string name="add_confirm_title">This tag already has content</string>
+    <string name="add_confirm_foreign">It holds data from another app or service.</string>
+    <string name="add_confirm_unreadable">Its content can\'t be read.</string>
+    <string name="add_confirm_newer">It was set up by a newer version of this app.</string>
+    <string name="add_confirm_body">Overwriting replaces that content for good.</string>
+    <string name="add_overwrite">Overwrite tag</string>
+    <string name="add_cancel">Cancel</string>
+    <string name="add_hold_same_tag">Hold the same tag against the phone again to overwrite it.</string>
+    <string name="add_other_tag">That was a different tag. Use the tag you want to overwrite.</string>
+    <string name="add_already_paired">This tag is already in your list as \u201c%1$s\u201d.</string>
+    <string name="add_open_tag">Open tag</string>
+    <string name="add_another">Add another tag</string>
+    <string name="add_ours_not_paired">This tag was set up by this app before, but it isn\'t in your list.</string>
+    <string name="add_adopt">Add it to your list</string>
+    <string name="add_new_id">Give it a new ID</string>
+    <string name="add_paired">Tag added.</string>
+    <string name="add_name_label">Name</string>
+    <string name="add_done">Done</string>
+    <string name="add_try_again">Try again</string>
+    <string name="add_failed_read_only">This tag is locked, so it can\'t be written.</string>
+    <string name="add_failed_too_small" tools:ignore="PluralsCandidate">This tag holds %1$d bytes, but %2$d are needed.</string>
+    <string name="add_failed_not_ndef">This type of tag isn\'t supported.</string>
+    <string name="add_failed_tag_lost">The tag moved away while writing. Hold it still and try again.</string>
+    <string name="add_failed_not_verified">The tag didn\'t read back correctly after writing. Try again.</string>
+    <string name="add_failed_other">Writing failed: %1$s</string>
+
+    <!-- Tag details -->
+    <string name="details_save_name">Save name</string>
+    <string name="details_uuid">ID: %1$s</string>
+    <string name="details_hardware_uid">Hardware ID: %1$s</string>
+    <string name="details_hardware_uid_unknown">Hardware ID: unknown</string>
+    <string name="details_forget">Forget tag</string>
+    <string name="details_wipe">Wipe and forget</string>
+    <string name="details_forget_title">Forget \u201c%1$s\u201d?</string>
+    <string name="details_forget_body">The tag keeps its content, so you can add it again later.</string>
+    <string name="details_wipe_waiting">Hold this tag against the phone to wipe it.</string>
+    <string name="details_wiping">Wiping. Keep holding the tag still.</string>
+    <string name="details_wipe_other_tag">That was a different tag. Use \u201c%1$s\u201d.</string>
+    <string name="details_wipe_failed_read_only">This tag is locked, so it can\'t be wiped.</string>
+    <string name="details_wipe_failed_tag_lost">The tag moved away while wiping. Hold it still and try again.</string>
+    <string name="details_wipe_failed_not_verified">The tag didn\'t read back as empty. Try again.</string>
+    <string name="details_wipe_failed_other">Wiping failed: %1$s</string>
+
     <!-- Spike B scan debug screen -->
     <string name="scan_debug_title">Scan test</string>
     <string name="scan_status_reader_mode">Reader mode is on. Hold a tag against this phone.</string>
