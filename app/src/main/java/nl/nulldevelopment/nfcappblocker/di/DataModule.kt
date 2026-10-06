@@ -9,6 +9,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import nl.nulldevelopment.nfcappblocker.apps.AndroidInstalledAppsSource
+import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileDao
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
@@ -50,4 +52,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun profileRepository(impl: RoomProfileRepository): ProfileRepository
+
+    @Binds
+    abstract fun installedAppsSource(impl: AndroidInstalledAppsSource): InstalledAppsSource
 }

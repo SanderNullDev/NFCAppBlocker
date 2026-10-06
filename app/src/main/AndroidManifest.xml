@@ -9,8 +9,13 @@
         android:name="android.hardware.nfc"
         android:required="false" />
 
-    <!-- Lets the blocker see which packages are launchers, so Home is never blocked. -->
+    <!-- Launcher apps for the app picker, and home apps (launchers) so Home is never blocked.
+         Avoids QUERY_ALL_PACKAGES, which Google Play restricts. -->
     <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
