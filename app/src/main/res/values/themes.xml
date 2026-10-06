@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Block screen: no window animations, so it covers the blocked app in one frame. -->
+    <style name="Theme.NFCAppBlocker.Block">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

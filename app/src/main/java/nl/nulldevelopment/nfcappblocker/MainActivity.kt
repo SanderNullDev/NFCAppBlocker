@@ -1,16 +1,28 @@
 package nl.nulldevelopment.nfcappblocker
 
+import android.content.ComponentName
+import android.content.Intent
 import android.nfc.NfcAdapter
+import android.provider.Settings
+import android.view.accessibility.AccessibilityManager
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import nl.nulldevelopment.nfcappblocker.nfc.TagScans
+import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockerAccessibilityService
+import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockingSpike
+import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockingSpikeState
+import nl.nulldevelopment.nfcappblocker.spike.blocking.blockingSpikeItems
 import nl.nulldevelopment.nfcappblocker.ui.scan.ScanDebugScreen
 import nl.nulldevelopment.nfcappblocker.ui.scan.WriteControls
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
@@ -20,6 +32,7 @@ class MainActivity : ComponentActivity() {
     private enum class ReaderStatus { ACTIVE, NFC_OFF, NO_NFC }
 
     private var readerStatus by mutableStateOf(ReaderStatus.ACTIVE)
+    private var accessibilityServiceEnabled by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +41,10 @@ class MainActivity : ComponentActivity() {
             NFCAppBlockerTheme {
                 val scans by TagScans.recent.collectAsStateWithLifecycle()
                 val writeArmed by TagScans.writeArmed.collectAsStateWithLifecycle()
+                val blockingFlow = remember { BlockingSpike.enabled(this) }
+                val blockingOn by blockingFlow.collectAsStateWithLifecycle(initialValue = false)
+                val latencies by BlockingSpike.latencies.collectAsStateWithLifecycle()
+                val events by BlockingSpike.events.collectAsStateWithLifecycle()
                 val status = stringResource(
                     when (readerStatus) {
                         ReaderStatus.ACTIVE -> R.string.scan_status_reader_mode
@@ -40,6 +57,15 @@ class MainActivity : ComponentActivity() {
                     scans = scans,
                     writeControls = WriteControls(writeArmed, TagScans::armWrite, TagScans::cancelWrite)
                         .takeIf { readerStatus == ReaderStatus.ACTIVE },
+                    extraItems = {
+                        blockingSpikeItems(
+                            state = BlockingSpikeState(accessibilityServiceEnabled, blockingOn, latencies, events),
+                            onBlockingChange = { on -> lifecycleScope.launch { BlockingSpike.setEnabled(this@MainActivity, on) } },
+                            onOpenAccessibilitySettings = {
+                                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                            },
+                        )
+                    },
                 )
             }
         }
@@ -58,6 +84,14 @@ class MainActivity : ComponentActivity() {
             else -> ReaderStatus.ACTIVE
         }
         adapter?.enableReaderMode(this, TagScans::onReaderModeTag, READER_FLAGS, null)
+        accessibilityServiceEnabled = isBlockerServiceEnabled()
+    }
+
+    private fun isBlockerServiceEnabled(): Boolean {
+        val ours = ComponentName(this, BlockerAccessibilityService::class.java)
+        return getSystemService(AccessibilityManager::class.java)
+            .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+            .any { ComponentName.unflattenFromString(it.id) == ours }
     }
 
     override fun onPause() {

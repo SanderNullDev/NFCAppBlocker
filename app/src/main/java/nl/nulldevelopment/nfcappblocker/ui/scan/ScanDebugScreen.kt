@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -44,7 +45,12 @@ data class WriteControls(val armed: Boolean, val onArm: () -> Unit, val onCancel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanDebugScreen(status: String, scans: List<ScanResult>, writeControls: WriteControls? = null) {
+fun ScanDebugScreen(
+    status: String,
+    scans: List<ScanResult>,
+    writeControls: WriteControls? = null,
+    extraItems: LazyListScope.() -> Unit = {},
+) {
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.scan_debug_title)) }) }) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -58,6 +64,8 @@ fun ScanDebugScreen(status: String, scans: List<ScanResult>, writeControls: Writ
         ) {
             item { Text(status, style = MaterialTheme.typography.bodyLarge) }
             writeControls?.let { controls -> item { WriteControlsRow(controls) } }
+            extraItems()
+            item { SectionHeading(stringResource(R.string.scan_section)) }
             if (scans.isEmpty()) {
                 item { Text(stringResource(R.string.scan_none_yet)) }
             } else {

@@ -132,3 +132,12 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** The app only needs standard NDEF read and write and about 104 bytes (D-013), which clones normally handle. Waiting for genuine tags would block spike B for no clear gain.
 - **Alternatives:** Order genuine NXP NTAG215 tags from a known reseller now and pause until they arrive.
 - **Consequences:** Clones differ most in password protection, lock bits and the originality signature. Those features are on the "Later" list (password protection, strict mode) and must be tested on the tags actually used then, which may mean buying genuine ones. A blank clone may arrive unformatted, so writing must handle both formatted (`Ndef`) and blank (`NdefFormatable`) tags.
+
+## D-016 — One reference test device: Samsung SM-S948B
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Decision:** All on-device testing happens on one Samsung SM-S948B (Android 16), which is also the phone that will run the app day to day. The plan's requirement to test enforcement on at least two OEMs is dropped.
+- **Why:** It's the only test device available, and the app is for personal use on exactly this phone. Samsung is also one of the stricter OEMs about background work, so passing here is a meaningful bar.
+- **Alternatives:** Borrow or buy a second device (e.g. a Pixel) for a second OEM data point.
+- **Consequences:** Behaviour on other OEMs is untested; moving to another phone, or ever publishing, means repeating spike A's measurements there. Detecting a disabled or killed AccessibilityService (D-001, Phase 5) matters even more, because it's the safety net for behaviour we haven't seen.

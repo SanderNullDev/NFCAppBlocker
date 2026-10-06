@@ -7,6 +7,7 @@
     <string name="scan_status_nfc_off">NFC is turned off. Turn it on to scan tags.</string>
     <string name="scan_status_no_nfc">This phone has no NFC hardware.</string>
     <string name="scan_status_dispatch">Opened by a tag scan. Scanning again while this screen is open tests the new-intent path.</string>
+    <string name="scan_section">Scans</string>
     <string name="scan_none_yet">No scans yet.</string>
     <string name="scan_latest">Latest scan</string>
     <string name="scan_earlier">Earlier scans</string>
@@ -38,4 +39,23 @@
     <string name="write_result_not_ndef">Not written: this tag type can\'t hold NDEF.</string>
     <string name="write_result_tag_lost">Write interrupted: the tag moved away and may hold partial content. Hold it still and try again.</string>
     <string name="write_result_failed">Write failed: %1$s</string>
+
+    <!-- Spike A: blocking -->
+    <string name="blocker_service_description">Detects when an app you\'ve chosen to block comes to the foreground and shows a block screen instead. It only looks at which app is open; it doesn\'t read screen content.</string>
+    <string name="blocking_spike_title">Blocking test</string>
+    <string name="blocking_service_on">Accessibility service: enabled.</string>
+    <string name="blocking_service_off">Accessibility service: not enabled. Blocking can\'t work until you turn it on.</string>
+    <string name="blocking_open_settings">Open accessibility settings</string>
+    <string name="blocking_toggle_title">Block test apps</string>
+    <string name="blocking_toggle_on">On. Blocking %1$s.</string>
+    <string name="blocking_toggle_off">Off. %1$s open normally.</string>
+    <string name="blocking_latency_heading">Time until the block screen was visible</string>
+    <string name="blocking_none_yet">No blocks yet.</string>
+    <string name="blocking_latency_entry">%1$s  %2$s: %3$d ms</string>
+    <string name="blocking_events_heading">Service events</string>
+    <string name="blocking_events_empty">No events since the app process started.</string>
+    <string name="blocking_event_entry">%1$s  %2$s (%3$d s after boot)</string>
+    <string name="block_title">%1$s is blocked</string>
+    <string name="block_body">Blocking test is on. Turn it off in NFC App Blocker to use this app again.</string>
+    <string name="block_go_home">Go to home screen</string>
 </resources>

@@ -37,7 +37,14 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 **Spike A: AccessibilityService enforcement (D-001)**
 - Listen for `TYPE_WINDOW_STATE_CHANGED` and redirect to a block screen when a blocked package comes to the foreground.
 - Measure: time until the block screen appears, behaviour after the app is swiped from recents, behaviour after a reboot.
-- Test on at least two OEMs (e.g. Pixel and Samsung); OEM background killing differs a lot.
+- Test on the reference device, a Samsung SM-S948B (D-016). Samsung is strict about background work, so also check survival after the phone has been idle for a while.
+
+Status (2026-10-06):
+- [x] Spike built in `:app` (`spike.blocking`): AccessibilityService listening for window state changes only, full-screen block activity, hard-coded test list (Instagram, Chrome), on/off switch persisted with DataStore, latency and service lifecycle shown on the main screen.
+- [x] On-device test (2026-10-06): blocking works, and keeps working after swiping the app from recents and after a reboot (the service reconnects by itself). Latency numbers not recorded yet.
+- [x] Instagram was briefly visible before the block screen, which slid in from the right. Most of that was the activity open animation, so the block screen now opens without animation.
+- [ ] Re-check the flash without the animation and record the latency. If still too visible, consider an instant accessibility overlay that covers the app until the block screen is up.
+- [ ] Survival after a long idle period (several hours or overnight).
 
 **Spike B: NFC round trip (D-008)**
 - Second phone runs an HCE `HostApduService` serving a Type 4 NDEF tag (AID `D2760000850101`, CC file `E103`, NDEF file `E104`).
@@ -53,7 +60,7 @@ Status (2026-10-06):
 - [x] Sticker test, part 1 (2026-10-06, Samsung SM-S948B, Android 16): writing and verifying works, rewriting a tag works, reader mode reads the new UUID, and the hardware UID stays the same across taps. The clone stickers present as `NfcA, MifareUltralight, Ndef`, so already NDEF-formatted.
 - [ ] Sticker test, part 2: cold launch via AAR with the app closed, and the new-intent path with `ScanActivity` open.
 
-**Exit criteria:** enforcement latency and survival are acceptable on test devices, and the NFC launch flow works end to end.
+**Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end.
 
 ## Phase 1 — Tag pairing
 

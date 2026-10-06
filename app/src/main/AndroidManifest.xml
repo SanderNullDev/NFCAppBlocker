@@ -9,6 +9,14 @@
         android:name="android.hardware.nfc"
         android:required="false" />
 
+    <!-- Lets the blocker see which packages are launchers, so Home is never blocked. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.HOME" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -45,6 +53,29 @@
                 <data android:mimeType="application/vnd.nulldev.nfcblocker" />
             </intent-filter>
         </activity>
+
+        <!-- Spike A (D-001): detects blocked apps coming to the foreground. -->
+        <service
+            android:name=".spike.blocking.BlockerAccessibilityService"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/blocker_accessibility_service" />
+        </service>
+
+        <!-- Own task, out of recents, so it never sits between the user and the home screen. -->
+        <activity
+            android:name=".spike.blocking.BlockActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:theme="@style/Theme.NFCAppBlocker.Block" />
     </application>
 
 </manifest>
