@@ -43,4 +43,9 @@ Read before working:
 ./gradlew :hce-emulator:testDebugUnitTest
 ./gradlew :hce-emulator:installDebug
 ./gradlew :hce-emulator:lintDebug
+./gradlew :app:testDebugUnitTest
+./gradlew :app:installDebug
+./gradlew :app:lintDebug
 ```
+
+Install `:app` with `./gradlew :app:installDebug`, not Android Studio's Run button. Run force-stops the app before installing, and Android then turns off the app's accessibility service, so blocking silently stops until it's re-enabled in Settings → Accessibility.
