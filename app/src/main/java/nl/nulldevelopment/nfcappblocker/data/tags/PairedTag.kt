@@ -12,4 +12,6 @@ data class PairedTag(
     val name: String,
     val hardwareUid: String?,
     val createdAt: Instant,
+    /** The profile this tag controls (D-003); null while unlinked. */
+    val profileId: Long? = null,
 )

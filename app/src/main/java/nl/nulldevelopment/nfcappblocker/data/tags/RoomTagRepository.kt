@@ -27,6 +27,8 @@ class RoomTagRepository @Inject constructor(
 
     override suspend fun rename(uuid: UUID, name: String) = dao.rename(uuid.toString(), name)
 
+    override suspend fun setProfile(uuid: UUID, profileId: Long?) = dao.setProfile(uuid.toString(), profileId)
+
     override suspend fun remove(uuid: UUID) = dao.delete(uuid.toString())
 
     private fun TagEntity.toDomain() = PairedTag(
@@ -34,5 +36,6 @@ class RoomTagRepository @Inject constructor(
         name = name,
         hardwareUid = hardwareUid,
         createdAt = Instant.ofEpochMilli(createdAtEpochMillis),
+        profileId = profileId,
     )
 }

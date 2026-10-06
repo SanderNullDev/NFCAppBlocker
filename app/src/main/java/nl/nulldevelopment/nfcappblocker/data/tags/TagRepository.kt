@@ -16,6 +16,9 @@ interface TagRepository {
 
     suspend fun rename(uuid: UUID, name: String)
 
+    /** Links the tag to a profile, moving it from any other profile, or unlinks it with null. */
+    suspend fun setProfile(uuid: UUID, profileId: Long?)
+
     suspend fun remove(uuid: UUID)
 }
 

@@ -48,10 +48,14 @@ Read before working:
 ./gradlew :app:lintDebug
 ```
 
-Device tests (Room) need a connected device or emulator:
+Device tests (Room) need a connected device or emulator. Don't use `connectedDebugAndroidTest` on the real phone: it uninstalls the app afterwards, which deletes its data (paired tags, profiles). Install both APKs and run the tests over adb instead, which leaves the app in place:
 
 ```bash
-./gradlew :app:connectedDebugAndroidTest
+./gradlew :app:installDebug :app:installDebugAndroidTest
+```
+
+```bash
+adb shell am instrument -w nl.nulldevelopment.nfcappblocker.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
 Simulate holding a tag against the phone (debug builds only, D-020). `content` is `blank`, `foreign`, `unreadable` or `ours:<uuid>`; without it, the existing virtual tag with that UID is tapped:

@@ -23,6 +23,9 @@ interface TagDao {
     @Query("UPDATE tags SET name = :name WHERE uuid = :uuid")
     suspend fun rename(uuid: String, name: String)
 
+    @Query("UPDATE tags SET profile_id = :profileId WHERE uuid = :uuid")
+    suspend fun setProfile(uuid: String, profileId: Long?)
+
     @Query("DELETE FROM tags WHERE uuid = :uuid")
     suspend fun delete(uuid: String)
 }

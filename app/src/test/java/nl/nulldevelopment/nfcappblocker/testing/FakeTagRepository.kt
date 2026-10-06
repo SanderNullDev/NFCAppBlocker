@@ -28,5 +28,8 @@ class FakeTagRepository(initial: List<PairedTag> = emptyList()) : TagRepository 
     override suspend fun rename(uuid: UUID, name: String) =
         tags.update { list -> list.map { if (it.uuid == uuid) it.copy(name = name) else it } }
 
+    override suspend fun setProfile(uuid: UUID, profileId: Long?) =
+        tags.update { list -> list.map { if (it.uuid == uuid) it.copy(profileId = profileId) else it } }
+
     override suspend fun remove(uuid: UUID) = tags.update { list -> list.filterNot { it.uuid == uuid } }
 }
