@@ -122,3 +122,13 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** AGP's local unit tests are ordinary Gradle test tasks, so no plugin is needed. The mannodermaus plugin (now `android-junit-framework`) mainly adds JUnit 5 for instrumented tests, and its AGP 9 support has caveats.
 - **Alternatives:** The mannodermaus plugin; JUnit 4 now and migrate later; JUnit 6, which needs a Java 17 runtime target.
 - **Consequences:** Revisit if instrumented tests ever need Jupiter.
+
+## D-015 — Use the delivered NTAG215-compatible clone stickers for development
+
+- **Date:** 2026-10-06
+- **Status:** Accepted
+- **Refines:** D-009
+- **Decision:** The stickers that arrived are reported as non-genuine by NXP TagInfo. Use them for development anyway, and verify per batch what the app relies on (NDEF read and write, capacity) instead of assuming genuine NXP behaviour. Take capacity from what the tag itself reports, not from the NTAG215 datasheet.
+- **Why:** The app only needs standard NDEF read and write and about 104 bytes (D-013), which clones normally handle. Waiting for genuine tags would block spike B for no clear gain.
+- **Alternatives:** Order genuine NXP NTAG215 tags from a known reseller now and pause until they arrive.
+- **Consequences:** Clones differ most in password protection, lock bits and the originality signature. Those features are on the "Later" list (password protection, strict mode) and must be tested on the tags actually used then, which may mean buying genuine ones. A blank clone may arrive unformatted, so writing must handle both formatted (`Ndef`) and blank (`NdefFormatable`) tags.

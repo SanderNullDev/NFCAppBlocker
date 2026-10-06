@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -29,6 +30,19 @@ object TagScans {
     /** Newest first. */
     val recent: StateFlow<List<ScanResult>> = _recent.asStateFlow()
 
+    private val _writeArmed = MutableStateFlow(false)
+
+    /** When true, the next reader-mode tag is written with a fresh UUID instead of only read. */
+    val writeArmed: StateFlow<Boolean> = _writeArmed.asStateFlow()
+
+    fun armWrite() {
+        _writeArmed.value = true
+    }
+
+    fun cancelWrite() {
+        _writeArmed.value = false
+    }
+
     /** Handles an `NDEF_DISCOVERED` intent. Ignores intents that carry no tag. */
     fun onDispatchIntent(intent: Intent, source: ScanSource) {
         if (intent.action != NfcAdapter.ACTION_NDEF_DISCOVERED) return
@@ -40,14 +54,21 @@ object TagScans {
     }
 
     /**
-     * Handles a tag from reader mode. Called on a binder thread. Uses the NDEF message Android
-     * already read during discovery, so no extra I/O with the tag is needed.
+     * Handles a tag from reader mode. Called on a binder thread, which is fine for the blocking
+     * write. When not writing, it uses the NDEF message Android already read during discovery.
+     * One armed write is used up by one tag, whatever the outcome.
      */
     fun onReaderModeTag(tag: Tag) {
-        record(tag, Ndef.get(tag)?.cachedNdefMessage, ScanSource.READER_MODE)
+        val contentBefore = Ndef.get(tag)?.cachedNdefMessage
+        val write = if (_writeArmed.compareAndSet(expect = true, update = false)) {
+            TagWriter.write(ndefTargetFor(tag), UUID.randomUUID())
+        } else {
+            null
+        }
+        record(tag, contentBefore, ScanSource.READER_MODE, write)
     }
 
-    private fun record(tag: Tag, message: NdefMessage?, source: ScanSource) {
+    private fun record(tag: Tag, message: NdefMessage?, source: ScanSource, write: WriteResult? = null) {
         val scan = ScanResult.create(
             id = nextId.getAndIncrement(),
             timeMillis = System.currentTimeMillis(),
@@ -56,6 +77,7 @@ object TagScans {
             uid = tag.id ?: ByteArray(0),
             techClassNames = tag.techList.toList(),
             processAgeMillis = SystemClock.elapsedRealtime() - Process.getStartElapsedRealtime(),
+            write = write,
         )
         _recent.update { (listOf(scan) + it).take(MAX_SCANS) }
     }

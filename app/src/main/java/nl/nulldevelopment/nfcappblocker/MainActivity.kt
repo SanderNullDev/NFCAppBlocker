@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.nulldevelopment.nfcappblocker.nfc.TagScans
 import nl.nulldevelopment.nfcappblocker.ui.scan.ScanDebugScreen
+import nl.nulldevelopment.nfcappblocker.ui.scan.WriteControls
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             NFCAppBlockerTheme {
                 val scans by TagScans.recent.collectAsStateWithLifecycle()
+                val writeArmed by TagScans.writeArmed.collectAsStateWithLifecycle()
                 val status = stringResource(
                     when (readerStatus) {
                         ReaderStatus.ACTIVE -> R.string.scan_status_reader_mode
@@ -33,7 +35,12 @@ class MainActivity : ComponentActivity() {
                         ReaderStatus.NO_NFC -> R.string.scan_status_no_nfc
                     },
                 )
-                ScanDebugScreen(status = status, scans = scans)
+                ScanDebugScreen(
+                    status = status,
+                    scans = scans,
+                    writeControls = WriteControls(writeArmed, TagScans::armWrite, TagScans::cancelWrite)
+                        .takeIf { readerStatus == ReaderStatus.ACTIVE },
+                )
             }
         }
     }
@@ -55,6 +62,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this)
+        // An armed write shouldn't wait around to overwrite some tag after the user comes back.
+        TagScans.cancelWrite()
         super.onPause()
     }
 

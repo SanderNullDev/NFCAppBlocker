@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">NFC App Blocker</string>
 
     <!-- Spike B scan debug screen -->
@@ -23,4 +23,19 @@
     <string name="scan_process_warm">Process running for %1$d ms (warm)</string>
     <string name="scan_uid">UID: %1$s</string>
     <string name="scan_techs">Technologies: %1$s</string>
+
+    <!-- Spike B write test -->
+    <string name="write_arm">Write test tag</string>
+    <string name="write_cancel">Cancel write</string>
+    <string name="write_armed">Ready to write. Hold a tag against the phone; its content will be replaced with a new UUID.</string>
+    <string name="write_previous_content">Before writing: %1$s</string>
+    <string name="write_result_written">Written and verified, new UUID:</string>
+    <string name="write_result_unverified">Written, but reading it back failed (%1$s). New UUID:</string>
+    <string name="write_result_mismatch">Written, but the tag reads back differently: %1$s. Intended UUID:</string>
+    <string name="write_result_read_only">Not written: the tag is read-only.</string>
+    <!-- Sizes are tag capacities and message lengths, never 1. -->
+    <string name="write_result_too_small" tools:ignore="PluralsCandidate">Not written: the tag holds %1$d bytes, the message needs %2$d.</string>
+    <string name="write_result_not_ndef">Not written: this tag type can\'t hold NDEF.</string>
+    <string name="write_result_tag_lost">Write interrupted: the tag moved away and may hold partial content. Hold it still and try again.</string>
+    <string name="write_result_failed">Write failed: %1$s</string>
 </resources>

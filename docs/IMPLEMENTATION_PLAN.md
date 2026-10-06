@@ -28,7 +28,7 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 
 ## Test hardware
 
-- NTAG215 NFC stickers (ordered; verify genuine NXP chips with NFC TagInfo on arrival).
+- NTAG215 NFC stickers (arrived 2026-10-06). NFC TagInfo reports them as non-genuine; used for development anyway (D-015). They arrived without an NDEF message.
 - Until they arrive: a second Android phone running the `:hce-emulator` app, which emulates an NFC Forum Type 4 tag via Host Card Emulation (HCE) (D-011), plus a debug tag source in the app.
 - Note: HCE randomizes the UID per tap, so UID-based checks (strict mode) can only be tested with physical tags.
 
@@ -44,13 +44,14 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 - Confirm: reading the custom MIME record, cold app launch via AAR / MIME intent filter, foreground scanning via `NfcAdapter.enableReaderMode()`.
 - When the stickers arrive: confirm writing NDEF to NTAG215.
 
-Status (2026-10-05):
+Status (2026-10-06):
 - [x] HCE emulator app `:hce-emulator` (D-011) and shared tag format `:core:tag-format` (D-012, D-013), with unit tests for the APDU state machine and NDEF encoding.
 - [x] Emulator UI checked on an Android emulator (no NFC there, so no taps).
-- [ ] Two-phone test: the emulator answers a real reader. Not yet done.
+- [-] Two-phone HCE test: skipped, the physical stickers arrived first. The emulator stays available for testing several tags quickly.
 - [x] Minimal reader in `:app`: `ScanActivity` handles tag dispatch via the MIME intent filter (cold launch and new intent); `MainActivity` scans with reader mode while in the foreground. Both show a debug screen with the result. Checked on an Android emulator only.
-- [ ] Two-phone test of the reader: cold launch via AAR, new-intent path, reader mode, UUID matches the emulator's active preset.
-- [ ] NTAG215 write test, when the stickers arrive.
+- [x] Write spike: "Write test tag" on the scan screen writes our message with a fresh UUID to the next tag in reader mode and verifies it by reading back. Handles formatted and blank tags.
+- [x] Sticker test, part 1 (2026-10-06, Samsung SM-S948B, Android 16): writing and verifying works, rewriting a tag works, reader mode reads the new UUID, and the hardware UID stays the same across taps. The clone stickers present as `NfcA, MifareUltralight, Ndef`, so already NDEF-formatted.
+- [ ] Sticker test, part 2: cold launch via AAR with the app closed, and the new-intent path with `ScanActivity` open.
 
 **Exit criteria:** enforcement latency and survival are acceptable on test devices, and the NFC launch flow works end to end.
 
