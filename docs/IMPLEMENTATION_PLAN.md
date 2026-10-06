@@ -29,7 +29,7 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 ## Test hardware
 
 - NTAG215 NFC stickers (ordered; verify genuine NXP chips with NFC TagInfo on arrival).
-- Until they arrive: a second Android phone emulating an NFC Forum Type 4 tag via Host Card Emulation (HCE), plus a debug tag source in the app.
+- Until they arrive: a second Android phone running the `:hce-emulator` app, which emulates an NFC Forum Type 4 tag via Host Card Emulation (HCE) (D-011), plus a debug tag source in the app.
 - Note: HCE randomizes the UID per tap, so UID-based checks (strict mode) can only be tested with physical tags.
 
 ## Phase 0 — Risk spikes (throwaway code)
@@ -43,6 +43,14 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 - Second phone runs an HCE `HostApduService` serving a Type 4 NDEF tag (AID `D2760000850101`, CC file `E103`, NDEF file `E104`).
 - Confirm: reading the custom MIME record, cold app launch via AAR / MIME intent filter, foreground scanning via `NfcAdapter.enableReaderMode()`.
 - When the stickers arrive: confirm writing NDEF to NTAG215.
+
+Status (2026-10-05):
+- [x] HCE emulator app `:hce-emulator` (D-011) and shared tag format `:core:tag-format` (D-012, D-013), with unit tests for the APDU state machine and NDEF encoding.
+- [x] Emulator UI checked on an Android emulator (no NFC there, so no taps).
+- [ ] Two-phone test: the emulator answers a real reader. Not yet done.
+- [x] Minimal reader in `:app`: `ScanActivity` handles tag dispatch via the MIME intent filter (cold launch and new intent); `MainActivity` scans with reader mode while in the foreground. Both show a debug screen with the result. Checked on an Android emulator only.
+- [ ] Two-phone test of the reader: cold launch via AAR, new-intent path, reader mode, UUID matches the emulator's active preset.
+- [ ] NTAG215 write test, when the stickers arrive.
 
 **Exit criteria:** enforcement latency and survival are acceptable on test devices, and the NFC launch flow works end to end.
 
@@ -93,7 +101,7 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 
 ## Testing strategy (all phases)
 
-- **Unit tests:** JUnit 5, MockK, Turbine — toggle logic, profile resolution, debounce, escape-hatch countdown — driven through the fake tag source.
+- **Unit tests:** JUnit 5 (Jupiter, without the android-junit5 plugin, D-014), MockK, Turbine — toggle logic, profile resolution, debounce, escape-hatch countdown — driven through the fake tag source.
 - **NDEF tests:** encode/decode round trips for our records, plus malformed and foreign payloads.
 - **Instrumented / manual:** HCE scans, cold launch, reboot persistence, OEM background killing. Keep a short manual test checklist per device; much of this can't be automated reliably.
 - **Static analysis:** Android Lint (warnings as errors on new code), detekt, ktlint.
@@ -106,4 +114,7 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 ## Project layout
 
 - `docs/` — this plan, the decision log, and later the architecture document.
-- The Android project will be set up separately and linked in later.
+- `:app` — the blocker app (`nl.nulldevelopment.nfcappblocker`, minSdk 30).
+- `:core:tag-format` — pure Kotlin/JVM module with the tag format and NDEF codec, shared by `:app` and `:hce-emulator` (D-012).
+- `:hce-emulator` — HCE tag emulator test app for a second phone (D-011).
+- All Android modules compile against SDK 37.1 (required by core-ktx 1.19 and lifecycle 2.11) and target SDK 36.

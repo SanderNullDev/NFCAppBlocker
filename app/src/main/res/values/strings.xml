@@ -1,3 +1,26 @@
 <resources>
     <string name="app_name">NFC App Blocker</string>
+
+    <!-- Spike B scan debug screen -->
+    <string name="scan_debug_title">Scan test</string>
+    <string name="scan_status_reader_mode">Reader mode is on. Hold a tag against this phone.</string>
+    <string name="scan_status_nfc_off">NFC is turned off. Turn it on to scan tags.</string>
+    <string name="scan_status_no_nfc">This phone has no NFC hardware.</string>
+    <string name="scan_status_dispatch">Opened by a tag scan. Scanning again while this screen is open tests the new-intent path.</string>
+    <string name="scan_none_yet">No scans yet.</string>
+    <string name="scan_latest">Latest scan</string>
+    <string name="scan_earlier">Earlier scans</string>
+    <string name="scan_outcome_ours">Our tag</string>
+    <string name="scan_outcome_foreign">Foreign tag (no record of ours)</string>
+    <string name="scan_outcome_unsupported">Our tag, unsupported payload version %1$d</string>
+    <string name="scan_outcome_malformed">Unreadable tag content: %1$s</string>
+    <string name="scan_outcome_no_ndef">Tag without an NDEF message</string>
+    <string name="scan_source">Received via: %1$s</string>
+    <string name="scan_source_dispatch_launch">tag dispatch, activity launched</string>
+    <string name="scan_source_dispatch_new_intent">tag dispatch, activity already open</string>
+    <string name="scan_source_reader_mode">reader mode</string>
+    <string name="scan_process_cold">Process started %1$d ms before the scan (cold start)</string>
+    <string name="scan_process_warm">Process running for %1$d ms (warm)</string>
+    <string name="scan_uid">UID: %1$s</string>
+    <string name="scan_techs">Technologies: %1$s</string>
 </resources>

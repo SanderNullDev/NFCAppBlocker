@@ -1,47 +1,67 @@
 package nl.nulldevelopment.nfcappblocker
 
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import nl.nulldevelopment.nfcappblocker.nfc.TagScans
+import nl.nulldevelopment.nfcappblocker.ui.scan.ScanDebugScreen
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
 
 class MainActivity : ComponentActivity() {
+
+    private enum class ReaderStatus { ACTIVE, NFC_OFF, NO_NFC }
+
+    private var readerStatus by mutableStateOf(ReaderStatus.ACTIVE)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             NFCAppBlockerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                val scans by TagScans.recent.collectAsStateWithLifecycle()
+                val status = stringResource(
+                    when (readerStatus) {
+                        ReaderStatus.ACTIVE -> R.string.scan_status_reader_mode
+                        ReaderStatus.NFC_OFF -> R.string.scan_status_nfc_off
+                        ReaderStatus.NO_NFC -> R.string.scan_status_no_nfc
+                    },
+                )
+                ScanDebugScreen(status = status, scans = scans)
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    /**
+     * While the app is in the foreground, read tags with reader mode instead of tag dispatch,
+     * so a scan doesn't relaunch an activity on top of the open app (spike B).
+     */
+    override fun onResume() {
+        super.onResume()
+        val adapter = NfcAdapter.getDefaultAdapter(this)
+        readerStatus = when {
+            adapter == null -> ReaderStatus.NO_NFC
+            !adapter.isEnabled -> ReaderStatus.NFC_OFF
+            else -> ReaderStatus.ACTIVE
+        }
+        adapter?.enableReaderMode(this, TagScans::onReaderModeTag, READER_FLAGS, null)
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    NFCAppBlockerTheme {
-        Greeting("Android")
+    override fun onPause() {
+        NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this)
+        super.onPause()
+    }
+
+    private companion object {
+        const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or
+            NfcAdapter.FLAG_READER_NFC_B or
+            NfcAdapter.FLAG_READER_NFC_F or
+            NfcAdapter.FLAG_READER_NFC_V
     }
 }

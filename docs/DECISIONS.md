@@ -86,3 +86,39 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** All test devices run Android 11 or newer. Package visibility (`<queries>`), background activity start limits and foreground service types become baseline behaviour instead of version branches, which shrinks the test matrix for the AccessibilityService and block screen.
 - **Alternatives:** minSdk 26 (D-002) — no meaningful benefit for personal use with these devices.
 - **Consequences:** Devices on Android 8–10 can't run the main app. A separate HCE tag-emulator test app can keep its own lower minSdk so older spare phones remain usable as test tags.
+
+## D-011 — HCE tag emulator as a separate app module
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Decision:** Until physical tags are available, a second phone emulates a tag via Host Card Emulation. The emulator is its own application module, `:hce-emulator` (`nl.nulldevelopment.nfcappblocker.hceemulator`), with `minSdk = 30`.
+- **Why:** Lets the real NFC stack on the reader phone (dispatch, AAR, cold launch, reader mode) be tested end to end without stickers. A separate app keeps test tooling out of the main app.
+- **Alternatives:** A lower minSdk for older spare phones, as D-010 allowed — not needed, all spare phones run Android 11 or newer. A debug-only screen inside `:app` — rejected because the emulating phone and the reading phone must be different devices.
+- **Consequences:** HCE randomizes the UID on every tap, so UID-based behaviour (strict mode) can only be tested with physical tags. HCE needs the emulating phone's screen to be on. The emulator answers on the lock screen (`requireDeviceUnlock="false"`).
+
+## D-012 — Shared tag format in a pure Kotlin/JVM module
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Decision:** The tag format (MIME type, AAR package, payload encoding, NDEF encoding and decoding) lives in `:core:tag-format`, a Kotlin/JVM module without Android dependencies, used by both `:app` and `:hce-emulator`. It contains its own small NDEF codec instead of using `android.nfc.NdefRecord`.
+- **Why:** One definition of the format means the emulator and the app can't drift apart. `android.nfc` classes are stubs in local unit tests, so a JVM module can be tested byte for byte without Robolectric or a device.
+- **Alternatives:** An Android library built on `android.nfc` — less code, but tests need Robolectric or instrumentation. A copy of the format in each module — rejected because of drift.
+- **Consequences:** The app converts with `NdefMessage.toByteArray()` / `NdefMessage(bytes)` at the Android boundary. The codec rejects chunked records; this app never writes them.
+
+## D-013 — Tag payload format v1 and record order
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Decision:** The MIME record's payload is one version byte (`0x01`) followed by the 16 bytes of the UUID, most significant bits first (17 bytes). The NDEF message has the MIME record first and the Android Application Record last.
+- **Why:** The version byte lets the format change later without guessing what an old tag holds; raw bytes are compact. Android matches intent filters against the first record and recommends putting the AAR last.
+- **Alternatives:** 16 raw bytes without a version; the 36-character UUID string, which is readable in generic NFC apps but has no versioning.
+- **Consequences:** A tag with an unknown version is reported as "unsupported version", not as foreign, so a newer format can get a clear message instead of a re-pair prompt.
+
+## D-014 — JUnit 5 for local unit tests, without the android-junit5 plugin
+
+- **Date:** 2026-10-05
+- **Status:** Accepted
+- **Decision:** Local unit tests in all modules use JUnit Jupiter 5.x. Android modules enable it with `testOptions.unitTests.all { it.useJUnitPlatform() }`; JVM modules natively. Instrumented tests stay on the AndroidX JUnit 4 runner.
+- **Why:** AGP's local unit tests are ordinary Gradle test tasks, so no plugin is needed. The mannodermaus plugin (now `android-junit-framework`) mainly adds JUnit 5 for instrumented tests, and its AGP 9 support has caveats.
+- **Alternatives:** The mannodermaus plugin; JUnit 4 now and migrate later; JUnit 6, which needs a Java 17 runtime target.
+- **Consequences:** Revisit if instrumented tests ever need Jupiter.
