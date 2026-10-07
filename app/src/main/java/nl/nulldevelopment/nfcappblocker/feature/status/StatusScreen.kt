@@ -48,6 +48,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.nulldevelopment.nfcappblocker.R
+import nl.nulldevelopment.nfcappblocker.feature.escape.EscapeActivity
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import java.time.ZoneId
@@ -118,7 +119,7 @@ fun StatusScreen(
                     urgent = false,
                 )
             }
-            BlockingCard(loaded)
+            BlockingCard(loaded, onStopWithoutTag = { context.startActivity(EscapeActivity.intent(context, fromBlockScreen = false)) })
             when (loaded.setup) {
                 StatusState.Setup.NoProfiles -> SetupHint(stringResource(R.string.status_setup_no_profiles), stringResource(R.string.status_go_profiles), onOpenProfiles)
                 StatusState.Setup.NoLinkedTags -> SetupHint(stringResource(R.string.status_setup_no_tags), stringResource(R.string.status_go_tags), onOpenTags)
@@ -131,7 +132,7 @@ fun StatusScreen(
 private val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
 
 @Composable
-private fun BlockingCard(state: StatusState.Loaded) {
+private fun BlockingCard(state: StatusState.Loaded, onStopWithoutTag: () -> Unit) {
     Card(Modifier.fillMaxWidth()) {
         // Polite live region: TalkBack announces when blocking starts or stops while this is open.
         Column(
@@ -151,6 +152,9 @@ private fun BlockingCard(state: StatusState.Loaded) {
                 )
                 state.since?.let { Text(stringResource(R.string.status_since, timeFormat.format(it)), style = MaterialTheme.typography.bodyLarge) }
                 Text(stringResource(R.string.status_blocking_hint), style = MaterialTheme.typography.bodyLarge)
+                OutlinedButton(onClick = onStopWithoutTag, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(R.string.escape_start))
+                }
                 Text(
                     pluralStringResource(R.plurals.status_blocked_apps, state.blockedApps.size, state.blockedApps.size),
                     style = MaterialTheme.typography.titleSmall,

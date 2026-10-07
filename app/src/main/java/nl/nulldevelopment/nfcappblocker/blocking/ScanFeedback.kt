@@ -10,13 +10,18 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import nl.nulldevelopment.nfcappblocker.R
 import javax.inject.Inject
 
-/**
- * Tells the user what a scan did, also when the app isn't open: a short message (which TalkBack
- * reads out) and a vibration that differs between starting and stopping.
- */
-class ScanFeedback @Inject constructor(@ApplicationContext private val context: Context) {
+/** Tells the user what a scan (or the escape countdown) did. */
+interface ScanFeedback {
+    fun show(outcome: ScanOutcome)
+}
 
-    fun show(outcome: ScanOutcome) {
+/**
+ * Works also when the app isn't open: a short message (which TalkBack reads out) and a vibration
+ * that differs between starting and stopping.
+ */
+class AndroidScanFeedback @Inject constructor(@ApplicationContext private val context: Context) : ScanFeedback {
+
+    override fun show(outcome: ScanOutcome) {
         val message = message(outcome) ?: return
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         vibrate(

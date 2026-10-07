@@ -91,6 +91,13 @@
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/Theme.NFCAppBlocker.Block" />
+
+        <!-- Stop without a tag: the countdown. Out of recents, as leaving cancels it anyway. -->
+        <activity
+            android:name=".feature.escape.EscapeActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@style/Theme.NFCAppBlocker" />
     </application>
 
 </manifest>

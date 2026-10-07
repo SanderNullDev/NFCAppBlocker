@@ -168,4 +168,12 @@
     <string name="block_title">%1$s is blocked</string>
     <string name="block_body">\u201c%1$s\u201d is blocking it. Scan a tag linked to \u201c%1$s\u201d to stop blocking.</string>
     <string name="block_go_home">Go to home screen</string>
+    <string name="escape_start">Stop without a tag</string>
+    <string name="escape_title">Stop blocking \u201c%1$s\u201d?</string>
+    <string name="escape_body">Blocking stops when the countdown ends. Leaving this screen or turning off the display cancels it.</string>
+    <plurals name="escape_minutes_left">
+        <item quantity="one">%d minute left</item>
+        <item quantity="other">%d minutes left</item>
+    </plurals>
+    <string name="escape_keep_blocking">Keep blocking</string>
 </resources>

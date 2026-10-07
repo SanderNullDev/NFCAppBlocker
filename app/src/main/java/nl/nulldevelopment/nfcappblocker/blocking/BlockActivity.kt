@@ -25,6 +25,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import nl.nulldevelopment.nfcappblocker.R
+import nl.nulldevelopment.nfcappblocker.feature.escape.EscapeActivity
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
 import java.util.function.Consumer
 
@@ -70,6 +72,7 @@ class BlockActivity : ComponentActivity() {
                     profileName = profileName,
                     blurAvailable = blurAvailable,
                     onGoHome = ::goHome,
+                    onStopWithoutTag = ::stopWithoutTag,
                 )
             }
         }
@@ -121,6 +124,12 @@ class BlockActivity : ComponentActivity() {
         profileName = intent.getStringExtra(EXTRA_PROFILE_NAME).orEmpty()
     }
 
+    /** The countdown takes this task's place, so finishing it shows the app that was blocked. */
+    private fun stopWithoutTag() {
+        startActivity(EscapeActivity.intent(this, fromBlockScreen = true))
+        finish()
+    }
+
     private fun goHome() {
         startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         finish()
@@ -144,7 +153,13 @@ private const val SCRIM_ALPHA_WITH_BLUR = 0.35f
 private const val SCRIM_ALPHA_WITHOUT_BLUR = 0.92f
 
 @Composable
-private fun BlockScreen(appName: String, profileName: String, blurAvailable: Boolean, onGoHome: () -> Unit) {
+private fun BlockScreen(
+    appName: String,
+    profileName: String,
+    blurAvailable: Boolean,
+    onGoHome: () -> Unit,
+    onStopWithoutTag: () -> Unit,
+) {
     val scrimAlpha by animateFloatAsState(
         targetValue = if (blurAvailable) SCRIM_ALPHA_WITH_BLUR else SCRIM_ALPHA_WITHOUT_BLUR,
         label = "scrim",
@@ -180,6 +195,9 @@ private fun BlockScreen(appName: String, profileName: String, blurAvailable: Boo
                 )
                 Button(onClick = onGoHome, modifier = Modifier.heightIn(min = 48.dp)) {
                     Text(stringResource(R.string.block_go_home))
+                }
+                TextButton(onClick = onStopWithoutTag, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(R.string.escape_start))
                 }
             }
         }

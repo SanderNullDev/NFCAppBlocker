@@ -11,10 +11,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import nl.nulldevelopment.nfcappblocker.apps.AndroidInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
+import android.os.SystemClock
 import nl.nulldevelopment.nfcappblocker.blocking.AndroidBlockerServiceStatus
+import nl.nulldevelopment.nfcappblocker.blocking.AndroidScanFeedback
 import nl.nulldevelopment.nfcappblocker.blocking.BlockerServiceStatus
 import nl.nulldevelopment.nfcappblocker.blocking.BlockingNotifications
 import nl.nulldevelopment.nfcappblocker.blocking.BlockingNotifier
+import nl.nulldevelopment.nfcappblocker.blocking.ScanFeedback
+import nl.nulldevelopment.nfcappblocker.util.ElapsedRealtime
 import nl.nulldevelopment.nfcappblocker.data.blocking.ActiveProfileDao
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
@@ -60,6 +64,9 @@ object DataModule {
     fun clock(): Clock = Clock.systemUTC()
 
     @Provides
+    fun elapsedRealtime(): ElapsedRealtime = ElapsedRealtime(SystemClock::elapsedRealtime)
+
+    @Provides
     @Singleton
     fun settingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
         PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
@@ -95,4 +102,7 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun blockingNotifications(impl: BlockingNotifier): BlockingNotifications
+
+    @Binds
+    abstract fun scanFeedback(impl: AndroidScanFeedback): ScanFeedback
 }
