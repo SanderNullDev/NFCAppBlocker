@@ -25,6 +25,8 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 - Usage stats (e.g. blocked open attempts per day)
 - Quick Settings tile and home screen widget
 - Play Store compliance (AccessibilityService declaration and justification)
+- A redesign of the theming, beyond the Phase 6 fixes
+- A friendlier setup, beyond the Phase 6 checklist
 
 ## Test hardware
 
@@ -150,9 +152,11 @@ Status (2026-10-07):
 - [x] Notification warns when the service is off while blocking (D-033), triggered by the service unbinding and checked at app start.
 - [x] Fixed a block screen crash on devices with cross-window blur (the blur was set before the window had a view); the reference device has no blur, so it never showed there.
 - Checked on an emulator with simulated tags: Settings lock, countdown from both places, cancelling with Home, display off and "Keep blocking", a full 3-minute run, and the notification across turning the service off and on and a cold start.
-- [ ] Check on the Samsung. Installing over USB failed on 2026-10-07 (the connection dropped during every APK transfer).
+- [x] Checked on the Samsung (2026-10-07): Settings lock, countdown from Status and the block screen (cancelling and running out), and the notification warning when switching the service off and on.
 
 ## Phase 6 — Polish
+
+Planned steps (2026-10-07): theme fixes (day and night window themes, own fallback colours), own app and notification icons, a setup checklist on the Status tab, and an accessibility pass with automated checks and a manual TalkBack walkthrough. The notification below is already done (D-030).
 
 - Material 3 UI, dark theme, dynamic color.
 - Accessibility pass: TalkBack labels on all controls, touch targets ≥ 48 dp, no state conveyed by color alone, announced scan results.
