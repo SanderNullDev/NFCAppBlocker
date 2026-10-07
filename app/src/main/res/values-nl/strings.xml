@@ -25,7 +25,7 @@
         <item quantity="other">%1$d apps geblokkeerd</item>
     </plurals>
     <string name="status_service_off_while_blocking">Blokkeren staat aan, maar werkt niet: de toegankelijkheidsservice staat uit.</string>
-    <string name="status_service_off_hint">Zoek Tikstop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
+    <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
     <string name="setup_title">Instellen afronden</string>
     <plurals name="setup_progress">
         <item quantity="one">%1$d van %2$d stap klaar</item>
@@ -50,7 +50,7 @@
     <string name="setup_tag_body">Tikken met de tag start en stopt dan het blokkeren.</string>
     <string name="setup_tag_action">Naar tags</string>
     <string name="disclosure_title">Over de blokkeerservice</string>
-    <string name="disclosure_what">Tikstop gebruikt een toegankelijkheidsservice om te zien wanneer een app die je wilt blokkeren op de voorgrond komt, en legt daar het blokkeerscherm overheen.</string>
+    <string name="disclosure_what">TikStop gebruikt een toegankelijkheidsservice om te zien wanneer een app die je wilt blokkeren op de voorgrond komt, en legt daar het blokkeerscherm overheen.</string>
     <string name="disclosure_not">De app kijkt alleen welke app open is. Hij leest niet wat er op het scherm staat of wat je typt, en stuurt niets door.</string>
     <string name="disclosure_continue">Instellingen openen</string>
     <string name="disclosure_not_now">Niet nu</string>
@@ -60,15 +60,15 @@
     <string name="onboarding_next">Volgende</string>
     <string name="onboarding_get_started">Aan de slag</string>
     <string name="onboarding_welcome_title">Minder tijd op je telefoon</string>
-    <string name="onboarding_welcome_body">Tikstop blokkeert de apps die jij kiest. Tik met een NFC-tag om te beginnen met blokkeren, en tik nog een keer om te stoppen.</string>
+    <string name="onboarding_welcome_body">TikStop blokkeert de apps die jij kiest. Tik met een NFC-tag om te beginnen met blokkeren, en tik nog een keer om te stoppen.</string>
     <string name="onboarding_welcome_steps">Instellen duurt een paar minuten. Houd je NFC-tag bij de hand.</string>
     <string name="onboarding_service_title">Zet blokkeren aan</string>
-    <string name="onboarding_service_body">Om apps te kunnen blokkeren heeft Tikstop jouw toestemming nodig in de Toegankelijkheid-instellingen van Android.</string>
-    <string name="onboarding_service_how">Zoek in Instellingen Tikstop op (op Samsung-telefoons onder Geïnstalleerde apps), open het en zet het aan. Kom daarna hier terug.</string>
+    <string name="onboarding_service_body">Om apps te kunnen blokkeren heeft TikStop jouw toestemming nodig in de Toegankelijkheid-instellingen van Android.</string>
+    <string name="onboarding_service_how">Zoek in Instellingen TikStop op (op Samsung-telefoons onder Geïnstalleerde apps), open het en zet het aan. Kom daarna hier terug.</string>
     <string name="onboarding_service_why">Wat ziet de app?</string>
     <string name="onboarding_open_settings">Instellingen openen</string>
     <string name="onboarding_service_on_title">Blokkeren staat aan</string>
-    <string name="onboarding_service_on_body">Tikstop kan nu de apps blokkeren die je kiest.</string>
+    <string name="onboarding_service_on_body">TikStop kan nu de apps blokkeren die je kiest.</string>
     <string name="onboarding_restricted_title">Is de schakelaar grijs?</string>
     <string name="onboarding_restricted_step1">Open App-info met de knop hieronder.</string>
     <string name="onboarding_restricted_step2">Tik rechtsboven op de drie puntjes.</string>
@@ -233,7 +233,7 @@
     <string name="scan_no_apps">\u201c%1$s\u201d heeft nog geen apps om te blokkeren</string>
     <string name="scan_not_linked">\u201c%1$s\u201d is nog niet aan een blokkeerlijst gekoppeld</string>
     <string name="scan_unknown_ours">Deze tag staat niet in je lijst. Houd hem nog een keer tegen de telefoon om hem toe te voegen.</string>
-    <string name="scan_not_ours">Deze tag is niet ingesteld voor Tikstop. Voeg hem toe onder Tags.</string>
+    <string name="scan_not_ours">Deze tag is niet ingesteld voor TikStop. Voeg hem toe onder Tags.</string>
     <string name="blocker_service_description">Ziet wanneer een app die je wilt blokkeren op de voorgrond komt en toont dan een blokkeerscherm. De service kijkt alleen welke app open is en leest geen scherminhoud.</string>
     <string name="block_title">%1$s is geblokkeerd</string>
     <string name="block_body">\u201c%1$s\u201d blokkeert deze app. Scan een tag die aan \u201c%1$s\u201d is gekoppeld om te stoppen met blokkeren.</string>
