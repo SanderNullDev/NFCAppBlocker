@@ -25,8 +25,6 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 - Usage stats (e.g. blocked open attempts per day)
 - Quick Settings tile and home screen widget
 - Play Store compliance (AccessibilityService declaration and justification)
-- A redesign of the theming, beyond the Phase 6 fixes
-- A friendlier setup, beyond the Phase 6 checklist
 - The accessibility pass: automated checks in device tests and a TalkBack walkthrough at large font sizes, before a release (D-036)
 
 ## Test hardware
@@ -170,6 +168,25 @@ Status (2026-10-07):
 - Accessibility pass: TalkBack labels on all controls, touch targets ≥ 48 dp, no state conveyed by color alone, announced scan results.
 - Onboarding: NFC check, accessibility service permission, battery optimization, first tag pairing.
 - Persistent status notification while blocking is active.
+
+## Phase 7 — Redesign, onboarding and Dutch
+
+Goal: someone who isn't technical can set the app up correctly, and the app looks calm and minimal.
+
+- First-run onboarding (D-037): welcome, blocker service (with help for restricted settings), add a tag, notifications (skippable), apps to block linked to the tag, try it (skippable). Progress saved; skipped when already set up. The Status checklist stays as a safety net.
+- Visual design (D-038): broken white with a sage accent, dynamic colour off, muted dark version, icon in the new accent, existing screens restyled to match.
+- "Block list" instead of "profile" in the UI (D-039).
+- Dutch translations and a language setting (D-040).
+
+Steps, one at a time:
+1. [x] Decisions and this plan.
+2. [ ] Theme: palette, dynamic colour off, dark version, icon colour.
+3. [ ] Wording: "block list" instead of "profile".
+4. [ ] Onboarding, part 1: first-launch detection, saved progress, welcome, blocker service with the restricted-settings guide.
+5. [ ] Onboarding, part 2: tag, notifications, apps to block, try it.
+6. [ ] Existing screens restyled.
+7. [ ] Dutch translations and the language setting.
+8. [ ] Checks in both languages on the emulator, then on the phones.
 
 ## Testing strategy (all phases)
 

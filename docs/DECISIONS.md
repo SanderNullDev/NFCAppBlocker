@@ -306,7 +306,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-034 — Setup checklist on the Status tab
 
 - **Date:** 2026-10-07
-- **Status:** Accepted
+- **Status:** Superseded by D-037
 - **Decision:** The Status tab shows a "Finish setting up" checklist: NFC, the blocker service, notifications, a profile with apps, and a linked tag. Each step shows whether it's done (as text for TalkBack, not only as a check mark), and steps still to do have a button. The checklist disappears once everything is done and comes back when a step is undone. Before opening Accessibility settings, a dialog explains what the service looks at and what it doesn't. It replaces the separate notices and hints from D-029; while blocking with the service off, the blocking card says it isn't working.
 - **Why:** Builds on what the Status tab already showed, and keeps working after setup, for example when a force stop turns the service off. Explaining the service before sending the user to Settings is also what Google Play expects of an accessibility service.
 - **Alternatives:** A first-run wizard, shown once; both a wizard and the checklist.
@@ -315,7 +315,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-035 — Phase 6 look: dark window, stand-in colours, own icon
 
 - **Date:** 2026-10-07
-- **Status:** Accepted
+- **Status:** Superseded by D-038
 - **Decision:** The window behind the Compose screens follows dark mode, so the app doesn't flash white when it opens. Dynamic colour stays; devices without it get a Material 3 scheme from a teal seed instead of the template's purple. The app icon is a white padlock with the NFC symbol on teal, with the symbol cut out so the themed (monochrome) icon keeps it, plus a matching status bar icon for the notification.
 - **Why:** Fixes what looked broken (the white flash, the template icon, the notification icon showing as a blob) without designing a full theme yet.
 - **Alternatives:** Only the theme fixes, keeping the template icon.
@@ -329,3 +329,41 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** The app is for personal use for now, and its users don't rely on TalkBack or large fonts. The pass is worth doing before others use it.
 - **Alternatives:** Do the pass now (automated checks plus a manual walkthrough), or only the manual walkthrough.
 - **Consequences:** Accessibility problems the per-screen work missed can go unnoticed until then. New screens keep following the accessibility-first rules in CLAUDE.md.
+
+## D-037 — First-run onboarding, with the checklist as a safety net
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Supersedes:** D-034
+- **Decision:** On first launch the app shows full-screen onboarding steps with a progress bar: welcome; switch on the blocker service (with the explanation, and help for Android's "restricted settings" on apps not installed from the Play Store; can't be skipped); add a tag (checking NFC first; naming is optional); notifications (can be skipped); choose the apps to block, which creates a block list linked to that tag; try it by tapping the tag (can be skipped). Progress is saved, so leaving halfway resumes at the same step. Onboarding is skipped when the app is already set up (the service is on and a tag is linked to a block list with apps). The Status checklist from D-034 stays as a safety net for steps undone later, such as the service turned off by a force stop.
+- **Why:** The app should be set up correctly by someone who isn't technical. One task per screen, in a fixed order, with the most important step first, is easier to follow than a checklist with several open steps.
+- **Alternatives:** Keep only the checklist (D-034); keep linking the tag to a block list as a separate step.
+- **Consequences:** Pairing and the app picker are reused inside onboarding. Battery optimisation still isn't a step (see D-034).
+
+## D-038 — Visual design: broken white with a sage accent
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Supersedes:** D-035
+- **Decision:** A light, minimal look: a broken-white background with a sage green accent, dynamic colour off so the app looks the same on every phone, and a muted dark version with a warm charcoal background that follows the system setting. The system font stays. Existing screens get the palette, more whitespace and fewer heavy cards, with the same layout and navigation. The app icon (D-035's padlock with the NFC symbol) moves to the sage accent; the dark window from D-035 stays.
+- **Why:** The app is meant to reduce phone use, so it should feel calm and quiet rather than busy. Sage was the calmest of the three accents tried (sage, terracotta, dusty blue).
+- **Alternatives:** Terracotta or dusty blue; keeping dynamic colour; light only; bundling a softer font such as DM Sans or Nunito.
+- **Consequences:** Wallpaper colours no longer change the app's colours.
+
+## D-039 — "Block list" instead of "profile"
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The UI calls a profile a "block list" ("blokkeerlijst" in Dutch), including the tab name. The code and the database keep `Profile`.
+- **Why:** "Block list" says what it is; "profile" is a technical word.
+- **Alternatives:** Keep "profile".
+- **Consequences:** Earlier decisions keep saying "profile"; it means the same thing.
+
+## D-040 — Dutch, and choosing the app's language
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The app is translated into Dutch and follows the phone's language: Dutch on a Dutch phone, otherwise English. Settings has a language option (system default, English, Nederlands) using Android's per-app languages, so it also shows up in Android's own app language setting. That feature exists from Android 13; on Android 11 and 12 the option is hidden and the app follows the system. Dutch terms match what Samsung's own Settings use, such as "Toegankelijkheid" and "Geïnstalleerde apps".
+- **Why:** Both users speak Dutch and want the app in Dutch.
+- **Alternatives:** AppCompat's language API, which also works on Android 11 and 12 but needs AppCompat activities.
+- **Consequences:** Every new text needs a Dutch version; lint reports missing translations. Translations are done last in Phase 7, so new texts are translated once.
