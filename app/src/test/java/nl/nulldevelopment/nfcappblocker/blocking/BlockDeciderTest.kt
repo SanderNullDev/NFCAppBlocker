@@ -1,4 +1,4 @@
-package nl.nulldevelopment.nfcappblocker.spike.blocking
+package nl.nulldevelopment.nfcappblocker.blocking
 
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -7,14 +7,13 @@ import org.junit.jupiter.api.Test
 class BlockDeciderTest {
 
     private val own = "nl.nulldevelopment.nfcappblocker"
-    private val launcher = "com.sec.android.app.launcher"
+    private val launcher = "ginlemon.flowerfree"
     private val instagram = "com.instagram.android"
     private val chrome = "com.android.chrome"
     private val blocked = setOf(instagram, chrome)
-    private val decider = BlockDecider(ownPackage = own, neverBlock = setOf(launcher))
+    private val decider = BlockDecider(ownPackage = own)
 
-    private fun check(pkg: String?, at: Long, enabled: Boolean = true, list: Set<String> = blocked) =
-        decider.shouldBlock(pkg, at, enabled, list)
+    private fun check(pkg: String?, at: Long, list: Set<String> = blocked) = decider.shouldBlock(pkg, at, list)
 
     @Test
     fun `blocks an app on the list`() {
@@ -22,19 +21,14 @@ class BlockDeciderTest {
     }
 
     @Test
-    fun `allows an app that isn't on the list`() {
+    fun `allows an app that isn't on the list, and everything when the list is empty`() {
         assertFalse(check("com.whatsapp", at = 0))
+        assertFalse(check(instagram, at = 0, list = emptySet()))
     }
 
     @Test
-    fun `allows everything when blocking is off`() {
-        assertFalse(check(instagram, at = 0, enabled = false))
-    }
-
-    @Test
-    fun `never blocks our own app or the launcher, even when listed`() {
+    fun `never blocks our own app, even when listed`() {
         assertFalse(check(own, at = 0, list = blocked + own))
-        assertFalse(check(launcher, at = 0, list = blocked + launcher))
     }
 
     @Test
@@ -65,22 +59,15 @@ class BlockDeciderTest {
     }
 
     @Test
-    fun `blocks again right away after another app was in front`() {
-        assertTrue(check(instagram, at = 0))
-        assertFalse(check("com.whatsapp", at = 100))
-        assertTrue(check(instagram, at = 200))
-    }
-
-    @Test
     fun `a different blocked app is blocked within the window`() {
         assertTrue(check(instagram, at = 0))
         assertTrue(check(chrome, at = 100))
     }
 
     @Test
-    fun `turning blocking off and on resets the duplicate check`() {
+    fun `stopping and starting blocking resets the duplicate check`() {
         assertTrue(check(instagram, at = 0))
-        assertFalse(check(instagram, at = 100, enabled = false))
+        assertFalse(check(instagram, at = 100, list = emptySet()))
         assertTrue(check(instagram, at = 200))
     }
 }

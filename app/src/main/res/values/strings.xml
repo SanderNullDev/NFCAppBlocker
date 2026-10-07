@@ -156,22 +156,9 @@
     <string name="write_result_tag_lost">Write interrupted: the tag moved away and may hold partial content. Hold it still and try again.</string>
     <string name="write_result_failed">Write failed: %1$s</string>
 
-    <!-- Spike A: blocking -->
+    <!-- Blocking -->
     <string name="blocker_service_description">Detects when an app you\'ve chosen to block comes to the foreground and shows a block screen instead. It only looks at which app is open; it doesn\'t read screen content.</string>
-    <string name="blocking_spike_title">Blocking test</string>
-    <string name="blocking_service_on">Accessibility service: enabled.</string>
-    <string name="blocking_service_off">Accessibility service: not enabled. Blocking can\'t work until you turn it on.</string>
-    <string name="blocking_open_settings">Open accessibility settings</string>
-    <string name="blocking_toggle_title">Block test apps</string>
-    <string name="blocking_toggle_on">On. Blocking %1$s.</string>
-    <string name="blocking_toggle_off">Off. %1$s open normally.</string>
-    <string name="blocking_latency_heading">Time until the block screen was visible</string>
-    <string name="blocking_none_yet">No blocks yet.</string>
-    <string name="blocking_latency_entry">%1$s  %2$s: %3$d ms</string>
-    <string name="blocking_events_heading">Service events</string>
-    <string name="blocking_events_empty">No events since the app process started.</string>
-    <string name="blocking_event_entry">%1$s  %2$s (%3$d s after boot)</string>
     <string name="block_title">%1$s is blocked</string>
-    <string name="block_body">Blocking test is on. Turn it off in NFC App Blocker to use this app again.</string>
+    <string name="block_body">\u201c%1$s\u201d is blocking it. Scan a tag linked to \u201c%1$s\u201d to stop blocking.</string>
     <string name="block_go_home">Go to home screen</string>
 </resources>

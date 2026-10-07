@@ -1,10 +1,10 @@
-package nl.nulldevelopment.nfcappblocker.spike.blocking
+package nl.nulldevelopment.nfcappblocker.blocking
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -42,16 +42,15 @@ import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
 import java.util.function.Consumer
 
 /**
- * Shown over a blocked app (spike A). The window is translucent: the blocked app stays visible
+ * Shown over a blocked app (D-001). The window is translucent: the blocked app stays visible
  * behind a dark scrim, and blurred on devices with cross-window blur, so the brief moment the app
  * is visible reads as the block taking effect rather than as a glitch. Never traps the user: the
  * button and Back both go to the home screen, never back into the blocked app.
  */
 class BlockActivity : ComponentActivity() {
 
-    private var blockedPackage by mutableStateOf("")
-    private var eventUptimeMillis = 0L
-    private var latencyRecorded = false
+    private var appName by mutableStateOf("")
+    private var profileName by mutableStateOf("")
 
     /** False when the device has cross-window blur off or unsupported (the reference device). */
     private var blurAvailable by mutableStateOf(false)
@@ -67,7 +66,8 @@ class BlockActivity : ComponentActivity() {
         setContent {
             NFCAppBlockerTheme {
                 BlockScreen(
-                    appName = BlockingSpike.appName(blockedPackage),
+                    appName = appName,
+                    profileName = profileName,
                     blurAvailable = blurAvailable,
                     onGoHome = ::goHome,
                 )
@@ -86,15 +86,6 @@ class BlockActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         readExtras(intent)
-    }
-
-    /** Focus is the closest cheap signal for "the user can see the block screen now". */
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus && !latencyRecorded && eventUptimeMillis > 0) {
-            latencyRecorded = true
-            BlockingSpike.recordLatency(blockedPackage, SystemClock.uptimeMillis() - eventUptimeMillis)
-        }
     }
 
     /**
@@ -118,9 +109,13 @@ class BlockActivity : ComponentActivity() {
     }
 
     private fun readExtras(intent: Intent) {
-        blockedPackage = intent.getStringExtra(EXTRA_PACKAGE).orEmpty()
-        eventUptimeMillis = intent.getLongExtra(EXTRA_EVENT_UPTIME, 0L)
-        latencyRecorded = false
+        val packageName = intent.getStringExtra(EXTRA_PACKAGE).orEmpty()
+        appName = try {
+            packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0)).toString()
+        } catch (_: PackageManager.NameNotFoundException) {
+            packageName
+        }
+        profileName = intent.getStringExtra(EXTRA_PROFILE_NAME).orEmpty()
     }
 
     private fun goHome() {
@@ -130,14 +125,14 @@ class BlockActivity : ComponentActivity() {
 
     companion object {
         private const val EXTRA_PACKAGE = "blocked_package"
-        private const val EXTRA_EVENT_UPTIME = "event_uptime"
+        private const val EXTRA_PROFILE_NAME = "profile_name"
         private const val BLUR_RADIUS_DP = 32
 
-        fun intent(context: Context, blockedPackage: String, eventUptimeMillis: Long): Intent =
+        fun intent(context: Context, blockedPackage: String, profileName: String): Intent =
             Intent(context, BlockActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(EXTRA_PACKAGE, blockedPackage)
-                .putExtra(EXTRA_EVENT_UPTIME, eventUptimeMillis)
+                .putExtra(EXTRA_PROFILE_NAME, profileName)
     }
 }
 
@@ -146,7 +141,7 @@ private const val SCRIM_ALPHA_WITH_BLUR = 0.35f
 private const val SCRIM_ALPHA_WITHOUT_BLUR = 0.92f
 
 @Composable
-private fun BlockScreen(appName: String, blurAvailable: Boolean, onGoHome: () -> Unit) {
+private fun BlockScreen(appName: String, profileName: String, blurAvailable: Boolean, onGoHome: () -> Unit) {
     val scrimAlpha by animateFloatAsState(
         targetValue = if (blurAvailable) SCRIM_ALPHA_WITH_BLUR else SCRIM_ALPHA_WITHOUT_BLUR,
         label = "scrim",
@@ -176,7 +171,7 @@ private fun BlockScreen(appName: String, blurAvailable: Boolean, onGoHome: () ->
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    stringResource(R.string.block_body),
+                    stringResource(R.string.block_body, profileName),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )

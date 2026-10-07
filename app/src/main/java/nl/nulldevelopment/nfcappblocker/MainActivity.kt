@@ -1,12 +1,7 @@
 package nl.nulldevelopment.nfcappblocker
 
-import android.accessibilityservice.AccessibilityServiceInfo
-import android.content.ComponentName
-import android.content.Intent
 import android.nfc.NfcAdapter
 import android.os.Bundle
-import android.provider.Settings
-import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -32,13 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileEditorScreen
@@ -55,10 +48,6 @@ import nl.nulldevelopment.nfcappblocker.navigation.TestToolsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.rememberNavigationState
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
 import nl.nulldevelopment.nfcappblocker.nfc.TagScans
-import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockerAccessibilityService
-import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockingSpike
-import nl.nulldevelopment.nfcappblocker.spike.blocking.BlockingSpikeState
-import nl.nulldevelopment.nfcappblocker.spike.blocking.blockingSpikeItems
 import nl.nulldevelopment.nfcappblocker.ui.scan.ScanDebugScreen
 import nl.nulldevelopment.nfcappblocker.ui.scan.WriteControls
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
@@ -73,7 +62,6 @@ class MainActivity : ComponentActivity() {
     private enum class ReaderStatus { ACTIVE, NFC_OFF, NO_NFC }
 
     private var readerStatus by mutableStateOf(ReaderStatus.ACTIVE)
-    private var accessibilityServiceEnabled by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,10 +132,6 @@ class MainActivity : ComponentActivity() {
     private fun TestTools() {
         val scans by TagScans.recent.collectAsStateWithLifecycle()
         val writeArmed by TagScans.writeArmed.collectAsStateWithLifecycle()
-        val blockingFlow = remember { BlockingSpike.enabled(this@MainActivity) }
-        val blockingOn by blockingFlow.collectAsStateWithLifecycle(initialValue = false)
-        val latencies by BlockingSpike.latencies.collectAsStateWithLifecycle()
-        val events by BlockingSpike.events.collectAsStateWithLifecycle()
         // While shown, scans go to the spike's scan log (and write test) instead of a pairing flow.
         LaunchedEffect(Unit) {
             tagEvents.platformTags.collect { tag -> withContext(Dispatchers.IO) { TagScans.onReaderModeTag(tag) } }
@@ -164,13 +148,6 @@ class MainActivity : ComponentActivity() {
             scans = scans,
             writeControls = WriteControls(writeArmed, TagScans::armWrite, TagScans::cancelWrite)
                 .takeIf { readerStatus == ReaderStatus.ACTIVE },
-            extraItems = {
-                blockingSpikeItems(
-                    state = BlockingSpikeState(accessibilityServiceEnabled, blockingOn, latencies, events),
-                    onBlockingChange = { on -> lifecycleScope.launch { BlockingSpike.setEnabled(this@MainActivity, on) } },
-                    onOpenAccessibilitySettings = { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) },
-                )
-            },
         )
     }
 
@@ -187,14 +164,6 @@ class MainActivity : ComponentActivity() {
             else -> ReaderStatus.ACTIVE
         }
         adapter?.enableReaderMode(this, tagEvents::onTagDiscovered, READER_FLAGS, null)
-        accessibilityServiceEnabled = isBlockerServiceEnabled()
-    }
-
-    private fun isBlockerServiceEnabled(): Boolean {
-        val ours = ComponentName(this, BlockerAccessibilityService::class.java)
-        return getSystemService(AccessibilityManager::class.java)
-            .getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
-            .any { ComponentName.unflattenFromString(it.id) == ours }
     }
 
     override fun onPause() {
