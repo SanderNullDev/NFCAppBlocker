@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -39,12 +40,14 @@ import nl.nulldevelopment.nfcappblocker.blocking.ScanToggleRunner
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileEditorScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileListScreen
+import nl.nulldevelopment.nfcappblocker.feature.status.StatusScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagDetailsScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagListScreen
 import nl.nulldevelopment.nfcappblocker.navigation.AddTagRoute
 import nl.nulldevelopment.nfcappblocker.navigation.Navigator
 import nl.nulldevelopment.nfcappblocker.navigation.ProfileEditorRoute
 import nl.nulldevelopment.nfcappblocker.navigation.ProfilesRoute
+import nl.nulldevelopment.nfcappblocker.navigation.StatusRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagDetailsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagListRoute
 import nl.nulldevelopment.nfcappblocker.navigation.rememberNavigationState
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NFCAppBlockerTheme {
-                val navigationState = rememberNavigationState(ProfilesRoute, TABS.keys)
+                val navigationState = rememberNavigationState(StatusRoute, TABS.keys)
                 val navigator = remember(navigationState) { Navigator(navigationState) }
                 // Scans that couldn't toggle anything ask for a screen: from the runner while the app
                 // is open, or through the intent when ScanActivity opened the app.
@@ -92,6 +95,12 @@ class MainActivity : ComponentActivity() {
                     pendingNavigation = null
                 }
                 val entryProvider = entryProvider {
+                    entry<StatusRoute> {
+                        StatusScreen(
+                            onOpenProfiles = { navigator.navigate(ProfilesRoute) },
+                            onOpenTags = { navigator.navigate(TagListRoute) },
+                        )
+                    }
                     entry<ProfilesRoute> {
                         ProfileListScreen(
                             onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) },
@@ -198,6 +207,7 @@ class MainActivity : ComponentActivity() {
                 }
 
         private val TABS: Map<NavKey, Tab> = linkedMapOf(
+            StatusRoute to Tab(Icons.Filled.Info, R.string.tab_status),
             ProfilesRoute to Tab(Icons.AutoMirrored.Filled.List, R.string.tab_profiles),
             TagListRoute to Tab(Icons.Filled.Lock, R.string.tab_tags),
         )

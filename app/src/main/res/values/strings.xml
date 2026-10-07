@@ -12,6 +12,34 @@
     <string name="tab_profiles">Profiles</string>
     <string name="tab_tags">Tags</string>
 
+    <string name="tab_status">Status</string>
+
+    <!-- Status -->
+    <string name="status_title">Status</string>
+    <string name="status_not_blocking">Not blocking</string>
+    <string name="status_not_blocking_hint">Tap a linked tag to start blocking.</string>
+    <string name="status_blocking">Blocking \u201c%1$s\u201d</string>
+    <string name="status_since">Since %1$s</string>
+    <string name="status_blocking_hint">Tap one of its tags to stop.</string>
+    <plurals name="status_blocked_apps">
+        <item quantity="one">%1$d app blocked</item>
+        <item quantity="other">%1$d apps blocked</item>
+    </plurals>
+    <string name="status_service_off">The accessibility service is off, so blocking can\'t work.</string>
+    <string name="status_service_off_while_blocking">Blocking is on, but it isn\'t working: the accessibility service is off.</string>
+    <string name="status_service_off_hint">Find NFC App Blocker under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
+    <string name="status_open_accessibility">Open accessibility settings</string>
+    <string name="status_notifications_off">Allow notifications to see when blocking is on, also outside the app.</string>
+    <string name="status_allow_notifications">Allow notifications</string>
+    <string name="status_setup_no_profiles">Create a profile with the apps you want to block.</string>
+    <string name="status_go_profiles">Go to profiles</string>
+    <string name="status_setup_no_tags">Link a tag to a profile to start blocking with it.</string>
+    <string name="status_go_tags">Go to tags</string>
+    <string name="notification_channel_name">Blocking status</string>
+    <string name="notification_channel_description">Shows while apps are being blocked.</string>
+    <string name="notification_blocking_title">Blocking \u201c%1$s\u201d</string>
+    <string name="notification_blocking_text">Since %1$s: %2$s</string>
+
     <!-- Profiles -->
     <string name="profiles_title">Profiles</string>
     <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>

@@ -11,6 +11,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import nl.nulldevelopment.nfcappblocker.apps.AndroidInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
+import nl.nulldevelopment.nfcappblocker.blocking.AndroidBlockerServiceStatus
+import nl.nulldevelopment.nfcappblocker.blocking.BlockerServiceStatus
+import nl.nulldevelopment.nfcappblocker.blocking.BlockingNotifications
+import nl.nulldevelopment.nfcappblocker.blocking.BlockingNotifier
 import nl.nulldevelopment.nfcappblocker.data.blocking.ActiveProfileDao
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
@@ -70,4 +74,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun defaultNameFormats(impl: AndroidDefaultNameFormats): DefaultNameFormats
+
+    @Binds
+    abstract fun blockerServiceStatus(impl: AndroidBlockerServiceStatus): BlockerServiceStatus
+
+    @Binds
+    abstract fun blockingNotifications(impl: BlockingNotifier): BlockingNotifications
 }
