@@ -101,6 +101,9 @@ class BlockActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.S)
     private fun enableBlur() {
+        // The radius is set on the decor view, which doesn't exist yet in onCreate; some Android
+        // builds then crash instead of ignoring it. Reading decorView creates it.
+        window.decorView
         window.setBackgroundBlurRadius((BLUR_RADIUS_DP * resources.displayMetrics.density).toInt())
         // Called right away with the current state, and again when e.g. power saving toggles it.
         val listener = Consumer<Boolean> { blurAvailable = it }
