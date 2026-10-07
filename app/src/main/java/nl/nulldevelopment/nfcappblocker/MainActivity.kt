@@ -16,6 +16,10 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -154,15 +158,19 @@ class MainActivity : ComponentActivity() {
         }
         Scaffold(
             bottomBar = {
-                NavigationBar {
-                    TABS.forEach { (route, tab) ->
-                        NavigationBarItem(
-                            selected = route == navigationState.topLevelRoute,
-                            onClick = { navigator.navigate(route) },
-                            // The label names the tab, so the icon needs no description.
-                            icon = { Icon(tab.icon, contentDescription = null) },
-                            label = { Text(stringResource(tab.label)) },
-                        )
+                // The background colour with a hairline, instead of a tinted bar (D-038).
+                Column {
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    NavigationBar(containerColor = MaterialTheme.colorScheme.surface, tonalElevation = 0.dp) {
+                        TABS.forEach { (route, tab) ->
+                            NavigationBarItem(
+                                selected = route == navigationState.topLevelRoute,
+                                onClick = { navigator.navigate(route) },
+                                // The label names the tab, so the icon needs no description.
+                                icon = { Icon(tab.icon, contentDescription = null) },
+                                label = { Text(stringResource(tab.label)) },
+                            )
+                        }
                     }
                 }
             },

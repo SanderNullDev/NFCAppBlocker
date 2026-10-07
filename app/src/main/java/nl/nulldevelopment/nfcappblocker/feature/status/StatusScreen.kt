@@ -60,6 +60,7 @@ import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatus
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
+import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -119,8 +120,8 @@ fun StatusScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             val checklist = setupChecklist(
                 nfc = nfcStatus,
@@ -157,8 +158,8 @@ fun StatusScreen(
 
 @Composable
 private fun SetupCard(items: List<SetupItem>, nfcStatus: NfcStatus, onAction: (SetupStep) -> Unit) {
-    Card(Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    SoftCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 stringResource(R.string.setup_title),
                 style = MaterialTheme.typography.headlineSmall,
@@ -259,11 +260,11 @@ private val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).wi
 
 @Composable
 private fun BlockingCard(state: StatusState.Loaded, onStopWithoutTag: () -> Unit) {
-    Card(Modifier.fillMaxWidth()) {
+    SoftCard(Modifier.fillMaxWidth()) {
         // Polite live region: TalkBack announces when blocking starts or stops while this is open.
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(20.dp)
                 .semantics { liveRegion = LiveRegionMode.Polite },
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {

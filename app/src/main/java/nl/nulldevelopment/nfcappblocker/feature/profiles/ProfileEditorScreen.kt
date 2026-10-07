@@ -66,6 +66,7 @@ import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
+import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -316,7 +317,7 @@ private fun LinkTagButton(choices: List<TagChoice>, onLink: (UUID) -> Unit) {
 
 @Composable
 private fun ScanPanel(scan: EditorScan, viewModel: ProfileEditorViewModel) {
-    Card(
+    SoftCard(
         Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),

@@ -332,10 +332,11 @@ private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit) {
     ) {
         BodyText(stringResource(R.string.onboarding_apps_body, tag.name))
         val loaded = apps ?: return@StepFrame
-        AppSearchField(loaded.query, appsViewModel::setQuery)
+        // No extra indent: the frame already has its side margin.
+        AppSearchField(loaded.query, appsViewModel::setQuery, sidePadding = 0.dp)
         LazyColumn(Modifier.weight(1f)) {
             items(loaded.apps, key = { it.packageName }) { app ->
-                AppPickerRow(app, onToggle = { appsViewModel.setSelected(app.packageName, it) })
+                AppPickerRow(app, onToggle = { appsViewModel.setSelected(app.packageName, it) }, sidePadding = 0.dp)
             }
         }
     }

@@ -45,6 +45,7 @@ import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
 import nl.nulldevelopment.nfcappblocker.ui.components.ProfileRadioList
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
+import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -191,7 +192,7 @@ private fun Actions(tag: PairedTag, onForget: () -> Unit, onWipe: () -> Unit) {
 @Composable
 private fun WipePanel(tag: PairedTag, wipe: WipeState, onCancel: () -> Unit) {
     NfcStatusNotice(rememberNfcStatus())
-    Card(Modifier.fillMaxWidth()) {
+    SoftCard(Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .padding(16.dp)
