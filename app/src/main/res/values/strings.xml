@@ -9,7 +9,7 @@
     <string name="tag_default_name">Tag %1$d</string>
 
     <!-- Navigation -->
-    <string name="tab_profiles">Profiles</string>
+    <string name="tab_profiles">Block lists</string>
     <string name="tab_tags">Tags</string>
 
     <string name="tab_status">Status</string>
@@ -44,10 +44,10 @@
     <string name="setup_notifications_title">Allow notifications</string>
     <string name="setup_notifications_body">To see when blocking is on, also outside the app.</string>
     <string name="setup_notifications_action">Allow notifications</string>
-    <string name="setup_profile_title">Create a profile</string>
-    <string name="setup_profile_body">A profile is a set of apps to block.</string>
-    <string name="setup_profile_action">Go to profiles</string>
-    <string name="setup_tag_title">Link a tag to a profile</string>
+    <string name="setup_profile_title">Create a block list</string>
+    <string name="setup_profile_body">A block list is the set of apps a tag blocks.</string>
+    <string name="setup_profile_action">Go to block lists</string>
+    <string name="setup_tag_title">Link a tag to a block list</string>
     <string name="setup_tag_body">Tapping the tag then starts and stops blocking.</string>
     <string name="setup_tag_action">Go to tags</string>
     <string name="disclosure_title">About the blocker service</string>
@@ -72,33 +72,33 @@
         <item quantity="other">%1$d minutes</item>
     </plurals>
 
-    <!-- Profiles -->
-    <string name="profiles_title">Profiles</string>
-    <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>
-    <string name="profiles_new">New profile</string>
-    <string name="profile_default_name">Profile %1$d</string>
-    <string name="profile_new_title">New profile</string>
+    <!-- Block lists (profiles in the code, D-039) -->
+    <string name="profiles_title">Block lists</string>
+    <string name="profiles_empty">No block lists yet. A block list is the set of apps a tag blocks.</string>
+    <string name="profiles_new">New block list</string>
+    <string name="profile_default_name">Block list %1$d</string>
+    <string name="profile_new_title">New block list</string>
     <string name="profile_save">Save</string>
     <string name="profile_discard_title">Discard changes?</string>
-    <string name="profile_discard_body">Your changes to this profile haven\'t been saved.</string>
+    <string name="profile_discard_body">Your changes to this block list haven\'t been saved.</string>
     <string name="profile_discard">Discard</string>
     <string name="profile_keep_editing">Keep editing</string>
-    <string name="profile_delete">Delete profile</string>
+    <string name="profile_delete">Delete block list</string>
     <string name="profile_delete_title">Delete \u201c%1$s\u201d?</string>
-    <string name="profile_delete_body">Its tags stay paired and can be linked to another profile.</string>
-    <string name="profile_delete_body_active">This profile is blocking now; deleting it stops blocking. Its tags stay paired and can be linked to another profile.</string>
-    <string name="profile_active_note">This profile is blocking now. Saved changes apply straight away.</string>
+    <string name="profile_delete_body">Its tags stay paired and can be linked to another block list.</string>
+    <string name="profile_delete_body_active">This block list is blocking now; deleting it stops blocking. Its tags stay paired and can be linked to another block list.</string>
+    <string name="profile_active_note">This block list is blocking now. Saved changes apply straight away.</string>
     <string name="profile_name_required">Enter a name</string>
     <string name="profile_tags_heading">Tags</string>
-    <string name="profile_no_tags">No tags linked. Scanning a linked tag will turn this profile on or off.</string>
+    <string name="profile_no_tags">No tags linked. Tapping a linked tag turns this block list on or off.</string>
     <string name="profile_unlink_tag">Unlink</string>
     <string name="profile_link_tag">Link a tag</string>
     <string name="profile_scan_tag">Scan a tag</string>
-    <string name="profile_scan_already_here">\u201c%1$s\u201d is already in this profile.</string>
-    <string name="profile_scan_add_to_profile">Add to profile</string>
+    <string name="profile_scan_already_here">\u201c%1$s\u201d is already in this block list.</string>
+    <string name="profile_scan_add_to_profile">Add to block list</string>
     <string name="profile_tag_in_other">Now in \u201c%1$s\u201d</string>
     <string name="profile_move_tag_title">Move \u201c%1$s\u201d here?</string>
-    <string name="profile_move_tag_body">It\'s linked to \u201c%1$s\u201d now. A tag controls one profile at a time.</string>
+    <string name="profile_move_tag_body">It\'s linked to \u201c%1$s\u201d now. A tag controls one block list at a time.</string>
     <string name="profile_move_tag">Move tag</string>
     <plurals name="profile_apps_heading">
         <item quantity="one">Apps to block: %1$d selected</item>
@@ -152,16 +152,16 @@
     <string name="add_failed_not_verified">The tag didn\'t read back correctly after writing. Try again.</string>
     <string name="add_failed_other">Writing failed: %1$s</string>
 
-    <string name="add_choose_profile">Which profile should this tag control?</string>
-    <string name="link_no_profiles">No profiles yet. Create one in the Profiles tab, then link this tag.</string>
-    <string name="profile_none">No profile</string>
+    <string name="add_choose_profile">Which block list should this tag control?</string>
+    <string name="link_no_profiles">No block lists yet. Create one in the Block lists tab, then link this tag.</string>
+    <string name="profile_none">No block list</string>
 
     <!-- Tag details -->
-    <string name="details_profile">Profile: %1$s</string>
-    <string name="details_profile_none">Profile: not linked</string>
-    <string name="details_link_profile">Link to a profile</string>
-    <string name="details_change_profile">Change profile</string>
-    <string name="details_choose_profile">Choose a profile</string>
+    <string name="details_profile">Block list: %1$s</string>
+    <string name="details_profile_none">Block list: not linked</string>
+    <string name="details_link_profile">Link to a block list</string>
+    <string name="details_change_profile">Change block list</string>
+    <string name="details_choose_profile">Choose a block list</string>
     <string name="details_save_name">Save name</string>
     <string name="details_uuid">ID: %1$s</string>
     <string name="details_hardware_uid">Hardware ID: %1$s</string>
@@ -183,7 +183,7 @@
     <string name="scan_stopped">Stopped blocking \u201c%1$s\u201d</string>
     <string name="scan_switched">Switched to \u201c%1$s\u201d, stopped \u201c%2$s\u201d</string>
     <string name="scan_no_apps">\u201c%1$s\u201d has no apps to block yet</string>
-    <string name="scan_not_linked">\u201c%1$s\u201d isn\'t linked to a profile yet</string>
+    <string name="scan_not_linked">\u201c%1$s\u201d isn\'t linked to a block list yet</string>
     <string name="scan_unknown_ours">This tag isn\'t in your list. Hold it against the phone again to add it.</string>
     <string name="scan_not_ours">This tag isn\'t set up for NFC App Blocker. Add it under Tags.</string>
     <string name="blocker_service_description">Detects when an app you\'ve chosen to block comes to the foreground and shows a block screen instead. It only looks at which app is open; it doesn\'t read screen content.</string>
