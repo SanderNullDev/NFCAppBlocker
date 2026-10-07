@@ -24,6 +24,8 @@ import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
 import nl.nulldevelopment.nfcappblocker.data.settings.DataStoreSettingsRepository
+import nl.nulldevelopment.nfcappblocker.data.onboarding.DataStoreOnboardingStore
+import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingStore
 import nl.nulldevelopment.nfcappblocker.data.settings.SettingsRepository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -96,6 +98,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun settingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun onboardingStore(impl: DataStoreOnboardingStore): OnboardingStore
 
     @Binds
     abstract fun blockerServiceStatus(impl: AndroidBlockerServiceStatus): BlockerServiceStatus

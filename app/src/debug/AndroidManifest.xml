@@ -11,6 +11,15 @@
                 <action android:name="nl.nulldevelopment.nfcappblocker.debug.TAP_TAG" />
             </intent-filter>
         </receiver>
+        <!-- Starts onboarding over without clearing data. Same sender limit as above. -->
+        <receiver
+            android:name=".debug.DebugOnboardingReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="nl.nulldevelopment.nfcappblocker.debug.RESET_ONBOARDING" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

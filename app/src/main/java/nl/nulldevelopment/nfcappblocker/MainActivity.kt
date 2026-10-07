@@ -19,13 +19,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,6 +41,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import nl.nulldevelopment.nfcappblocker.blocking.ScanNavigation
 import nl.nulldevelopment.nfcappblocker.blocking.ScanToggleRunner
+import nl.nulldevelopment.nfcappblocker.feature.onboarding.OnboardingScreen
+import nl.nulldevelopment.nfcappblocker.feature.onboarding.OnboardingState
+import nl.nulldevelopment.nfcappblocker.feature.onboarding.OnboardingViewModel
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileEditorScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileListScreen
@@ -77,86 +84,98 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NFCAppBlockerTheme {
-                val navigationState = rememberNavigationState(StatusRoute, TABS.keys)
-                val navigator = remember(navigationState) { Navigator(navigationState) }
-                // Scans that couldn't toggle anything ask for a screen: from the runner while the app
-                // is open, or through the intent when ScanActivity opened the app.
-                LaunchedEffect(navigator) { scanToggleRunner.navigation.collect { pendingNavigation = it } }
-                LaunchedEffect(pendingNavigation) {
-                    when (val request = pendingNavigation) {
-                        is ScanNavigation.OpenTag -> {
-                            navigator.navigate(TagListRoute)
-                            navigator.navigate(TagDetailsRoute(request.uuid.toString()))
-                        }
-                        ScanNavigation.AddTag -> {
-                            navigator.navigate(TagListRoute)
-                            navigator.navigate(AddTagRoute)
-                        }
-                        null -> Unit
-                    }
-                    pendingNavigation = null
-                }
-                val entryProvider = entryProvider {
-                    entry<StatusRoute> {
-                        StatusScreen(
-                            onOpenProfiles = { navigator.navigate(ProfilesRoute) },
-                            onOpenSettings = { navigator.navigate(SettingsRoute) },
-                            onOpenTags = { navigator.navigate(TagListRoute) },
-                        )
-                    }
-                    entry<SettingsRoute> { SettingsScreen(onBack = navigator::goBack) }
-                    entry<ProfilesRoute> {
-                        ProfileListScreen(
-                            onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) },
-                            onNewProfile = { navigator.navigate(ProfileEditorRoute(null)) },
-                        )
-                    }
-                    entry<ProfileEditorRoute> { route ->
-                        ProfileEditorScreen(profileId = route.profileId, onBack = navigator::goBack)
-                    }
-                    entry<TagListRoute> {
-                        TagListScreen(
-                            onAddTag = { navigator.navigate(AddTagRoute) },
-                            onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
-                        )
-                    }
-                    entry<AddTagRoute> {
-                        AddTagScreen(
-                            onBack = navigator::goBack,
-                            // Replace "add tag" so Back from the details returns to the list.
-                            onOpenTag = { uuid -> navigator.replace(TagDetailsRoute(uuid.toString())) },
-                        )
-                    }
-                    entry<TagDetailsRoute> { route ->
-                        TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
-                    }
-                }
-                Scaffold(
-                    bottomBar = {
-                        NavigationBar {
-                            TABS.forEach { (route, tab) ->
-                                NavigationBarItem(
-                                    selected = route == navigationState.topLevelRoute,
-                                    onClick = { navigator.navigate(route) },
-                                    // The label names the tab, so the icon needs no description.
-                                    icon = { Icon(tab.icon, contentDescription = null) },
-                                    label = { Text(stringResource(tab.label)) },
-                                )
-                            }
-                        }
-                    },
-                ) { innerPadding ->
-                    // The bar covers the bottom inset; each screen's own top bar handles the top.
-                    val barPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
-                    NavDisplay(
-                        entries = navigationState.toDecoratedEntries(entryProvider),
-                        onBack = navigator::goBack,
-                        modifier = Modifier
-                            .padding(barPadding)
-                            .consumeWindowInsets(barPadding),
-                    )
+                // First-run onboarding takes the whole screen until it's finished (D-037).
+                val onboarding: OnboardingViewModel = hiltViewModel()
+                val onboardingState by onboarding.state.collectAsStateWithLifecycle()
+                when (val shown = onboardingState) {
+                    OnboardingState.Loading -> Surface(Modifier.fillMaxSize()) {}
+                    is OnboardingState.Showing -> OnboardingScreen(shown, onboarding)
+                    OnboardingState.Hidden -> MainContent()
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun MainContent() {
+        val navigationState = rememberNavigationState(StatusRoute, TABS.keys)
+        val navigator = remember(navigationState) { Navigator(navigationState) }
+        // Scans that couldn't toggle anything ask for a screen: from the runner while the app
+        // is open, or through the intent when ScanActivity opened the app.
+        LaunchedEffect(navigator) { scanToggleRunner.navigation.collect { pendingNavigation = it } }
+        LaunchedEffect(pendingNavigation) {
+            when (val request = pendingNavigation) {
+                is ScanNavigation.OpenTag -> {
+                    navigator.navigate(TagListRoute)
+                    navigator.navigate(TagDetailsRoute(request.uuid.toString()))
+                }
+                ScanNavigation.AddTag -> {
+                    navigator.navigate(TagListRoute)
+                    navigator.navigate(AddTagRoute)
+                }
+                null -> Unit
+            }
+            pendingNavigation = null
+        }
+        val entryProvider = entryProvider {
+            entry<StatusRoute> {
+                StatusScreen(
+                    onOpenProfiles = { navigator.navigate(ProfilesRoute) },
+                    onOpenSettings = { navigator.navigate(SettingsRoute) },
+                    onOpenTags = { navigator.navigate(TagListRoute) },
+                )
+            }
+            entry<SettingsRoute> { SettingsScreen(onBack = navigator::goBack) }
+            entry<ProfilesRoute> {
+                ProfileListScreen(
+                    onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) },
+                    onNewProfile = { navigator.navigate(ProfileEditorRoute(null)) },
+                )
+            }
+            entry<ProfileEditorRoute> { route ->
+                ProfileEditorScreen(profileId = route.profileId, onBack = navigator::goBack)
+            }
+            entry<TagListRoute> {
+                TagListScreen(
+                    onAddTag = { navigator.navigate(AddTagRoute) },
+                    onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
+                )
+            }
+            entry<AddTagRoute> {
+                AddTagScreen(
+                    onBack = navigator::goBack,
+                    // Replace "add tag" so Back from the details returns to the list.
+                    onOpenTag = { uuid -> navigator.replace(TagDetailsRoute(uuid.toString())) },
+                )
+            }
+            entry<TagDetailsRoute> { route ->
+                TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
+            }
+        }
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    TABS.forEach { (route, tab) ->
+                        NavigationBarItem(
+                            selected = route == navigationState.topLevelRoute,
+                            onClick = { navigator.navigate(route) },
+                            // The label names the tab, so the icon needs no description.
+                            icon = { Icon(tab.icon, contentDescription = null) },
+                            label = { Text(stringResource(tab.label)) },
+                        )
+                    }
+                }
+            },
+        ) { innerPadding ->
+            // The bar covers the bottom inset; each screen's own top bar handles the top.
+            val barPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
+            NavDisplay(
+                entries = navigationState.toDecoratedEntries(entryProvider),
+                onBack = navigator::goBack,
+                modifier = Modifier
+                    .padding(barPadding)
+                    .consumeWindowInsets(barPadding),
+            )
         }
     }
 

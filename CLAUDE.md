@@ -64,4 +64,10 @@ Simulate holding a tag against the phone (debug builds only, D-020). `content` i
 adb shell am broadcast -a nl.nulldevelopment.nfcappblocker.debug.TAP_TAG -p nl.nulldevelopment.nfcappblocker --es uid 04:00:00:00:00:00:01 --es content blank
 ```
 
+Start onboarding over without clearing data (debug builds only, D-037):
+
+```bash
+adb shell am broadcast -a nl.nulldevelopment.nfcappblocker.debug.RESET_ONBOARDING -p nl.nulldevelopment.nfcappblocker
+```
+
 Install `:app` with `./gradlew :app:installDebug`, not Android Studio's Run button. Run force-stops the app before installing, and Android then turns off the app's accessibility service, so blocking silently stops until it's re-enabled in Settings → Accessibility.

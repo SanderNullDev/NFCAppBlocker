@@ -55,6 +55,26 @@
     <string name="disclosure_not">It only looks at which app is open. It doesn\'t read what\'s on screen or what you type, and it sends nothing anywhere.</string>
     <string name="disclosure_continue">Open settings</string>
     <string name="disclosure_not_now">Not now</string>
+    <!-- Onboarding (D-037) -->
+    <string name="onboarding_progress">Step %1$d of %2$d</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_welcome_title">Less time on your phone</string>
+    <string name="onboarding_welcome_body">NFC App Blocker blocks the apps you choose. Tap an NFC tag to start blocking, and tap it again to stop.</string>
+    <string name="onboarding_welcome_steps">Setting up takes a few minutes. You\'ll need your NFC tag.</string>
+    <string name="onboarding_service_title">Switch on blocking</string>
+    <string name="onboarding_service_body">To cover the apps you block, NFC App Blocker needs your permission in Android\'s Accessibility settings.</string>
+    <string name="onboarding_service_how">In Settings, find NFC App Blocker (on Samsung phones under Installed apps), open it and switch it on. Then come back here.</string>
+    <string name="onboarding_service_why">What does the app see?</string>
+    <string name="onboarding_open_settings">Open settings</string>
+    <string name="onboarding_service_on_title">Blocking is switched on</string>
+    <string name="onboarding_service_on_body">NFC App Blocker can now cover the apps you block.</string>
+    <string name="onboarding_restricted_title">Is the switch greyed out?</string>
+    <string name="onboarding_restricted_step1">Open App info with the button below.</string>
+    <string name="onboarding_restricted_step2">Tap the three dots at the top right.</string>
+    <string name="onboarding_restricted_step3">Tap Allow restricted settings and confirm.</string>
+    <string name="onboarding_restricted_step4">Come back here and tap Open settings again.</string>
+    <string name="onboarding_open_app_info">Open App info</string>
     <string name="notification_channel_name">Blocking status</string>
     <string name="notification_channel_description">Shows while apps are being blocked, and warns when blocking isn\'t working.</string>
     <string name="notification_blocking_title">Blocking \u201c%1$s\u201d</string>
