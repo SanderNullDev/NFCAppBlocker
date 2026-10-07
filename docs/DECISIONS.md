@@ -214,7 +214,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-024 — Bottom bar with Profiles and Tags
 
 - **Date:** 2026-10-06
-- **Status:** Accepted
+- **Status:** Superseded by D-029
 - **Decision:** The app's top level is a bottom bar with two tabs, Profiles (the start tab) and Tags. Each tab keeps its own back stack; the user always leaves the app through the Profiles tab. Phase 3 can add a third tab for the current blocking status.
 - **Why:** Profiles and tags are both managed often and are equal in importance; tags without a profile need a home of their own.
 - **Alternatives:** One start screen with profiles, reaching tags only through a profile.
@@ -229,3 +229,49 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Trying the editor showed that saving silently in the background left it unclear whether leaving the screen kept the changes. An explicit Save matches what the user expects, and it means backing out of "New profile" leaves no empty profile behind.
 - **Alternatives:** Keep saving as you edit, but show a "Saved" indicator and a Done button (D-021).
 - **Consequences:** Tag pairing still saves straight away (D-019). A tag paired from inside the profile editor is stored at once and only linked to the profile when the profile is saved. Phase 3 must still refuse to activate a profile without apps.
+
+## D-026 — Scan to toggle, and Phase 3 and 4 combined
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** Phase 3 (blocking engine) and Phase 4 (scan to toggle) are built together. Scanning a tag linked to a profile starts that profile; scanning it again (or any other tag of that profile) stops it. Scanning a tag of another profile while one is active switches to that profile (answers open question Q-1). The same tag within 2 seconds is ignored. Tags that can't toggle anything are handled helpfully: an unlinked tag opens its details, an unknown tag of ours opens "Add tag", and a profile without apps isn't started. Each scan gives a short message and a vibration, distinct for starting and stopping.
+- **Why:** Without scan to toggle, Phase 3 would need a temporary start/stop button; the scan path and the debug tag source already existed. Switching does what the user most likely means with one tap.
+- **Alternatives:** A temporary button in Phase 3 and scanning in Phase 4; refusing a scan of another profile's tag while one is active ("scan one of its tags to stop it").
+- **Consequences:** Any linked tag can end the current block. That's accepted under D-007 (no tamper resistance). The 2-second window is a guess, to be tuned in daily use.
+
+## D-027 — Editing an active profile is allowed
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** A profile that's blocking can be edited, and saved changes apply straight away; the editor says the profile is blocking. Deleting the active profile stops blocking, and the confirmation says so (answers open question Q-2).
+- **Why:** Locking the editor would only add friction for a personal tool without tamper resistance (D-007).
+- **Alternatives:** Lock editing and deleting while a profile is active.
+- **Consequences:** Removing apps from an active profile is an easy way around a block. That's a deliberate choice by the user, as D-007 accepts.
+
+## D-028 — Routing scans: screens claim them, otherwise they toggle
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** While the app is open, a scan goes to a screen that needs a tag (adding, wiping, scanning in the profile editor) only while that screen is visible and waiting; it claims scans for that time. Every other scan toggles blocking. With the app closed, the scan opens an invisible activity that toggles, gives feedback and closes, opening the app only when the tag can't toggle anything yet.
+- **Why:** Claiming only while visible means a screen left in another tab's history can never take a scan, for example a hidden "Add tag" writing to a tag being scanned in the profile editor.
+- **Alternatives:** Every listening screen gets every scan; a fixed priority between screens.
+- **Consequences:** Real and simulated scans take the same route (D-020), so the debug tag source tests toggling too.
+
+## D-029 — Status tab as the start screen
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Supersedes:** D-024
+- **Decision:** The bottom bar has three tabs: Status (the start tab), Profiles and Tags, each with its own back stack; the user leaves the app through Status. Status shows whether blocking is on, which profile, since when and which apps, warns when the accessibility service is off (urgently while a profile is active), asks for notification permission, and points to what still needs setting up.
+- **Why:** Whether blocking is on is the first thing to see when opening the app (plan: "the user can always see whether blocking is active").
+- **Alternatives:** Keep Profiles as the start tab (D-024).
+- **Consequences:** Profiles and Tags keep working as described in D-024.
+
+## D-030 — Ongoing notification while blocking
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** While a profile is blocking, an ongoing, silent notification shows the profile, since when and which apps; tapping it opens the app. It needs the notification permission on Android 13+, which the Status tab asks for. Brought forward from Phase 6.
+- **Why:** Status must be visible outside the app too, including after toggling with the app closed.
+- **Alternatives:** Status only inside the app; a foreground service (not needed: the accessibility service does the enforcing).
+- **Consequences:** Phase 5's warning about a disabled accessibility service can use the same notification.

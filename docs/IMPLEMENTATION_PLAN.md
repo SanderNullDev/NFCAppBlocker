@@ -116,7 +116,19 @@ Status (2026-10-06):
 - Restore enforcement after reboot (`BOOT_COMPLETED`) and app updates.
 - Onboarding for battery optimization exemption and OEM-specific background restrictions.
 
+Status (2026-10-07):
+- [x] Active profile stored in the database (version 3), one at a time (D-004); a profile without apps can't be activated; deleting it stops blocking.
+- [x] Scan to toggle (D-026): start, stop, switch, 2-second debounce, help for tags that can't toggle, message and vibration.
+- [x] Real blocker: the accessibility service blocks the active profile's apps minus the never-block rule (D-023); block screen names app and profile. Spike code and test tools removed.
+- [x] Scan routing (D-028): screens claim scans while visible; otherwise a scan toggles; with the app closed, an invisible activity toggles.
+- [x] Status tab as the start screen (D-029) and an ongoing notification (D-030).
+- [x] Editing an active profile allowed, with a note in the editor (D-027).
+- Checked on an emulator with simulated tags (toggling, debounce, routing, Status updates). Not yet checked on the Samsung: blocking a real app, a real tap with the app closed, the notification.
+- [ ] Battery onboarding: only if the long-idle test shows Samsung stopping the service.
+
 ## Phase 4 — Scan to toggle
+
+Built together with Phase 3 (D-026); see the Phase 3 status.
 
 - Paired tag → toggle its profile (D-005). Unknown or foreign tag → pairing flow.
 - Debounce so one physical tap that registers twice doesn't toggle on and immediately off.
@@ -145,8 +157,8 @@ Status (2026-10-06):
 
 ## Open questions
 
-- **Q-1:** Scanning a tag for profile B while profile A is active — switch to B, or reject the scan?
-- **Q-2:** Can profiles and the countdown duration be edited while blocking is active? Given D-007 the likely answer is "yes, that's on the user", but it should be decided explicitly.
+- **Q-1:** Scanning a tag for profile B while profile A is active — switch to B, or reject the scan? **Answered by D-026: switch to B.**
+- **Q-2:** Can profiles and the countdown duration be edited while blocking is active? Given D-007 the likely answer is "yes, that's on the user", but it should be decided explicitly. **Answered for profiles by D-027: yes, changes apply immediately.** The countdown duration is still open (Phase 5).
 
 ## Project layout
 
