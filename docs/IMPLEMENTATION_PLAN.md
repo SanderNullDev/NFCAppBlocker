@@ -27,6 +27,7 @@ See [DECISIONS.md](DECISIONS.md) for the reasoning behind the choices referenced
 - Play Store compliance (AccessibilityService declaration and justification)
 - A redesign of the theming, beyond the Phase 6 fixes
 - A friendlier setup, beyond the Phase 6 checklist
+- The accessibility pass: automated checks in device tests and a TalkBack walkthrough at large font sizes, before a release (D-036)
 
 ## Test hardware
 
@@ -156,7 +157,14 @@ Status (2026-10-07):
 
 ## Phase 6 — Polish
 
-Planned steps (2026-10-07): theme fixes (day and night window themes, own fallback colours), own app and notification icons, a setup checklist on the Status tab, and an accessibility pass with automated checks and a manual TalkBack walkthrough. The notification below is already done (D-030).
+Status (2026-10-07):
+- [x] Dark window in dark mode, so the app doesn't flash white when it opens; teal fallback colours for devices without dynamic colour; template colours removed (D-035).
+- [x] Own app icon (padlock with the NFC symbol), with a themed version and a status bar icon for the notification (D-035).
+- [x] Setup checklist on the Status tab: NFC, service, notifications, profile, linked tag, with an explanation before Accessibility settings (D-034).
+- [x] Ongoing notification (D-030, done in Phase 3).
+- [-] Accessibility pass: postponed until a release (D-036).
+- Checked on an emulator: every screen in dark mode, the icon in the app drawer and the notification, and the checklist with the notification prompt and the service explanation.
+- [ ] Check on the Samsung.
 
 - Material 3 UI, dark theme, dynamic color.
 - Accessibility pass: TalkBack labels on all controls, touch targets ≥ 48 dp, no state conveyed by color alone, announced scan results.

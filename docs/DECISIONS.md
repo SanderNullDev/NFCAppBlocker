@@ -302,3 +302,30 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Force stop turns the service off without telling the user (Phase 0, spike A). Blocking then silently stops while the app still says it's blocking.
 - **Alternatives:** A periodic check with WorkManager; a separate, more urgent notification.
 - **Consequences:** If the service is turned off while the app's process isn't running, for example by force stop, the warning appears only the next time the app starts. A scan of a tag starts the app, so that case is covered too.
+
+## D-034 — Setup checklist on the Status tab
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The Status tab shows a "Finish setting up" checklist: NFC, the blocker service, notifications, a profile with apps, and a linked tag. Each step shows whether it's done (as text for TalkBack, not only as a check mark), and steps still to do have a button. The checklist disappears once everything is done and comes back when a step is undone. Before opening Accessibility settings, a dialog explains what the service looks at and what it doesn't. It replaces the separate notices and hints from D-029; while blocking with the service off, the blocking card says it isn't working.
+- **Why:** Builds on what the Status tab already showed, and keeps working after setup, for example when a force stop turns the service off. Explaining the service before sending the user to Settings is also what Google Play expects of an accessibility service.
+- **Alternatives:** A first-run wizard, shown once; both a wizard and the checklist.
+- **Consequences:** Battery optimisation isn't a step; it's only added if the long-idle test shows Samsung stopping the service. A friendlier setup is planned for later.
+
+## D-035 — Phase 6 look: dark window, stand-in colours, own icon
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The window behind the Compose screens follows dark mode, so the app doesn't flash white when it opens. Dynamic colour stays; devices without it get a Material 3 scheme from a teal seed instead of the template's purple. The app icon is a white padlock with the NFC symbol on teal, with the symbol cut out so the themed (monochrome) icon keeps it, plus a matching status bar icon for the notification.
+- **Why:** Fixes what looked broken (the white flash, the template icon, the notification icon showing as a blob) without designing a full theme yet.
+- **Alternatives:** Only the theme fixes, keeping the template icon.
+- **Consequences:** The teal colours and the icon are a stand-in until the theming redesign planned for later.
+
+## D-036 — Accessibility pass postponed until a release
+
+- **Date:** 2026-10-07
+- **Status:** Deferred
+- **Decision:** The full accessibility pass from Phase 6 (automated accessibility checks in device tests, a TalkBack walkthrough at large font sizes, and the fixes from both) is postponed until the app might be released. What was built in along the way stays: TalkBack labels, touch targets of at least 48dp, live regions for changing state, and state shown as text rather than by colour alone.
+- **Why:** The app is for personal use for now, and its users don't rely on TalkBack or large fonts. The pass is worth doing before others use it.
+- **Alternatives:** Do the pass now (automated checks plus a manual walkthrough), or only the manual walkthrough.
+- **Consequences:** Accessibility problems the per-screen work missed can go unnoticed until then. New screens keep following the accessibility-first rules in CLAUDE.md.
