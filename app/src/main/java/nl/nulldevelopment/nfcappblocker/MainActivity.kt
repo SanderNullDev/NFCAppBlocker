@@ -40,6 +40,7 @@ import nl.nulldevelopment.nfcappblocker.blocking.ScanToggleRunner
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileEditorScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileListScreen
+import nl.nulldevelopment.nfcappblocker.feature.settings.SettingsScreen
 import nl.nulldevelopment.nfcappblocker.feature.status.StatusScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagDetailsScreen
 import nl.nulldevelopment.nfcappblocker.feature.tags.TagListScreen
@@ -47,6 +48,7 @@ import nl.nulldevelopment.nfcappblocker.navigation.AddTagRoute
 import nl.nulldevelopment.nfcappblocker.navigation.Navigator
 import nl.nulldevelopment.nfcappblocker.navigation.ProfileEditorRoute
 import nl.nulldevelopment.nfcappblocker.navigation.ProfilesRoute
+import nl.nulldevelopment.nfcappblocker.navigation.SettingsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.StatusRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagDetailsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagListRoute
@@ -98,9 +100,11 @@ class MainActivity : ComponentActivity() {
                     entry<StatusRoute> {
                         StatusScreen(
                             onOpenProfiles = { navigator.navigate(ProfilesRoute) },
+                            onOpenSettings = { navigator.navigate(SettingsRoute) },
                             onOpenTags = { navigator.navigate(TagListRoute) },
                         )
                     }
+                    entry<SettingsRoute> { SettingsScreen(onBack = navigator::goBack) }
                     entry<ProfilesRoute> {
                         ProfileListScreen(
                             onOpenProfile = { id -> navigator.navigate(ProfileEditorRoute(id)) },

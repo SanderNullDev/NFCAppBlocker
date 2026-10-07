@@ -19,6 +19,12 @@ import nl.nulldevelopment.nfcappblocker.data.blocking.ActiveProfileDao
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
+import nl.nulldevelopment.nfcappblocker.data.settings.DataStoreSettingsRepository
+import nl.nulldevelopment.nfcappblocker.data.settings.SettingsRepository
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileDao
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.profiles.RoomProfileRepository
@@ -52,6 +58,11 @@ object DataModule {
 
     @Provides
     fun clock(): Clock = Clock.systemUTC()
+
+    @Provides
+    @Singleton
+    fun settingsDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create { context.preferencesDataStoreFile("settings") }
 }
 
 @Module
@@ -74,6 +85,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun defaultNameFormats(impl: AndroidDefaultNameFormats): DefaultNameFormats
+
+    @Binds
+    @Singleton
+    abstract fun settingsRepository(impl: DataStoreSettingsRepository): SettingsRepository
 
     @Binds
     abstract fun blockerServiceStatus(impl: AndroidBlockerServiceStatus): BlockerServiceStatus

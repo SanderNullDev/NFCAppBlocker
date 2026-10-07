@@ -7,6 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object StatusRoute : NavKey
 
+@Serializable
+data object SettingsRoute : NavKey
+
 /** Tab: block profiles. */
 @Serializable
 data object ProfilesRoute : NavKey

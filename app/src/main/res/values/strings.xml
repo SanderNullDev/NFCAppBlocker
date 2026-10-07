@@ -40,6 +40,16 @@
     <string name="notification_blocking_title">Blocking \u201c%1$s\u201d</string>
     <string name="notification_blocking_text">Since %1$s: %2$s</string>
 
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_countdown_title">Stop without a tag</string>
+    <string name="settings_countdown_body">To stop blocking without a tag, you wait out a countdown on screen. Leaving the screen cancels it.</string>
+    <string name="settings_countdown_locked">You can change this when nothing is blocking.</string>
+    <plurals name="settings_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
     <!-- Profiles -->
     <string name="profiles_title">Profiles</string>
     <string name="profiles_empty">No profiles yet. A profile is a set of apps to block.</string>

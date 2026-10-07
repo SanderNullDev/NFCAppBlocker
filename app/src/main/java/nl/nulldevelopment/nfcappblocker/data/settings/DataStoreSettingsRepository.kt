@@ -1,0 +1,28 @@
+package nl.nulldevelopment.nfcappblocker.data.settings
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+
+class DataStoreSettingsRepository @Inject constructor(
+    private val dataStore: DataStore<Preferences>,
+) : SettingsRepository {
+
+    override fun observeCountdownMinutes(): Flow<Int> =
+        dataStore.data
+            .map { CountdownLength.clamp(it[COUNTDOWN_MINUTES] ?: CountdownLength.DEFAULT_MINUTES) }
+            .distinctUntilChanged()
+
+    override suspend fun setCountdownMinutes(minutes: Int) {
+        dataStore.edit { it[COUNTDOWN_MINUTES] = CountdownLength.clamp(minutes) }
+    }
+
+    private companion object {
+        val COUNTDOWN_MINUTES = intPreferencesKey("countdown_minutes")
+    }
+}
