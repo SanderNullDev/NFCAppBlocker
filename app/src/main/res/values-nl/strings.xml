@@ -95,8 +95,8 @@
     </plurals>
     <string name="onboarding_stopping_title">Zo stop je met blokkeren</string>
     <string name="onboarding_stopping_tag">Tik nog een keer met \u201c%1$s\u201d. Het blokkeren stopt meteen.</string>
-    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Stoppen zonder tag in de app of op het blokkeerscherm, en wacht tot een aftelling klaar is. Verlaat je het aftelscherm, dan stopt de aftelling.</string>
-    <string name="onboarding_stopping_length">Duur van de aftelling</string>
+    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Stoppen zonder tag in de app of op het blokkeerscherm, en wacht tot het aftellen klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
+    <string name="onboarding_stopping_length">Hoe lang aftellen</string>
     <string name="onboarding_stopping_later">Je kunt dit later wijzigen in Instellingen.</string>
     <string name="onboarding_try_title">Probeer het</string>
     <string name="onboarding_try_body">Houd \u201c%1$s\u201d tegen je telefoon om te beginnen met blokkeren.</string>
@@ -114,7 +114,7 @@
     <!-- Settings -->
     <string name="settings_title">Instellingen</string>
     <string name="settings_countdown_title">Stoppen zonder tag</string>
-    <string name="settings_countdown_body">Om zonder tag te stoppen met blokkeren, wacht je een aftelling op het scherm af. Verlaat je het scherm, dan stopt de aftelling.</string>
+    <string name="settings_countdown_body">Om zonder tag te stoppen met blokkeren, wacht je tot het aftellen op het scherm klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
     <string name="settings_countdown_locked">Je kunt dit wijzigen als er niets wordt geblokkeerd.</string>
     <plurals name="settings_minutes">
         <item quantity="one">%1$d minuut</item>
@@ -240,7 +240,7 @@
     <string name="block_go_home">Naar startscherm</string>
     <string name="escape_start">Stoppen zonder tag</string>
     <string name="escape_title">\u201c%1$s\u201d stoppen?</string>
-    <string name="escape_body">Het blokkeren stopt als de aftelling klaar is. Verlaat je dit scherm of zet je het scherm uit, dan stopt de aftelling.</string>
+    <string name="escape_body">Het blokkeren stopt als het aftellen klaar is. Verlaat je dit scherm of zet je het scherm uit, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
     <plurals name="escape_minutes_left">
         <item quantity="one">Nog %d minuut</item>
         <item quantity="other">Nog %d minuten</item>
