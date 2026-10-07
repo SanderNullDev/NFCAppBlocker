@@ -63,8 +63,9 @@ fun SettingsScreen(onBack: () -> Unit, viewModel: SettingsViewModel = hiltViewMo
     }
 }
 
+/** The countdown length, 1–20 minutes; also used in onboarding. */
 @Composable
-private fun CountdownSlider(minutes: Int, enabled: Boolean, onChange: (Int) -> Unit) {
+fun CountdownSlider(minutes: Int, enabled: Boolean, onChange: (Int) -> Unit) {
     // Follows the drag locally and saves when it's let go, instead of writing on every step.
     var dragging by remember(minutes) { mutableFloatStateOf(minutes.toFloat()) }
     val shown = dragging.roundToInt()

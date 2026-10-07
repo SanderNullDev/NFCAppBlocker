@@ -180,10 +180,10 @@ Goal: someone who isn't technical can set the app up correctly, and the app look
 
 Steps, one at a time:
 1. [x] Decisions and this plan.
-2. [ ] Theme: palette, dynamic colour off, dark version, icon colour.
-3. [ ] Wording: "block list" instead of "profile".
-4. [ ] Onboarding, part 1: first-launch detection, saved progress, welcome, blocker service with the restricted-settings guide.
-5. [ ] Onboarding, part 2: tag, notifications, apps to block, try it.
+2. [x] Theme: palette, dynamic colour off, dark version, icon colour.
+3. [x] Wording: "block list" instead of "profile".
+4. [x] Onboarding, part 1: first-launch detection, saved progress, welcome, blocker service with the restricted-settings guide.
+5. [x] Onboarding, part 2: tag, notifications, apps to block, how to stop (with the countdown length), try it (with the apps that will be blocked).
 6. [ ] Existing screens restyled.
 7. [ ] Dutch translations and the language setting.
 8. [ ] Checks in both languages on the emulator, then on the phones.

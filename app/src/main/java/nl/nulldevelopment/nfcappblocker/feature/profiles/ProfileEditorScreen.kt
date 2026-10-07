@@ -60,6 +60,8 @@ import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingMessage
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingPrimaryAction
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingStepContent
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
+import nl.nulldevelopment.nfcappblocker.ui.components.AppPickerRow
+import nl.nulldevelopment.nfcappblocker.ui.components.AppSearchField
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
@@ -156,9 +158,9 @@ fun ProfileEditorScreen(
                     pluralStringResource(R.plurals.profile_apps_heading, loaded.selectedCount, loaded.selectedCount),
                 )
             }
-            item { SearchField(loaded.query, viewModel::setQuery) }
+            item { AppSearchField(loaded.query, viewModel::setQuery) }
             items(loaded.apps, key = { "app-${it.packageName}" }) { app ->
-                AppRow(app, onToggle = { selected -> viewModel.setAppSelected(app.packageName, selected) })
+                AppPickerRow(app, onToggle = { selected -> viewModel.setAppSelected(app.packageName, selected) })
             }
         }
     }
@@ -372,60 +374,3 @@ private fun NameScannedTag(tag: PairedTag, onDone: (String) -> Unit) {
     PairingPrimaryAction(stringResource(R.string.profile_scan_add_to_profile)) { onDone(name) }
 }
 
-@Composable
-private fun SearchField(query: String, onChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onChange,
-        label = { Text(stringResource(R.string.profile_search_apps)) },
-        leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    )
-}
-
-@Composable
-private fun AppRow(app: AppPickerItem, onToggle: (Boolean) -> Unit) {
-    // Removing is always allowed, so an app that became protected can still be taken out.
-    val enabled = app.selectable || app.selected
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .toggleable(value = app.selected, enabled = enabled, role = Role.Checkbox, onValueChange = onToggle)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            AppIcon(app.packageName)
-            Column(Modifier.weight(1f)) {
-                Text(
-                    app.label,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                appNote(app)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
-            }
-            Checkbox(checked = app.selected, onCheckedChange = null, enabled = enabled)
-        }
-        HorizontalDivider(Modifier.padding(start = 72.dp))
-    }
-}
-
-/** Why an app is unavailable or unusual, in words, so it's not shown by colour alone. */
-@Composable
-private fun appNote(app: AppPickerItem): String? = when {
-    !app.installed -> stringResource(R.string.profile_app_not_installed)
-    else -> when (app.neverBlockReason) {
-        NeverBlockReason.THIS_APP -> stringResource(R.string.never_block_this_app)
-        NeverBlockReason.PHONE -> stringResource(R.string.never_block_phone)
-        NeverBlockReason.SETTINGS -> stringResource(R.string.never_block_settings)
-        NeverBlockReason.LAUNCHER -> stringResource(R.string.never_block_launcher)
-        NeverBlockReason.ALWAYS_ALLOWED -> stringResource(R.string.never_block_always_allowed)
-        null -> null
-    }
-}
