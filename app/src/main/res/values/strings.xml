@@ -54,6 +54,8 @@
     <string name="profile_delete">Delete profile</string>
     <string name="profile_delete_title">Delete \u201c%1$s\u201d?</string>
     <string name="profile_delete_body">Its tags stay paired and can be linked to another profile.</string>
+    <string name="profile_delete_body_active">This profile is blocking now; deleting it stops blocking. Its tags stay paired and can be linked to another profile.</string>
+    <string name="profile_active_note">This profile is blocking now. Saved changes apply straight away.</string>
     <string name="profile_name_required">Enter a name</string>
     <string name="profile_tags_heading">Tags</string>
     <string name="profile_no_tags">No tags linked. Scanning a linked tag will turn this profile on or off.</string>

@@ -120,6 +120,15 @@ fun ProfileEditorScreen(
                 bottom = innerPadding.calculateBottomPadding() + 16.dp,
             ),
         ) {
+            if (loaded.isActive) {
+                item {
+                    Text(
+                        stringResource(R.string.profile_active_note),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
+            }
             item { NameField(profileId, loaded.name, viewModel::setName) }
             item { SectionHeading(stringResource(R.string.profile_tags_heading)) }
             if (loaded.linkedTags.isEmpty()) {
@@ -158,7 +167,9 @@ fun ProfileEditorScreen(
         AlertDialog(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.profile_delete_title, loaded.name)) },
-            text = { Text(stringResource(R.string.profile_delete_body)) },
+            text = {
+                Text(stringResource(if (loaded.isActive) R.string.profile_delete_body_active else R.string.profile_delete_body))
+            },
             confirmButton = {
                 TextButton(onClick = {
                     confirmDelete = false

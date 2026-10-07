@@ -10,6 +10,7 @@ import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
 import nl.nulldevelopment.nfcappblocker.nfc.ScannedTag
 import nl.nulldevelopment.nfcappblocker.nfc.TagContent
 import nl.nulldevelopment.nfcappblocker.testing.FakeNdefTarget
+import nl.nulldevelopment.nfcappblocker.testing.FakeBlockingRepository
 import nl.nulldevelopment.nfcappblocker.testing.FakeDefaultNameFormats
 import nl.nulldevelopment.nfcappblocker.testing.FakeInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.testing.FakeProfileRepository
@@ -45,9 +46,10 @@ class ProfileEditorViewModelTest {
     private val bed = UUID.fromString("00000000-0000-0000-0000-00000000000b")
 
     private val tagEvents = NfcTagEvents()
+    private val blocking = FakeBlockingRepository(profiles)
 
     private fun editor(profileId: Long?) = ProfileEditorViewModel(
-        profileId, profiles, tags, apps, FakeDefaultNameFormats(), tagEvents, UnconfinedTestDispatcher(),
+        profileId, profiles, tags, apps, FakeDefaultNameFormats(), tagEvents, blocking, UnconfinedTestDispatcher(),
     )
 
     private fun tap(content: TagContent, uid: String = "04:AA") =
@@ -203,6 +205,17 @@ class ProfileEditorViewModelTest {
 
             vm.setAppSelected(settings, false)
             assertEquals(0, vm.loaded().selectedCount)
+        }
+
+        @Test
+        fun `says when the profile is blocking right now`() = runTest {
+            val id = profiles.create("Focus", setOf(instagram))
+            val vm = editor(id)
+            assertFalse(vm.loaded().isActive)
+
+            blocking.activate(id)
+
+            assertTrue(vm.loaded().isActive)
         }
 
         @Test

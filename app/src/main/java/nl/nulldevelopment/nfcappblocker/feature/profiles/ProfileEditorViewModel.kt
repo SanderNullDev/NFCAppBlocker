@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,6 +23,7 @@ import nl.nulldevelopment.nfcappblocker.apps.InstalledApp
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.apps.NeverBlockPolicy
 import nl.nulldevelopment.nfcappblocker.apps.appPickerItems
+import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
@@ -57,6 +59,8 @@ sealed interface ProfileEditorState {
         val hasChanges: Boolean,
         /** A new profile can be saved untouched; an existing one only after a change. */
         val canSave: Boolean,
+        /** This profile is blocking right now; saved changes apply straight away (Q-2). */
+        val isActive: Boolean,
     ) : ProfileEditorState
 }
 
@@ -87,6 +91,7 @@ class ProfileEditorViewModel @AssistedInject constructor(
     private val apps: InstalledAppsSource,
     private val names: DefaultNameFormats,
     private val tagEvents: NfcTagEvents,
+    private val blocking: BlockingRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -130,13 +135,15 @@ class ProfileEditorViewModel @AssistedInject constructor(
         }
     }
 
+    private val isActive = blocking.observeActive().map { active -> profileId != null && active.any { it.profile.id == profileId } }
+
     val state: StateFlow<ProfileEditorState> = combine(
-        combine(saved, draft, missing, ::Triple),
+        combine(saved, draft, missing, isActive, ::EditorInputs),
         tags.observeAll(),
         profiles.observeAll(),
         appsData,
         query,
-    ) { (saved, draft, missing), allTags, allProfiles, data, query ->
+    ) { (saved, draft, missing, isActive), allTags, allProfiles, data, query ->
         when {
             missing -> ProfileEditorState.Missing
             // Deleted while open (only an existing profile can disappear).
@@ -156,6 +163,7 @@ class ProfileEditorViewModel @AssistedInject constructor(
                         .map { TagChoice(it, it.profileId?.takeIf { id -> id != profileId }?.let(namesById::get)) },
                     hasChanges = hasChanges,
                     canSave = (hasChanges || profileId == null) && draft.name.isNotBlank(),
+                    isActive = isActive,
                 )
             }
         }
@@ -278,4 +286,6 @@ class ProfileEditorViewModel @AssistedInject constructor(
     }
 
     private fun editDraft(change: (Draft) -> Draft) = draft.update { it?.let(change) }
+
+    private data class EditorInputs(val saved: Draft?, val draft: Draft?, val missing: Boolean, val isActive: Boolean)
 }
