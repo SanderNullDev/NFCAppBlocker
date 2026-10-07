@@ -1,5 +1,7 @@
 package nl.nulldevelopment.nfcappblocker
 
+import android.content.Context
+import android.content.Intent
 import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,7 +19,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,8 @@ import androidx.navigation3.ui.NavDisplay
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import nl.nulldevelopment.nfcappblocker.blocking.ScanNavigation
+import nl.nulldevelopment.nfcappblocker.blocking.ScanToggleRunner
 import nl.nulldevelopment.nfcappblocker.feature.pairing.AddTagScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileEditorScreen
 import nl.nulldevelopment.nfcappblocker.feature.profiles.ProfileListScreen
@@ -44,12 +47,8 @@ import nl.nulldevelopment.nfcappblocker.navigation.ProfileEditorRoute
 import nl.nulldevelopment.nfcappblocker.navigation.ProfilesRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagDetailsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.TagListRoute
-import nl.nulldevelopment.nfcappblocker.navigation.TestToolsRoute
 import nl.nulldevelopment.nfcappblocker.navigation.rememberNavigationState
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
-import nl.nulldevelopment.nfcappblocker.nfc.TagScans
-import nl.nulldevelopment.nfcappblocker.ui.scan.ScanDebugScreen
-import nl.nulldevelopment.nfcappblocker.ui.scan.WriteControls
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
 import java.util.UUID
 import javax.inject.Inject
@@ -58,6 +57,10 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject lateinit var tagEvents: NfcTagEvents
+    @Inject lateinit var scanToggleRunner: ScanToggleRunner
+
+    /** A screen to open, asked for by a scan; see [intentFor]. */
+    private var pendingNavigation by mutableStateOf<ScanNavigation?>(null)
 
     private enum class ReaderStatus { ACTIVE, NFC_OFF, NO_NFC }
 
@@ -65,11 +68,29 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) pendingNavigation = navigationFrom(intent)
         enableEdgeToEdge()
         setContent {
             NFCAppBlockerTheme {
                 val navigationState = rememberNavigationState(ProfilesRoute, TABS.keys)
                 val navigator = remember(navigationState) { Navigator(navigationState) }
+                // Scans that couldn't toggle anything ask for a screen: from the runner while the app
+                // is open, or through the intent when ScanActivity opened the app.
+                LaunchedEffect(navigator) { scanToggleRunner.navigation.collect { pendingNavigation = it } }
+                LaunchedEffect(pendingNavigation) {
+                    when (val request = pendingNavigation) {
+                        is ScanNavigation.OpenTag -> {
+                            navigator.navigate(TagListRoute)
+                            navigator.navigate(TagDetailsRoute(request.uuid.toString()))
+                        }
+                        ScanNavigation.AddTag -> {
+                            navigator.navigate(TagListRoute)
+                            navigator.navigate(AddTagRoute)
+                        }
+                        null -> Unit
+                    }
+                    pendingNavigation = null
+                }
                 val entryProvider = entryProvider {
                     entry<ProfilesRoute> {
                         ProfileListScreen(
@@ -84,7 +105,6 @@ class MainActivity : ComponentActivity() {
                         TagListScreen(
                             onAddTag = { navigator.navigate(AddTagRoute) },
                             onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
-                            onOpenTestTools = { navigator.navigate(TestToolsRoute) },
                         )
                     }
                     entry<AddTagRoute> {
@@ -97,7 +117,6 @@ class MainActivity : ComponentActivity() {
                     entry<TagDetailsRoute> { route ->
                         TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
                     }
-                    entry<TestToolsRoute> { TestTools() }
                 }
                 Scaffold(
                     bottomBar = {
@@ -128,27 +147,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    private fun TestTools() {
-        val scans by TagScans.recent.collectAsStateWithLifecycle()
-        val writeArmed by TagScans.writeArmed.collectAsStateWithLifecycle()
-        // While shown, scans go to the spike's scan log (and write test) instead of a pairing flow.
-        LaunchedEffect(Unit) {
-            tagEvents.platformTags.collect { tag -> withContext(Dispatchers.IO) { TagScans.onReaderModeTag(tag) } }
-        }
-        val status = stringResource(
-            when (readerStatus) {
-                ReaderStatus.ACTIVE -> R.string.scan_status_reader_mode
-                ReaderStatus.NFC_OFF -> R.string.scan_status_nfc_off
-                ReaderStatus.NO_NFC -> R.string.scan_status_no_nfc
-            },
-        )
-        ScanDebugScreen(
-            status = status,
-            scans = scans,
-            writeControls = WriteControls(writeArmed, TagScans::armWrite, TagScans::cancelWrite)
-                .takeIf { readerStatus == ReaderStatus.ACTIVE },
-        )
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        navigationFrom(intent)?.let { pendingNavigation = it }
+    }
+
+    private fun navigationFrom(intent: Intent): ScanNavigation? = when (intent.getStringExtra(EXTRA_OPEN)) {
+        OPEN_TAG -> intent.getStringExtra(EXTRA_TAG_UUID)?.let { ScanNavigation.OpenTag(UUID.fromString(it)) }
+        OPEN_ADD_TAG -> ScanNavigation.AddTag
+        else -> null
     }
 
     /**
@@ -168,20 +175,34 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         NfcAdapter.getDefaultAdapter(this)?.disableReaderMode(this)
-        // An armed write shouldn't wait around to overwrite some tag after the user comes back.
-        TagScans.cancelWrite()
         super.onPause()
     }
 
     private class Tab(val icon: ImageVector, @StringRes val label: Int)
 
-    private companion object {
-        val TABS: Map<NavKey, Tab> = linkedMapOf(
+    companion object {
+        private const val EXTRA_OPEN = "open"
+        private const val EXTRA_TAG_UUID = "tag_uuid"
+        private const val OPEN_TAG = "tag"
+        private const val OPEN_ADD_TAG = "add_tag"
+
+        /** Opens the app on the screen a scan asked for. */
+        fun intentFor(context: Context, navigation: ScanNavigation): Intent =
+            Intent(context, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                .apply {
+                    when (navigation) {
+                        is ScanNavigation.OpenTag -> putExtra(EXTRA_OPEN, OPEN_TAG).putExtra(EXTRA_TAG_UUID, navigation.uuid.toString())
+                        ScanNavigation.AddTag -> putExtra(EXTRA_OPEN, OPEN_ADD_TAG)
+                    }
+                }
+
+        private val TABS: Map<NavKey, Tab> = linkedMapOf(
             ProfilesRoute to Tab(Icons.AutoMirrored.Filled.List, R.string.tab_profiles),
             TagListRoute to Tab(Icons.Filled.Lock, R.string.tab_tags),
         )
 
-        const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or
+        private const val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A or
             NfcAdapter.FLAG_READER_NFC_B or
             NfcAdapter.FLAG_READER_NFC_F or
             NfcAdapter.FLAG_READER_NFC_V

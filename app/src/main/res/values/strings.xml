@@ -56,7 +56,6 @@
 
     <!-- Tag list -->
     <string name="tags_title">Tags</string>
-    <string name="test_tools">Test tools</string>
     <string name="tags_add">Add tag</string>
     <string name="tags_empty">No tags yet. Add a tag to get started.</string>
     <string name="tags_added_on">Added %1$s</string>
@@ -117,46 +116,14 @@
     <string name="details_wipe_failed_not_verified">The tag didn\'t read back as empty. Try again.</string>
     <string name="details_wipe_failed_other">Wiping failed: %1$s</string>
 
-    <!-- Spike B scan debug screen -->
-    <string name="scan_debug_title">Scan test</string>
-    <string name="scan_status_reader_mode">Reader mode is on. Hold a tag against this phone.</string>
-    <string name="scan_status_nfc_off">NFC is turned off. Turn it on to scan tags.</string>
-    <string name="scan_status_no_nfc">This phone has no NFC hardware.</string>
-    <string name="scan_status_dispatch">Opened by a tag scan. Scanning again while this screen is open tests the new-intent path.</string>
-    <string name="scan_section">Scans</string>
-    <string name="scan_none_yet">No scans yet.</string>
-    <string name="scan_latest">Latest scan</string>
-    <string name="scan_earlier">Earlier scans</string>
-    <string name="scan_outcome_ours">Our tag</string>
-    <string name="scan_outcome_foreign">Foreign tag (no record of ours)</string>
-    <string name="scan_outcome_unsupported">Our tag, unsupported payload version %1$d</string>
-    <string name="scan_outcome_malformed">Unreadable tag content: %1$s</string>
-    <string name="scan_outcome_no_ndef">Tag without an NDEF message</string>
-    <string name="scan_source">Received via: %1$s</string>
-    <string name="scan_source_dispatch_launch">tag dispatch, activity launched</string>
-    <string name="scan_source_dispatch_new_intent">tag dispatch, activity already open</string>
-    <string name="scan_source_reader_mode">reader mode</string>
-    <string name="scan_process_cold">Process started %1$d ms before the scan (cold start)</string>
-    <string name="scan_process_warm">Process running for %1$d ms (warm)</string>
-    <string name="scan_uid">UID: %1$s</string>
-    <string name="scan_techs">Technologies: %1$s</string>
-
-    <!-- Spike B write test -->
-    <string name="write_arm">Write test tag</string>
-    <string name="write_cancel">Cancel write</string>
-    <string name="write_armed">Ready to write. Hold a tag against the phone; its content will be replaced with a new UUID.</string>
-    <string name="write_previous_content">Before writing: %1$s</string>
-    <string name="write_result_written">Written and verified, new UUID:</string>
-    <string name="write_result_unverified">Written, but reading it back failed (%1$s). New UUID:</string>
-    <string name="write_result_mismatch">Written, but the tag reads back differently: %1$s. Intended UUID:</string>
-    <string name="write_result_read_only">Not written: the tag is read-only.</string>
-    <!-- Sizes are tag capacities and message lengths, never 1. -->
-    <string name="write_result_too_small" tools:ignore="PluralsCandidate">Not written: the tag holds %1$d bytes, the message needs %2$d.</string>
-    <string name="write_result_not_ndef">Not written: this tag type can\'t hold NDEF.</string>
-    <string name="write_result_tag_lost">Write interrupted: the tag moved away and may hold partial content. Hold it still and try again.</string>
-    <string name="write_result_failed">Write failed: %1$s</string>
-
     <!-- Blocking -->
+    <string name="scan_started">Blocking \u201c%1$s\u201d</string>
+    <string name="scan_stopped">Stopped blocking \u201c%1$s\u201d</string>
+    <string name="scan_switched">Switched to \u201c%1$s\u201d, stopped \u201c%2$s\u201d</string>
+    <string name="scan_no_apps">\u201c%1$s\u201d has no apps to block yet</string>
+    <string name="scan_not_linked">\u201c%1$s\u201d isn\'t linked to a profile yet</string>
+    <string name="scan_unknown_ours">This tag isn\'t in your list. Hold it against the phone again to add it.</string>
+    <string name="scan_not_ours">This tag isn\'t set up for NFC App Blocker. Add it under Tags.</string>
     <string name="blocker_service_description">Detects when an app you\'ve chosen to block comes to the foreground and shows a block screen instead. It only looks at which app is open; it doesn\'t read screen content.</string>
     <string name="block_title">%1$s is blocked</string>
     <string name="block_body">\u201c%1$s\u201d is blocking it. Scan a tag linked to \u201c%1$s\u201d to stop blocking.</string>

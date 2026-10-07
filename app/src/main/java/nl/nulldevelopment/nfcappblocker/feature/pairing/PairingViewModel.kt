@@ -16,6 +16,7 @@ import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
 import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
+import nl.nulldevelopment.nfcappblocker.nfc.ScanClaim
 import java.util.UUID
 import javax.inject.Inject
 
@@ -36,12 +37,19 @@ class PairingViewModel @Inject constructor(
 
     val state: StateFlow<PairingState> = flow.state
 
+    /** Waiting for a tag the whole time the screen is shown. */
+    private val claim = ScanClaim(tagEvents).apply { setWanted(true) }
+
     init {
         viewModelScope.launch {
             // Each scan in its own coroutine, so PairingFlow can drop a scan that arrives mid-write.
-            tagEvents.scans.collect { tag -> launch { flow.onTagScanned(tag) } }
+            tagEvents.scans.collect { tag -> if (claim.active) launch { flow.onTagScanned(tag) } }
         }
     }
+
+    fun setResumed(resumed: Boolean) = claim.setResumed(resumed)
+
+    override fun onCleared() = claim.close()
 
     fun confirmOverwrite() = act { flow.confirmOverwrite() }
     fun adopt() = act { flow.adopt() }

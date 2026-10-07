@@ -29,6 +29,7 @@ import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingFlow
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingState
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
+import nl.nulldevelopment.nfcappblocker.nfc.ScanClaim
 import nl.nulldevelopment.nfcappblocker.util.DefaultNameFormats
 import nl.nulldevelopment.nfcappblocker.util.firstUnusedName
 import java.util.UUID
@@ -182,13 +183,21 @@ class ProfileEditorViewModel @AssistedInject constructor(
     private var scanJob: Job? = null
     private var pairing: PairingFlow? = null
 
+    /** Wanted only while "Scan a tag" is open. */
+    private val claim = ScanClaim(tagEvents)
+
+    fun setResumed(resumed: Boolean) = claim.setResumed(resumed)
+
+    override fun onCleared() = claim.close()
+
     /** Listens for a tag: a paired one is linked, an unknown one is paired first. */
     fun startScan() {
         stopScan()
         val flow = PairingFlow(tags, names::tag, ioDispatcher)
         pairing = flow
+        claim.setWanted(true)
         scanJob = viewModelScope.launch {
-            launch { tagEvents.scans.collect { tag -> launch { flow.onTagScanned(tag) } } }
+            launch { tagEvents.scans.collect { tag -> if (claim.active) launch { flow.onTagScanned(tag) } } }
             flow.state.collect { state ->
                 when (state) {
                     is PairingState.AlreadyPaired -> onKnownTag(state.tag)
@@ -200,6 +209,7 @@ class ProfileEditorViewModel @AssistedInject constructor(
     }
 
     fun stopScan() {
+        claim.setWanted(false)
         scanJob?.cancel()
         scanJob = null
         pairing = null

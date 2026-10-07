@@ -22,6 +22,7 @@ import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
 import nl.nulldevelopment.nfcappblocker.di.IoDispatcher
 import nl.nulldevelopment.nfcappblocker.nfc.NfcTagEvents
+import nl.nulldevelopment.nfcappblocker.nfc.ScanClaim
 import nl.nulldevelopment.nfcappblocker.nfc.ScannedTag
 import nl.nulldevelopment.nfcappblocker.nfc.TagWiper
 import nl.nulldevelopment.nfcappblocker.nfc.WipeResult
@@ -69,6 +70,13 @@ class TagDetailsViewModel @AssistedInject constructor(
     val wipe: StateFlow<WipeState> = _wipe.asStateFlow()
     private var wipeJob: Job? = null
 
+    /** Wanted only while waiting to wipe. */
+    private val claim = ScanClaim(tagEvents)
+
+    fun setResumed(resumed: Boolean) = claim.setResumed(resumed)
+
+    override fun onCleared() = claim.close()
+
     fun rename(name: String) {
         if (name.isBlank()) return
         viewModelScope.launch { repository.rename(uuid, name.trim()) }
@@ -88,12 +96,14 @@ class TagDetailsViewModel @AssistedInject constructor(
     fun startWipe() {
         wipeJob?.cancel()
         _wipe.value = WipeState.WaitingForTag()
+        claim.setWanted(true)
         wipeJob = viewModelScope.launch {
-            tagEvents.scans.collect { tag -> onTagForWipe(tag) }
+            tagEvents.scans.collect { tag -> if (claim.active) onTagForWipe(tag) }
         }
     }
 
     fun cancelWipe() {
+        claim.setWanted(false)
         wipeJob?.cancel()
         _wipe.value = WipeState.Idle
     }
@@ -104,6 +114,7 @@ class TagDetailsViewModel @AssistedInject constructor(
         when (val result = withContext(ioDispatcher) { TagWiper.wipe(tag, uuid) }) {
             WipeResult.Wiped -> {
                 repository.remove(uuid)
+                claim.setWanted(false)
                 wipeJob?.cancel()
                 _wipe.value = WipeState.Idle
             }

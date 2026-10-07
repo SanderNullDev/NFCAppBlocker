@@ -62,6 +62,7 @@ import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingStepContent
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
+import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.util.UUID
 
@@ -78,6 +79,7 @@ fun ProfileEditorScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val scan by viewModel.scan.collectAsStateWithLifecycle()
     val closed by viewModel.closed.collectAsStateWithLifecycle()
+    ResumedEffect(viewModel::setResumed)
     // Saved, deleted or gone: close once.
     val shouldClose = closed || state == ProfileEditorState.Missing
     LaunchedEffect(shouldClose) { if (shouldClose) onBack() }

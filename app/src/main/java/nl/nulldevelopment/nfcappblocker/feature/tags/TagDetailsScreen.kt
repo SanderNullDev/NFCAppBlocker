@@ -43,6 +43,7 @@ import nl.nulldevelopment.nfcappblocker.nfc.WipeResult
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
 import nl.nulldevelopment.nfcappblocker.ui.components.ProfileRadioList
+import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -60,6 +61,7 @@ fun TagDetailsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val wipe by viewModel.wipe.collectAsStateWithLifecycle()
+    ResumedEffect(viewModel::setResumed)
 
     // Forgotten or wiped: nothing left to show here.
     LaunchedEffect(state) { if (state == TagDetailsState.Missing) onBack() }

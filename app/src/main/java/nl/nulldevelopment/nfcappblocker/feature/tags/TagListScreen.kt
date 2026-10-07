@@ -17,7 +17,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +38,6 @@ import java.util.UUID
 fun TagListScreen(
     onAddTag: () -> Unit,
     onOpenTag: (UUID) -> Unit,
-    onOpenTestTools: () -> Unit,
     viewModel: TagListViewModel = hiltViewModel(),
 ) {
     val tags by viewModel.tags.collectAsStateWithLifecycle()
@@ -48,7 +46,6 @@ fun TagListScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.tags_title)) },
-                actions = { TextButton(onClick = onOpenTestTools) { Text(stringResource(R.string.test_tools)) } },
             )
         },
         floatingActionButton = {

@@ -246,6 +246,7 @@ class ProfileEditorViewModelTest {
             val vm = editor(profiles.create("Focus", emptySet()))
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             tap(TagContent.Ours(desk))
 
@@ -261,6 +262,7 @@ class ProfileEditorViewModelTest {
             val vm = editor(id)
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             tap(TagContent.Ours(desk))
 
@@ -275,6 +277,7 @@ class ProfileEditorViewModelTest {
             val vm = editor(focus)
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             tap(TagContent.Ours(bed))
             assertEquals(EditorScan.ConfirmMove(tags.tags.value.single(), "Evening"), vm.scan.value)
@@ -291,6 +294,7 @@ class ProfileEditorViewModelTest {
             val vm = editor(null)
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             tap(TagContent.Empty)
             val naming = vm.scan.value as EditorScan.NameNewTag
@@ -308,6 +312,7 @@ class ProfileEditorViewModelTest {
             val vm = editor(null)
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             tap(TagContent.Foreign)
 
@@ -320,11 +325,24 @@ class ProfileEditorViewModelTest {
             val vm = editor(profiles.create("Focus", emptySet()))
             vm.loaded()
 
+            vm.setResumed(true)
             vm.startScan()
             vm.stopScan()
             tap(TagContent.Ours(desk))
 
             assertNull(vm.scan.value)
+            assertTrue(vm.loaded().linkedTags.isEmpty())
+        }
+
+        @Test
+        fun `while the screen isn't resumed, scans go elsewhere`() = runTest {
+            tags.tags.value = listOf(PairedTag(desk, "Desk", null, Instant.EPOCH))
+            val vm = editor(profiles.create("Focus", emptySet()))
+            vm.loaded()
+
+            vm.startScan()
+            tap(TagContent.Ours(desk))
+
             assertTrue(vm.loaded().linkedTags.isEmpty())
         }
     }

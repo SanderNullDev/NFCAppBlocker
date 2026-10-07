@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.NFC" />
+    <!-- Vibration as feedback when a scan starts or stops blocking. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Not required, so the app still installs on test devices without NFC. -->
     <uses-feature
@@ -55,8 +57,9 @@
             android:exported="true"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
+            android:noHistory="true"
             android:taskAffinity="nl.nulldevelopment.nfcappblocker.scan"
-            android:theme="@style/Theme.NFCAppBlocker">
+            android:theme="@style/Theme.NFCAppBlocker.Invisible">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -42,6 +42,7 @@ import nl.nulldevelopment.nfcappblocker.nfc.TagContent
 import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatusNotice
 import nl.nulldevelopment.nfcappblocker.ui.components.ProfileRadioList
+import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.util.UUID
 
@@ -55,6 +56,7 @@ fun AddTagScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val profiles by viewModel.profiles.collectAsStateWithLifecycle()
     val nfcStatus = rememberNfcStatus()
+    ResumedEffect(viewModel::setResumed)
 
     Scaffold(
         topBar = {

@@ -3,6 +3,12 @@
 
     <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.Light.NoActionBar" />
 
+    <!-- ScanActivity: handles a scan without showing anything. -->
+    <style name="Theme.NFCAppBlocker.Invisible" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowNoDisplay">false</item>
+    </style>
+
     <!-- Block screen: translucent, so the blocked app shows through dimmed (and blurred where
          the device supports cross-window blur; the reference device doesn't, see D-016). -->
     <style name="Theme.NFCAppBlocker.Block">
