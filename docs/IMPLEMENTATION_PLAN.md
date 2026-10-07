@@ -123,7 +123,9 @@ Status (2026-10-07):
 - [x] Scan routing (D-028): screens claim scans while visible; otherwise a scan toggles; with the app closed, an invisible activity toggles.
 - [x] Status tab as the start screen (D-029) and an ongoing notification (D-030).
 - [x] Editing an active profile allowed, with a note in the editor (D-027).
-- Checked on an emulator with simulated tags (toggling, debounce, routing, Status updates). Not yet checked on the Samsung: blocking a real app, a real tap with the app closed, the notification.
+- Checked on an emulator with simulated tags (toggling, debounce, routing, Status updates).
+- [x] Checked on the Samsung (2026-10-07): blocking a real app, tapping the sticker with the app open and closed, the block screen, the notification, switching the service on from the Status tab.
+- [ ] Long-idle test with the real blocker (overnight).
 - [ ] Battery onboarding: only if the long-idle test shows Samsung stopping the service.
 
 ## Phase 4 — Scan to toggle
