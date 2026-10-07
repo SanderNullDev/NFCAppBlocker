@@ -33,11 +33,11 @@ sealed interface StatusState {
         val since: Instant?,
         val blockedApps: List<BlockedApp>,
         val serviceEnabled: Boolean,
-        /** What the user still has to set up before a tag can start blocking. */
-        val setup: Setup,
+        /** At least one profile has apps to block. */
+        val hasProfileWithApps: Boolean,
+        /** At least one tag is linked to a profile. */
+        val hasLinkedTag: Boolean,
     ) : StatusState
-
-    enum class Setup { NoProfiles, NoLinkedTags, Ready }
 }
 
 @HiltViewModel
@@ -84,11 +84,8 @@ class StatusViewModel @Inject constructor(
                 .map { BlockedApp(it, labels[it] ?: it) }
                 .sortedBy { it.label.lowercase() },
             serviceEnabled = enabled,
-            setup = when {
-                allProfiles.isEmpty() -> StatusState.Setup.NoProfiles
-                allTags.none { it.profileId != null } -> StatusState.Setup.NoLinkedTags
-                else -> StatusState.Setup.Ready
-            },
+            hasProfileWithApps = allProfiles.any { it.packageNames.isNotEmpty() },
+            hasLinkedTag = allTags.any { it.profileId != null },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatusState.Loading)
 }

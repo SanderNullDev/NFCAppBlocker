@@ -59,19 +59,30 @@ class StatusViewModelTest {
     }
 
     @Test
-    fun `with nothing set up, it asks for a profile first`() = runTest {
+    fun `with nothing set up, there's no profile with apps and no linked tag`() = runTest {
         val state = viewModel().loaded()
 
         assertNull(state.activeProfileName)
-        assertEquals(StatusState.Setup.NoProfiles, state.setup)
+        assertFalse(state.hasProfileWithApps)
+        assertFalse(state.hasLinkedTag)
     }
 
     @Test
-    fun `with a profile but no linked tag, it asks to link one`() = runTest {
+    fun `a profile without apps doesn't count`() = runTest {
+        profiles.create("Empty", emptySet())
+
+        assertFalse(viewModel().loaded().hasProfileWithApps)
+    }
+
+    @Test
+    fun `with a profile but no linked tag, only the profile counts`() = runTest {
         profiles.create("Focus", setOf("com.instagram.android"))
         tags.tags.value = listOf(PairedTag(UUID.randomUUID(), "Desk", null, Instant.EPOCH))
 
-        assertEquals(StatusState.Setup.NoLinkedTags, viewModel().loaded().setup)
+        val state = viewModel().loaded()
+
+        assertTrue(state.hasProfileWithApps)
+        assertFalse(state.hasLinkedTag)
     }
 
     @Test
@@ -87,7 +98,7 @@ class StatusViewModelTest {
         assertEquals("Focus", state.activeProfileName)
         assertEquals(Instant.parse("2026-10-07T09:30:00Z"), state.since)
         assertEquals(listOf("Chrome", "Instagram"), state.blockedApps.map { it.label })
-        assertEquals(StatusState.Setup.Ready, state.setup)
+        assertTrue(state.hasProfileWithApps && state.hasLinkedTag)
     }
 
     @Test
