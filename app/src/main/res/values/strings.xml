@@ -36,9 +36,11 @@
     <string name="status_setup_no_tags">Link a tag to a profile to start blocking with it.</string>
     <string name="status_go_tags">Go to tags</string>
     <string name="notification_channel_name">Blocking status</string>
-    <string name="notification_channel_description">Shows while apps are being blocked.</string>
+    <string name="notification_channel_description">Shows while apps are being blocked, and warns when blocking isn\'t working.</string>
     <string name="notification_blocking_title">Blocking \u201c%1$s\u201d</string>
     <string name="notification_blocking_text">Since %1$s: %2$s</string>
+    <string name="notification_not_working_title">\u201c%1$s\u201d isn\'t blocking anything</string>
+    <string name="notification_not_working_text">The accessibility service is off. Tap to open the app and switch it back on.</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

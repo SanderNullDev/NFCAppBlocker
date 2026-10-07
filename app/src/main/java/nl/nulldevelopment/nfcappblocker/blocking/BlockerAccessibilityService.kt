@@ -1,6 +1,7 @@
 package nl.nulldevelopment.nfcappblocker.blocking
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Intent
 import android.os.SystemClock
 import android.view.accessibility.AccessibilityEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +23,7 @@ class BlockerAccessibilityService : AccessibilityService() {
 
     @Inject lateinit var blocking: BlockingRepository
     @Inject lateinit var apps: InstalledAppsSource
+    @Inject lateinit var notifier: BlockingNotifier
 
     private val scope = MainScope()
     private lateinit var decider: BlockDecider
@@ -32,6 +34,8 @@ class BlockerAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         decider = BlockDecider(ownPackage = packageName)
+        // Switched (back) on: clears a "not working" warning.
+        notifier.refresh()
         scope.launch {
             // The never-block rule is re-read on every change, so a new launcher or phone app is
             // picked up the next time blocking starts.
@@ -51,6 +55,12 @@ class BlockerAccessibilityService : AccessibilityService() {
     }
 
     override fun onInterrupt() = Unit
+
+    /** The user switched the service off (or Android did); the notification warns while blocking. */
+    override fun onUnbind(intent: Intent?): Boolean {
+        notifier.onServiceStopped()
+        return super.onUnbind(intent)
+    }
 
     override fun onDestroy() {
         scope.cancel()
