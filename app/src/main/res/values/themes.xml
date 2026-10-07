@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Light window behind the Compose screens; values-night has the dark one. -->
-    <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Light window behind the Compose screens; values-night has the dark one. The background
+         matches the app's broken white, so the launch screen doesn't change colour (D-038). -->
+    <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
 
     <!-- ScanActivity: handles a scan without showing anything. -->
     <style name="Theme.NFCAppBlocker.Invisible" parent="android:Theme.Translucent.NoTitleBar">
