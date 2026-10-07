@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Dark window behind the Compose screens, so dark mode doesn't flash white on launch.
+         The variants in values/themes.xml inherit this by name. -->
+    <style name="Theme.NFCAppBlocker" parent="android:Theme.Material.NoActionBar" />
+</resources>
