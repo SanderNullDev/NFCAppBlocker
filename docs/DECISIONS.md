@@ -367,3 +367,12 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Both users speak Dutch and want the app in Dutch.
 - **Alternatives:** AppCompat's language API, which also works on Android 11 and 12 but needs AppCompat activities.
 - **Consequences:** Every new text needs a Dutch version; lint reports missing translations. Translations are done last in Phase 7, so new texts are translated once.
+
+## D-041 — The app is called Tikstop
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The app's name is Tikstop, in English and Dutch: "tik" (tap) plus "stop". It replaces "NFC App Blocker" in every text the user sees, including the launcher and the accessibility service's name in Settings. The package name (`nl.nulldevelopment.nfcappblocker`) and the project stay as they are.
+- **Why:** Short and easy to say in both languages, it says what you do, and it fits the main use, cutting down TikTok.
+- **Alternatives:** PauseTap, Tapaway, Stil, Rust, Slot.
+- **Consequences:** Changing the package name would install a separate app and lose existing data, so it stays. Check the Play Store and trademarks before any release.
