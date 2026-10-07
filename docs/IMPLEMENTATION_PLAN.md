@@ -143,6 +143,15 @@ Built together with Phase 3 (D-026); see the Phase 3 status.
 - Detect a disabled or killed AccessibilityService and surface it clearly instead of failing silently. Force stop disables the service (see spike A findings), so this must also reach the user outside the app, e.g. through the status notification.
 - No tamper resistance: uninstalling the app or disabling the service is an accepted way out (D-007).
 
+Status (2026-10-07):
+- [x] Settings screen (gear on the Status tab) with the countdown length, 1–20 minutes, default 3; locked while blocking (D-032).
+- [x] Countdown logic, unit tested with a test clock: time left, finishing, cancelling, once-a-minute TalkBack updates.
+- [x] Countdown screen from the Status tab and the block screen (D-031): keeps the display on, cancelled by leaving it or turning off the display, stops blocking with the same feedback as a tag.
+- [x] Notification warns when the service is off while blocking (D-033), triggered by the service unbinding and checked at app start.
+- [x] Fixed a block screen crash on devices with cross-window blur (the blur was set before the window had a view); the reference device has no blur, so it never showed there.
+- Checked on an emulator with simulated tags: Settings lock, countdown from both places, cancelling with Home, display off and "Keep blocking", a full 3-minute run, and the notification across turning the service off and on and a cold start.
+- [ ] Check on the Samsung. Installing over USB failed on 2026-10-07 (the connection dropped during every APK transfer).
+
 ## Phase 6 — Polish
 
 - Material 3 UI, dark theme, dynamic color.
@@ -160,7 +169,7 @@ Built together with Phase 3 (D-026); see the Phase 3 status.
 ## Open questions
 
 - **Q-1:** Scanning a tag for profile B while profile A is active — switch to B, or reject the scan? **Answered by D-026: switch to B.**
-- **Q-2:** Can profiles and the countdown duration be edited while blocking is active? Given D-007 the likely answer is "yes, that's on the user", but it should be decided explicitly. **Answered for profiles by D-027: yes, changes apply immediately.** The countdown duration is still open (Phase 5).
+- **Q-2:** Can profiles and the countdown duration be edited while blocking is active? Given D-007 the likely answer is "yes, that's on the user", but it should be decided explicitly. **Answered for profiles by D-027: yes, changes apply immediately. The countdown length is locked while blocking (D-032).**
 
 ## Project layout
 

@@ -275,3 +275,30 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Status must be visible outside the app too, including after toggling with the app closed.
 - **Alternatives:** Status only inside the app; a foreground service (not needed: the accessibility service does the enforcing).
 - **Consequences:** Phase 5's warning about a disabled accessibility service can use the same notification.
+
+## D-031 — How the escape countdown works
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** Works out the countdown from D-006. "Stop without a tag" is on the Status tab and on the block screen, only while a profile is blocking. The countdown has its own screen, which keeps the display on. Leaving the screen (Back, Home, another app) or turning off the display cancels it, and so does blocking stopping or switching to another profile in the meantime. When it finishes, it stops the profile it was started for, with the same message and vibration as a tag. TalkBack hears the minutes left once a minute, not every second. Cancelling from the block screen goes to the home screen. When the countdown finishes there, the app that was blocked comes back.
+- **Why:** The countdown is meant as friction, so it should take attention for its whole length rather than run in the background. Keeping the display on means the screen timeout can't cancel it by accident.
+- **Alternatives:** Only start it from the Status tab; let it keep running when the screen is left, or pause it.
+- **Consequences:** A phone call or anything else that covers the screen cancels the countdown, and the user starts it again.
+
+## D-032 — Countdown length locked while blocking
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** The countdown length can be changed in Settings only while nothing is blocking. While a profile is blocking, the setting is disabled with an explanation, and changes are refused (answers the rest of open question Q-2).
+- **Why:** Otherwise the way out of a block is to set the countdown to 1 minute and start it, which makes the chosen length pointless. Unlike editing a profile (D-027), this setting exists only as friction.
+- **Alternatives:** Allow changes at any time, as with profiles (D-027).
+- **Consequences:** This is friction, not tamper resistance: under D-007 the user can still turn off the accessibility service.
+
+## D-033 — Warning when the accessibility service is off
+
+- **Date:** 2026-10-07
+- **Status:** Accepted
+- **Decision:** While a profile is blocking and the accessibility service is off, the ongoing notification (D-030) says the profile isn't blocking anything and that the service is off; tapping it opens the app, where the Status tab has the button to fix it (D-029). The service reports being switched off from `onUnbind`, and the app checks the service at start and whenever the Status tab is shown. When the service comes back, the normal text returns.
+- **Why:** Force stop turns the service off without telling the user (Phase 0, spike A). Blocking then silently stops while the app still says it's blocking.
+- **Alternatives:** A periodic check with WorkManager; a separate, more urgent notification.
+- **Consequences:** If the service is turned off while the app's process isn't running, for example by force stop, the warning appears only the next time the app starts. A scan of a tag starts the app, so that case is covered too.
