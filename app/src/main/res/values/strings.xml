@@ -95,7 +95,7 @@
     </plurals>
     <string name="onboarding_stopping_title">How to stop blocking</string>
     <string name="onboarding_stopping_tag">Tap \u201c%1$s\u201d again. Blocking stops straight away.</string>
-    <string name="onboarding_stopping_without">No tag at hand? Choose Stop without a tag in the app or on the block screen, and wait for a countdown to finish. Leaving the countdown screen cancels it.</string>
+    <string name="onboarding_stopping_without">No tag at hand? Choose Stop without a tag in the app or on the block screen, and wait for a countdown to finish. Leaving the screen stops the countdown, but your block list stays active.</string>
     <string name="onboarding_stopping_length">Countdown length</string>
     <string name="onboarding_stopping_later">You can change this later in Settings.</string>
     <string name="onboarding_try_title">Try it</string>
@@ -114,7 +114,7 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_countdown_title">Stop without a tag</string>
-    <string name="settings_countdown_body">To stop blocking without a tag, you wait out a countdown on screen. Leaving the screen cancels it.</string>
+    <string name="settings_countdown_body">To stop blocking without a tag, you wait out a countdown on screen. Leaving the screen stops the countdown, but your block list stays active.</string>
     <string name="settings_countdown_locked">You can change this when nothing is blocking.</string>
     <plurals name="settings_minutes">
         <item quantity="one">%1$d minute</item>
@@ -241,7 +241,7 @@
     <string name="block_go_home">Go to home screen</string>
     <string name="escape_start">Stop without a tag</string>
     <string name="escape_title">Stop blocking \u201c%1$s\u201d?</string>
-    <string name="escape_body">Blocking stops when the countdown ends. Leaving this screen or turning off the display cancels it.</string>
+    <string name="escape_body">Blocking stops when the countdown ends. Leaving this screen or turning off the display stops the countdown, but your block list stays active.</string>
     <plurals name="escape_minutes_left">
         <item quantity="one">%d minute left</item>
         <item quantity="other">%d minutes left</item>
