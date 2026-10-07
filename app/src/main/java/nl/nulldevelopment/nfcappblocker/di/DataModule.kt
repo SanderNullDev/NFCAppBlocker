@@ -11,6 +11,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import nl.nulldevelopment.nfcappblocker.apps.AndroidInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
+import nl.nulldevelopment.nfcappblocker.data.blocking.ActiveProfileDao
+import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
+import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileDao
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
@@ -41,6 +44,9 @@ object DataModule {
     fun profileDao(database: AppDatabase): ProfileDao = database.profileDao()
 
     @Provides
+    fun activeProfileDao(database: AppDatabase): ActiveProfileDao = database.activeProfileDao()
+
+    @Provides
     fun clock(): Clock = Clock.systemUTC()
 }
 
@@ -54,6 +60,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun profileRepository(impl: RoomProfileRepository): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun blockingRepository(impl: RoomBlockingRepository): BlockingRepository
 
     @Binds
     abstract fun installedAppsSource(impl: AndroidInstalledAppsSource): InstalledAppsSource

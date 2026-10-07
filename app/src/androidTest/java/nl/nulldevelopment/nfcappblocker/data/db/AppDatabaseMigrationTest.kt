@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -17,10 +18,19 @@ class AppDatabaseMigrationTest {
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
 
+    /**
+     * The test's own scratch file, never the app's real database. Tests now run without
+     * uninstalling the app (CLAUDE.md), so a file from an earlier run must be removed first.
+     */
+    @Before
+    fun deleteScratchDatabase() {
+        instrumentation.targetContext.deleteDatabase(DATABASE)
+    }
+
     @get:Rule
     val helper = MigrationTestHelper(
         instrumentation = instrumentation,
-        file = instrumentation.targetContext.getDatabasePath("migration-test.db"),
+        file = instrumentation.targetContext.getDatabasePath(DATABASE),
         driver = AndroidSQLiteDriver(),
         databaseClass = AppDatabase::class,
     )
@@ -47,5 +57,35 @@ class AppDatabaseMigrationTest {
                 assertEquals(0L, row.getLong(0))
             }
         }
+    }
+
+    @Test
+    fun profilesAppsAndLinkedTagsSurviveVersion3WithNothingActive() = runTest {
+        helper.createDatabase(2).use { connection ->
+            connection.execSQL("INSERT INTO profiles (id, name, created_at) VALUES (1, 'Focus', 1000)")
+            connection.execSQL("INSERT INTO profile_apps (profile_id, package_name) VALUES (1, 'com.instagram.android')")
+            connection.execSQL(
+                "INSERT INTO tags (uuid, name, hardware_uid, created_at, profile_id) " +
+                    "VALUES ('6e24ed8e-a569-4248-942c-fcbb1b99043c', 'Desk', NULL, 1000, 1)",
+            )
+        }
+
+        helper.runMigrationsAndValidate(3).use { connection ->
+            connection.prepare("SELECT p.name, a.package_name, t.name FROM profiles p " +
+                "JOIN profile_apps a ON a.profile_id = p.id JOIN tags t ON t.profile_id = p.id").use { row ->
+                assertTrue(row.step())
+                assertEquals("Focus", row.getText(0))
+                assertEquals("com.instagram.android", row.getText(1))
+                assertEquals("Desk", row.getText(2))
+            }
+            connection.prepare("SELECT COUNT(*) FROM active_profiles").use { row ->
+                assertTrue(row.step())
+                assertEquals(0L, row.getLong(0))
+            }
+        }
+    }
+
+    private companion object {
+        const val DATABASE = "migration-test.db"
     }
 }
