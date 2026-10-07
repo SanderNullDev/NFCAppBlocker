@@ -187,7 +187,7 @@ Steps, one at a time:
 6. [x] Existing screens restyled: light cards (white with a hairline; one step lighter in dark mode), more space on Status, the bottom bar in the background colour, and the onboarding app list lined up with its text.
    - Next session (2026-10-07): a redesign of the Status (home) screen, beyond this restyle.
    - Still to record: onboarding has seven steps, with "How to stop" (countdown length) added before "Try it"; D-037 lists six, so it needs a new entry.
-7. [ ] Dutch translations and the language setting.
+7. [~] Dutch translations done (informal "je", Samsung's Dutch terms); still to do: the language setting in Settings (D-040), and a read-through by both users.
 8. [ ] Checks in both languages on the emulator, then on the phones.
 
 ## Testing strategy (all phases)

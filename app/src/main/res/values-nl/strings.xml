@@ -1,0 +1,249 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dutch (D-040). Informal "je"; terms match Samsung's Dutch Settings. -->
+
+    <!-- Common -->
+    <string name="navigate_back">Terug</string>
+    <string name="nfc_missing">Deze telefoon heeft geen NFC, dus tags kunnen niet worden gelezen.</string>
+    <string name="nfc_off">NFC staat uit. Zet het aan om tags te gebruiken.</string>
+    <string name="nfc_open_settings">NFC-instellingen openen</string>
+    <string name="tag_default_name">Tag %1$d</string>
+
+    <!-- Navigation -->
+    <string name="tab_profiles">Blokkeerlijsten</string>
+    <string name="tab_tags">Tags</string>
+    <string name="tab_status">Status</string>
+
+    <!-- Status -->
+    <string name="status_title">Status</string>
+    <string name="status_not_blocking">Niet aan het blokkeren</string>
+    <string name="status_not_blocking_hint">Tik met een gekoppelde tag om te beginnen met blokkeren.</string>
+    <string name="status_blocking">\u201c%1$s\u201d blokkeert</string>
+    <string name="status_since">Sinds %1$s</string>
+    <string name="status_blocking_hint">Tik met een van de tags om te stoppen.</string>
+    <plurals name="status_blocked_apps">
+        <item quantity="one">%1$d app geblokkeerd</item>
+        <item quantity="other">%1$d apps geblokkeerd</item>
+    </plurals>
+    <string name="status_service_off_while_blocking">Blokkeren staat aan, maar werkt niet: de toegankelijkheidsservice staat uit.</string>
+    <string name="status_service_off_hint">Zoek NFC App Blocker onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
+    <string name="setup_title">Instellen afronden</string>
+    <plurals name="setup_progress">
+        <item quantity="one">%1$d van %2$d stap klaar</item>
+        <item quantity="other">%1$d van %2$d stappen klaar</item>
+    </plurals>
+    <string name="setup_done">Klaar</string>
+    <string name="setup_to_do">Nog te doen</string>
+    <string name="setup_nfc_title">Zet NFC aan</string>
+    <string name="setup_nfc_body">Tags worden via NFC gelezen.</string>
+    <string name="setup_nfc_missing_title">Geen NFC op deze telefoon</string>
+    <string name="setup_nfc_missing_body">Zonder NFC kunnen tags niet worden gelezen.</string>
+    <string name="setup_service_title">Zet de blokkeerservice aan</string>
+    <string name="setup_service_body">Blokkeren werkt via een toegankelijkheidsservice. Zonder die service wordt niets geblokkeerd.</string>
+    <string name="setup_service_action">Aanzetten</string>
+    <string name="setup_notifications_title">Meldingen toestaan</string>
+    <string name="setup_notifications_body">Zo zie je wanneer blokkeren aan staat, ook buiten de app.</string>
+    <string name="setup_notifications_action">Meldingen toestaan</string>
+    <string name="setup_profile_title">Maak een blokkeerlijst</string>
+    <string name="setup_profile_body">Een blokkeerlijst is de set apps die een tag blokkeert.</string>
+    <string name="setup_profile_action">Naar blokkeerlijsten</string>
+    <string name="setup_tag_title">Koppel een tag aan een blokkeerlijst</string>
+    <string name="setup_tag_body">Tikken met de tag start en stopt dan het blokkeren.</string>
+    <string name="setup_tag_action">Naar tags</string>
+    <string name="disclosure_title">Over de blokkeerservice</string>
+    <string name="disclosure_what">NFC App Blocker gebruikt een toegankelijkheidsservice om te zien wanneer een app die je wilt blokkeren op de voorgrond komt, en legt daar het blokkeerscherm overheen.</string>
+    <string name="disclosure_not">De app kijkt alleen welke app open is. Hij leest niet wat er op het scherm staat of wat je typt, en stuurt niets door.</string>
+    <string name="disclosure_continue">Instellingen openen</string>
+    <string name="disclosure_not_now">Niet nu</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_progress">Stap %1$d van %2$d</string>
+    <string name="onboarding_next">Volgende</string>
+    <string name="onboarding_get_started">Aan de slag</string>
+    <string name="onboarding_welcome_title">Minder tijd op je telefoon</string>
+    <string name="onboarding_welcome_body">NFC App Blocker blokkeert de apps die jij kiest. Tik met een NFC-tag om te beginnen met blokkeren, en tik nog een keer om te stoppen.</string>
+    <string name="onboarding_welcome_steps">Instellen duurt een paar minuten. Houd je NFC-tag bij de hand.</string>
+    <string name="onboarding_service_title">Zet blokkeren aan</string>
+    <string name="onboarding_service_body">Om apps te kunnen blokkeren heeft NFC App Blocker jouw toestemming nodig in de Toegankelijkheid-instellingen van Android.</string>
+    <string name="onboarding_service_how">Zoek in Instellingen NFC App Blocker op (op Samsung-telefoons onder Geïnstalleerde apps), open het en zet het aan. Kom daarna hier terug.</string>
+    <string name="onboarding_service_why">Wat ziet de app?</string>
+    <string name="onboarding_open_settings">Instellingen openen</string>
+    <string name="onboarding_service_on_title">Blokkeren staat aan</string>
+    <string name="onboarding_service_on_body">NFC App Blocker kan nu de apps blokkeren die je kiest.</string>
+    <string name="onboarding_restricted_title">Is de schakelaar grijs?</string>
+    <string name="onboarding_restricted_step1">Open App-info met de knop hieronder.</string>
+    <string name="onboarding_restricted_step2">Tik rechtsboven op de drie puntjes.</string>
+    <string name="onboarding_restricted_step3">Tik op Beperkte instellingen toestaan en bevestig.</string>
+    <string name="onboarding_restricted_step4">Kom hier terug en tik opnieuw op Instellingen openen.</string>
+    <string name="onboarding_open_app_info">App-info openen</string>
+    <string name="onboarding_skip">Nu overslaan</string>
+    <string name="onboarding_finish">Klaar</string>
+    <string name="onboarding_tag_title">Voeg je tag toe</string>
+    <string name="onboarding_tag_body">Houd de tag tegen de achterkant van je telefoon, bovenaan, en houd hem even stil.</string>
+    <string name="onboarding_tag_waiting">Wachten op een tag…</string>
+    <string name="onboarding_tag_added">Tag toegevoegd</string>
+    <string name="onboarding_tag_known">Tag herkend</string>
+    <string name="onboarding_tag_name_hint">Geef hem een naam als je wilt, bijvoorbeeld waar hij ligt.</string>
+    <string name="onboarding_notifications_title">Zien wanneer blokkeren aan staat</string>
+    <string name="onboarding_notifications_on_title">Meldingen staan aan</string>
+    <string name="onboarding_notifications_body">Zolang blokkeren aan staat, zie je dat aan een stille melding, ook buiten de app.</string>
+    <string name="onboarding_apps_title">Kies apps om te blokkeren</string>
+    <string name="onboarding_apps_body">Tikken met \u201c%1$s\u201d blokkeert deze apps, en nog een keer tikken geeft ze weer vrij.</string>
+    <string name="onboarding_apps_none">Kies minstens één app</string>
+    <plurals name="onboarding_apps_next">
+        <item quantity="one">%1$d app blokkeren</item>
+        <item quantity="other">%1$d apps blokkeren</item>
+    </plurals>
+    <string name="onboarding_stopping_title">Zo stop je met blokkeren</string>
+    <string name="onboarding_stopping_tag">Tik nog een keer met \u201c%1$s\u201d. Het blokkeren stopt meteen.</string>
+    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Stoppen zonder tag in de app of op het blokkeerscherm, en wacht tot een aftelling klaar is. Verlaat je het aftelscherm, dan stopt de aftelling.</string>
+    <string name="onboarding_stopping_length">Duur van de aftelling</string>
+    <string name="onboarding_stopping_later">Je kunt dit later wijzigen in Instellingen.</string>
+    <string name="onboarding_try_title">Probeer het</string>
+    <string name="onboarding_try_body">Houd \u201c%1$s\u201d tegen je telefoon om te beginnen met blokkeren.</string>
+    <string name="onboarding_try_will_block">Deze apps worden geblokkeerd</string>
+    <string name="onboarding_try_blocking_title">Blokkeren staat aan</string>
+    <string name="onboarding_try_blocking_body">Open een van deze apps om te zien wat er gebeurt. Tik nog een keer met \u201c%1$s\u201d om te stoppen.</string>
+    <string name="onboarding_try_blocked_now">Nu geblokkeerd</string>
+    <string name="notification_channel_name">Blokkeerstatus</string>
+    <string name="notification_channel_description">Zichtbaar zolang apps worden geblokkeerd, en waarschuwt als blokkeren niet werkt.</string>
+    <string name="notification_blocking_title">\u201c%1$s\u201d blokkeert</string>
+    <string name="notification_blocking_text">Sinds %1$s: %2$s</string>
+    <string name="notification_not_working_title">\u201c%1$s\u201d blokkeert niets</string>
+    <string name="notification_not_working_text">De toegankelijkheidsservice staat uit. Tik om de app te openen en zet hem weer aan.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Instellingen</string>
+    <string name="settings_countdown_title">Stoppen zonder tag</string>
+    <string name="settings_countdown_body">Om zonder tag te stoppen met blokkeren, wacht je een aftelling op het scherm af. Verlaat je het scherm, dan stopt de aftelling.</string>
+    <string name="settings_countdown_locked">Je kunt dit wijzigen als er niets wordt geblokkeerd.</string>
+    <plurals name="settings_minutes">
+        <item quantity="one">%1$d minuut</item>
+        <item quantity="other">%1$d minuten</item>
+    </plurals>
+
+    <!-- Block lists -->
+    <string name="profiles_title">Blokkeerlijsten</string>
+    <string name="profiles_empty">Nog geen blokkeerlijsten. Een blokkeerlijst is de set apps die een tag blokkeert.</string>
+    <string name="profiles_new">Nieuwe blokkeerlijst</string>
+    <string name="profile_default_name">Blokkeerlijst %1$d</string>
+    <string name="profile_new_title">Nieuwe blokkeerlijst</string>
+    <string name="profile_save">Opslaan</string>
+    <string name="profile_discard_title">Wijzigingen weggooien?</string>
+    <string name="profile_discard_body">Je wijzigingen aan deze blokkeerlijst zijn nog niet opgeslagen.</string>
+    <string name="profile_discard">Weggooien</string>
+    <string name="profile_keep_editing">Verder bewerken</string>
+    <string name="profile_delete">Blokkeerlijst verwijderen</string>
+    <string name="profile_delete_title">\u201c%1$s\u201d verwijderen?</string>
+    <string name="profile_delete_body">De tags blijven gekoppeld aan de app en kun je aan een andere blokkeerlijst koppelen.</string>
+    <string name="profile_delete_body_active">Deze blokkeerlijst blokkeert nu; verwijderen stopt het blokkeren. De tags blijven gekoppeld aan de app en kun je aan een andere blokkeerlijst koppelen.</string>
+    <string name="profile_active_note">Deze blokkeerlijst blokkeert nu. Opgeslagen wijzigingen gelden meteen.</string>
+    <string name="profile_name_required">Voer een naam in</string>
+    <string name="profile_tags_heading">Tags</string>
+    <string name="profile_no_tags">Geen tags gekoppeld. Tikken met een gekoppelde tag zet deze blokkeerlijst aan of uit.</string>
+    <string name="profile_unlink_tag">Ontkoppelen</string>
+    <string name="profile_link_tag">Tag koppelen</string>
+    <string name="profile_scan_tag">Tag scannen</string>
+    <string name="profile_scan_already_here">\u201c%1$s\u201d zit al in deze blokkeerlijst.</string>
+    <string name="profile_scan_add_to_profile">Toevoegen aan blokkeerlijst</string>
+    <string name="profile_tag_in_other">Nu in \u201c%1$s\u201d</string>
+    <string name="profile_move_tag_title">\u201c%1$s\u201d hierheen verplaatsen?</string>
+    <string name="profile_move_tag_body">Hij is nu gekoppeld aan \u201c%1$s\u201d. Een tag bedient één blokkeerlijst tegelijk.</string>
+    <string name="profile_move_tag">Tag verplaatsen</string>
+    <plurals name="profile_apps_heading">
+        <item quantity="one">Apps om te blokkeren: %1$d gekozen</item>
+        <item quantity="other">Apps om te blokkeren: %1$d gekozen</item>
+    </plurals>
+    <string name="profile_search_apps">Apps zoeken</string>
+    <string name="profile_app_not_installed">Niet geïnstalleerd</string>
+    <string name="never_block_this_app">Kan niet worden geblokkeerd: deze app</string>
+    <string name="never_block_phone">Kan niet worden geblokkeerd: telefoon-app</string>
+    <string name="never_block_settings">Kan niet worden geblokkeerd: Instellingen</string>
+    <string name="never_block_launcher">Kan niet worden geblokkeerd: startscherm</string>
+    <string name="never_block_always_allowed">Altijd toegestaan</string>
+    <plurals name="profiles_app_count">
+        <item quantity="one">%1$d app</item>
+        <item quantity="other">%1$d apps</item>
+    </plurals>
+
+    <!-- Tag list -->
+    <string name="tags_title">Tags</string>
+    <string name="tags_add">Tag toevoegen</string>
+    <string name="tags_empty">Nog geen tags. Voeg een tag toe om te beginnen.</string>
+    <string name="tags_added_on">Toegevoegd op %1$s</string>
+
+    <!-- Add tag -->
+    <string name="add_tag_title">Tag toevoegen</string>
+    <string name="add_waiting">Houd een tag plat tegen de achterkant van de telefoon.</string>
+    <string name="add_writing">Bezig met schrijven naar de tag. Houd hem stil.</string>
+    <string name="add_confirm_title">Er staat al iets op deze tag</string>
+    <string name="add_confirm_foreign">Er staan gegevens op van een andere app of dienst.</string>
+    <string name="add_confirm_unreadable">De inhoud kan niet worden gelezen.</string>
+    <string name="add_confirm_body">Overschrijven vervangt die inhoud definitief.</string>
+    <string name="add_confirm_newer">Hij is ingesteld met een nieuwere versie van deze app.</string>
+    <string name="add_overwrite">Tag overschrijven</string>
+    <string name="add_cancel">Annuleren</string>
+    <string name="add_hold_same_tag">Houd dezelfde tag nog een keer tegen de telefoon om hem te overschrijven.</string>
+    <string name="add_other_tag">Dat was een andere tag. Gebruik de tag die je wilt overschrijven.</string>
+    <string name="add_already_paired">Deze tag staat al in je lijst als \u201c%1$s\u201d.</string>
+    <string name="add_open_tag">Tag openen</string>
+    <string name="add_another">Nog een tag toevoegen</string>
+    <string name="add_ours_not_paired">Deze tag is eerder met deze app ingesteld, maar staat niet in je lijst.</string>
+    <string name="add_adopt">Aan je lijst toevoegen</string>
+    <string name="add_new_id">Nieuwe ID geven</string>
+    <string name="add_paired">Tag toegevoegd.</string>
+    <string name="add_name_label">Naam</string>
+    <string name="add_done">Klaar</string>
+    <string name="add_try_again">Opnieuw proberen</string>
+    <string name="add_failed_read_only">Deze tag is vergrendeld en kan niet worden beschreven.</string>
+    <string name="add_failed_too_small" tools:ignore="PluralsCandidate">Op deze tag past %1$d bytes, maar er is %2$d nodig.</string>
+    <string name="add_failed_not_ndef">Dit soort tag wordt niet ondersteund.</string>
+    <string name="add_failed_tag_lost">De tag bewoog weg tijdens het schrijven. Houd hem stil en probeer het opnieuw.</string>
+    <string name="add_failed_not_verified">De tag gaf na het schrijven niet de juiste inhoud terug. Probeer het opnieuw.</string>
+    <string name="add_failed_other">Schrijven mislukt: %1$s</string>
+    <string name="add_choose_profile">Welke blokkeerlijst moet deze tag bedienen?</string>
+    <string name="link_no_profiles">Nog geen blokkeerlijsten. Maak er een in het tabblad Blokkeerlijsten en koppel dan deze tag.</string>
+    <string name="profile_none">Geen blokkeerlijst</string>
+
+    <!-- Tag details -->
+    <string name="details_profile">Blokkeerlijst: %1$s</string>
+    <string name="details_profile_none">Blokkeerlijst: niet gekoppeld</string>
+    <string name="details_link_profile">Aan een blokkeerlijst koppelen</string>
+    <string name="details_change_profile">Blokkeerlijst wijzigen</string>
+    <string name="details_choose_profile">Kies een blokkeerlijst</string>
+    <string name="details_save_name">Naam opslaan</string>
+    <string name="details_uuid">ID: %1$s</string>
+    <string name="details_hardware_uid">Hardware-ID: %1$s</string>
+    <string name="details_hardware_uid_unknown">Hardware-ID: onbekend</string>
+    <string name="details_forget">Tag vergeten</string>
+    <string name="details_wipe">Wissen en vergeten</string>
+    <string name="details_forget_title">\u201c%1$s\u201d vergeten?</string>
+    <string name="details_forget_body">De inhoud blijft op de tag staan, dus je kunt hem later opnieuw toevoegen.</string>
+    <string name="details_wipe_waiting">Houd deze tag tegen de telefoon om hem te wissen.</string>
+    <string name="details_wiping">Bezig met wissen. Houd de tag stil.</string>
+    <string name="details_wipe_other_tag">Dat was een andere tag. Gebruik \u201c%1$s\u201d.</string>
+    <string name="details_wipe_failed_read_only">Deze tag is vergrendeld en kan niet worden gewist.</string>
+    <string name="details_wipe_failed_tag_lost">De tag bewoog weg tijdens het wissen. Houd hem stil en probeer het opnieuw.</string>
+    <string name="details_wipe_failed_not_verified">De tag was na het wissen niet leeg. Probeer het opnieuw.</string>
+    <string name="details_wipe_failed_other">Wissen mislukt: %1$s</string>
+
+    <!-- Blocking -->
+    <string name="scan_started">\u201c%1$s\u201d blokkeert</string>
+    <string name="scan_stopped">\u201c%1$s\u201d blokkeert niet meer</string>
+    <string name="scan_switched">Gewisseld naar \u201c%1$s\u201d, \u201c%2$s\u201d gestopt</string>
+    <string name="scan_no_apps">\u201c%1$s\u201d heeft nog geen apps om te blokkeren</string>
+    <string name="scan_not_linked">\u201c%1$s\u201d is nog niet aan een blokkeerlijst gekoppeld</string>
+    <string name="scan_unknown_ours">Deze tag staat niet in je lijst. Houd hem nog een keer tegen de telefoon om hem toe te voegen.</string>
+    <string name="scan_not_ours">Deze tag is niet ingesteld voor NFC App Blocker. Voeg hem toe onder Tags.</string>
+    <string name="blocker_service_description">Ziet wanneer een app die je wilt blokkeren op de voorgrond komt en toont dan een blokkeerscherm. De service kijkt alleen welke app open is en leest geen scherminhoud.</string>
+    <string name="block_title">%1$s is geblokkeerd</string>
+    <string name="block_body">\u201c%1$s\u201d blokkeert deze app. Scan een tag die aan \u201c%1$s\u201d is gekoppeld om te stoppen met blokkeren.</string>
+    <string name="block_go_home">Naar startscherm</string>
+    <string name="escape_start">Stoppen zonder tag</string>
+    <string name="escape_title">\u201c%1$s\u201d stoppen?</string>
+    <string name="escape_body">Het blokkeren stopt als de aftelling klaar is. Verlaat je dit scherm of zet je het scherm uit, dan stopt de aftelling.</string>
+    <plurals name="escape_minutes_left">
+        <item quantity="one">Nog %d minuut</item>
+        <item quantity="other">Nog %d minuten</item>
+    </plurals>
+    <string name="escape_keep_blocking">Blijven blokkeren</string>
+</resources>
