@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.history.UsageHistory
+import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingProgress
+import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingStore
 import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import javax.inject.Inject
 
@@ -26,12 +28,16 @@ class BlockerAccessibilityService : AccessibilityService() {
     @Inject lateinit var apps: InstalledAppsSource
     @Inject lateinit var notifier: BlockingNotifier
     @Inject lateinit var history: UsageHistory
+    @Inject lateinit var onboarding: OnboardingStore
 
     private val scope = MainScope()
     private lateinit var decider: BlockDecider
 
     /** Package name to the profile blocking it. Updated on the main thread, read on the main thread. */
     private var blocked: Map<String, Profile> = emptyMap()
+
+    /** Onboarding's "Try it" is running: the block screen leads back to the app (D-037). */
+    private var duringOnboarding = false
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -45,6 +51,9 @@ class BlockerAccessibilityService : AccessibilityService() {
                 .map { active -> blockList(active, apps.neverBlockPolicy()) }
                 .collect { blocked = it }
         }
+        scope.launch {
+            onboarding.observe().collect { duringOnboarding = it is OnboardingProgress.InProgress }
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
@@ -53,7 +62,7 @@ class BlockerAccessibilityService : AccessibilityService() {
         if (!decider.shouldBlock(foreground, SystemClock.uptimeMillis(), blocked.keys)) return
         val profile = blocked[foreground] ?: return
         // A bound accessibility service may start activities from the background.
-        startActivity(BlockActivity.intent(this, foreground, profile.name))
+        startActivity(BlockActivity.intent(this, foreground, profile.name, duringOnboarding))
         scope.launch { history.recordBlockScreen(foreground, profile.id) }
     }
 

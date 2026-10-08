@@ -266,8 +266,9 @@
     <string name="scan_not_ours">Deze tag is niet ingesteld voor TikStop. Voeg hem toe onder Tags.</string>
     <string name="blocker_service_description">Ziet wanneer een app die je wilt blokkeren op de voorgrond komt en toont dan een blokkeerscherm. De service kijkt alleen welke app open is en leest geen scherminhoud.</string>
     <string name="block_title">%1$s is geblokkeerd</string>
-    <string name="block_body">\u201c%1$s\u201d blokkeert deze app. Scan een tag die aan \u201c%1$s\u201d is gekoppeld om te stoppen met blokkeren.</string>
-    <string name="block_go_home">Naar startscherm</string>
+    <string name="block_body">Je hebt ervoor gekozen deze app even te laten rusten. Leg je telefoon weg en geniet van het moment.</string>
+    <string name="block_close">Sluiten</string>
+    <string name="block_back_to_app">Terug naar TikStop</string>
     <string name="escape_start">Nu ontgrendelen</string>
     <string name="escape_title">\u201c%1$s\u201d stoppen?</string>
     <string name="escape_body">Het blokkeren stopt als het aftellen klaar is. Verlaat je dit scherm of zet je het scherm uit, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>

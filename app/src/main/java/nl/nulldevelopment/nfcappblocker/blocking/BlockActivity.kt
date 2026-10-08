@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import nl.nulldevelopment.nfcappblocker.MainActivity
 import nl.nulldevelopment.nfcappblocker.R
 import nl.nulldevelopment.nfcappblocker.feature.escape.EscapeActivity
 import nl.nulldevelopment.nfcappblocker.ui.theme.NFCAppBlockerTheme
@@ -54,6 +55,9 @@ class BlockActivity : ComponentActivity() {
     private var appName by mutableStateOf("")
     private var profileName by mutableStateOf("")
 
+    /** Opened during onboarding: lead back to TikStop instead of the home screen, no unlocking. */
+    private var duringOnboarding by mutableStateOf(false)
+
     /** False when the device has cross-window blur off or unsupported (the reference device). */
     private var blurAvailable by mutableStateOf(false)
     private var blurListener: Consumer<Boolean>? = null
@@ -61,7 +65,7 @@ class BlockActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         readExtras(intent)
-        onBackPressedDispatcher.addCallback(this) { goHome() }
+        onBackPressedDispatcher.addCallback(this) { leave() }
         useFadeTransitions()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) enableBlur()
         enableEdgeToEdge()
@@ -71,7 +75,8 @@ class BlockActivity : ComponentActivity() {
                     appName = appName,
                     profileName = profileName,
                     blurAvailable = blurAvailable,
-                    onGoHome = ::goHome,
+                    duringOnboarding = duringOnboarding,
+                    onLeave = ::leave,
                     onStopWithoutTag = ::stopWithoutTag,
                 )
             }
@@ -122,12 +127,23 @@ class BlockActivity : ComponentActivity() {
             packageName
         }
         profileName = intent.getStringExtra(EXTRA_PROFILE_NAME).orEmpty()
+        duringOnboarding = intent.getBooleanExtra(EXTRA_DURING_ONBOARDING, false)
     }
 
     /** The countdown takes this task's place, so finishing it shows the app that was blocked. */
     private fun stopWithoutTag() {
         startActivity(EscapeActivity.intent(this, fromBlockScreen = true))
         finish()
+    }
+
+    /** Never back into the blocked app: to TikStop during onboarding, otherwise the home screen. */
+    private fun leave() {
+        if (duringOnboarding) {
+            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            finish()
+        } else {
+            goHome()
+        }
     }
 
     private fun goHome() {
@@ -138,13 +154,15 @@ class BlockActivity : ComponentActivity() {
     companion object {
         private const val EXTRA_PACKAGE = "blocked_package"
         private const val EXTRA_PROFILE_NAME = "profile_name"
+        private const val EXTRA_DURING_ONBOARDING = "during_onboarding"
         private const val BLUR_RADIUS_DP = 32
 
-        fun intent(context: Context, blockedPackage: String, profileName: String): Intent =
+        fun intent(context: Context, blockedPackage: String, profileName: String, duringOnboarding: Boolean = false): Intent =
             Intent(context, BlockActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(EXTRA_PACKAGE, blockedPackage)
                 .putExtra(EXTRA_PROFILE_NAME, profileName)
+                .putExtra(EXTRA_DURING_ONBOARDING, duringOnboarding)
     }
 }
 
@@ -157,7 +175,8 @@ private fun BlockScreen(
     appName: String,
     profileName: String,
     blurAvailable: Boolean,
-    onGoHome: () -> Unit,
+    duringOnboarding: Boolean,
+    onLeave: () -> Unit,
     onStopWithoutTag: () -> Unit,
 ) {
     val scrimAlpha by animateFloatAsState(
@@ -189,15 +208,26 @@ private fun BlockScreen(
                     modifier = Modifier.semantics { heading() },
                 )
                 Text(
-                    stringResource(R.string.block_body, profileName),
+                    stringResource(R.string.block_body),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
                 )
-                Button(onClick = onGoHome, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.block_go_home))
+                if (profileName.isNotEmpty()) {
+                    Text(
+                        stringResource(R.string.home_active, profileName),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
                 }
-                TextButton(onClick = onStopWithoutTag, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.escape_start))
+                Button(onClick = onLeave, modifier = Modifier.heightIn(min = 48.dp)) {
+                    Text(stringResource(if (duringOnboarding) R.string.block_back_to_app else R.string.block_close))
+                }
+                // Unlocking makes no sense while trying blocking out during onboarding.
+                if (!duringOnboarding) {
+                    TextButton(onClick = onStopWithoutTag, modifier = Modifier.heightIn(min = 48.dp)) {
+                        Text(stringResource(R.string.escape_start))
+                    }
                 }
             }
         }
