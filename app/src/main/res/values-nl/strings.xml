@@ -161,8 +161,8 @@
     <!-- Settings -->
     <string name="settings_title">Instellingen</string>
     <string name="settings_countdown_title">Ontgrendelen zonder tag</string>
-    <string name="settings_countdown_body">Om zonder tag te stoppen met blokkeren, wacht je tot het aftellen op het scherm klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
-    <string name="settings_countdown_locked">Je kunt dit wijzigen als er niets wordt geblokkeerd.</string>
+    <string name="settings_countdown_body">Kies je Nu ontgrendelen, dan wacht je eerst het aftellen af. Ga je eerder weg, dan blijft je blokkeerlijst gewoon actief. Hier stel je in hoe lang het aftellen duurt.</string>
+    <string name="settings_countdown_locked">Er is nu een blokkeerlijst actief, dus je kunt deze instelling even niet wijzigen. Zet je blokkeerlijst eerst uit om de tijd van het aftellen aan te passen.</string>
     <plurals name="settings_minutes">
         <item quantity="one">%1$d minuut</item>
         <item quantity="other">%1$d minuten</item>

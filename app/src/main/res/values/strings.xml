@@ -161,8 +161,8 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_countdown_title">Unlock without a tag</string>
-    <string name="settings_countdown_body">To stop blocking without a tag, you wait out a countdown on screen. Leaving the screen stops the countdown, but your block list stays active.</string>
-    <string name="settings_countdown_locked">You can change this when nothing is blocking.</string>
+    <string name="settings_countdown_body">Choose Unlock now and you first wait out a countdown. Leave it early, and your block list simply stays on. Set how long the countdown takes here.</string>
+    <string name="settings_countdown_locked">A block list is active right now, so you can\'t change this setting. Turn your block list off first to change the countdown time.</string>
     <plurals name="settings_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
