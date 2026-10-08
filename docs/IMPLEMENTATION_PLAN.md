@@ -204,10 +204,10 @@ Goal: one calm screen that shows whether blocking is on and whether it helps (D-
 
 1. [x] Decisions (D-045, D-046).
 2. [x] Figtree bundled, type scale, softer card shadows.
-3. [ ] Wordmark and greeting, scrolling with the screen.
-4. [ ] Problem banner; NFC and notifications moved to Settings.
-5. [ ] Status card and time blocked with folding details.
-6. [ ] Check on the emulator, light and dark; review the texts.
+3. [x] Wordmark and greeting, scrolling with the screen.
+4. [x] Problem banner; NFC and notifications moved to Settings.
+5. [x] Status card and time blocked with folding details.
+6. [~] Checked on the emulator (2026-10-08), light and dark: wordmark and greeting scroll along, the blocking card, folding details, the urgent banner with the service off. Still to do: review the texts, and the phone.
 
 ## Testing strategy (all phases)
 

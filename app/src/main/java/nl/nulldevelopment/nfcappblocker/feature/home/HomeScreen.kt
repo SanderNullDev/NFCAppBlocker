@@ -6,49 +6,57 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.Role
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,10 +65,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -74,13 +87,18 @@ import nl.nulldevelopment.nfcappblocker.feature.escape.EscapeActivity
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatus
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
-import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
+import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.time.Duration
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
+/**
+ * The one home screen (D-043, D-046): the wordmark and a greeting, at most one problem, the
+ * blocking status, time blocked, and the block lists. Everything scrolls together.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -118,50 +136,60 @@ fun HomeScreen(
         }
     }
     var explainingService by rememberSaveable { mutableStateOf(false) }
+    var showingChecklist by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title))
-                    }
-                },
-            )
-        },
-        floatingActionButton = { AddButton(onNewBlockList = onNewBlockList, onAddTag = onAddTag) },
-    ) { innerPadding ->
+    Scaffold(floatingActionButton = { AddButton(onNewBlockList = onNewBlockList, onAddTag = onAddTag) }) { innerPadding ->
         val loaded = state as? HomeState.Loaded ?: return@Scaffold
+        val fix: (HomeProblem) -> Unit = { problem ->
+            when (problem) {
+                HomeProblem.ServiceOff -> explainingService = true
+                HomeProblem.NfcOff -> context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+                HomeProblem.NoBlockList -> onNewBlockList()
+                HomeProblem.NoTag -> onAddTag()
+            }
+        }
+        // The header is part of the content, so it scrolls away with it (D-045).
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 96.dp),
+                .padding(innerPadding)
+                .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            val checklist = setupChecklist(
-                nfc = nfcStatus,
-                serviceEnabled = loaded.serviceEnabled,
-                notificationsAllowed = notificationsAllowed,
-                hasProfileWithApps = loaded.hasProfileWithApps,
-                hasLinkedTag = loaded.hasLinkedTag,
-            )
-            if (checklist != null) {
-                SetupCard(checklist, nfcStatus) { step ->
-                    when (step) {
-                        SetupStep.Nfc -> context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
-                        SetupStep.Service -> explainingService = true
-                        SetupStep.Notifications -> allowNotifications()
-                        SetupStep.Profile -> onNewBlockList()
-                        SetupStep.Tag -> onAddTag()
+            Wordmark(onOpenSettings)
+            Greeting(loaded)
+            homeProblem(loaded.serviceEnabled, nfcStatus, loaded.hasProfileWithApps, loaded.hasLinkedTag)?.let { problem ->
+                ProblemBanner(
+                    problem = problem,
+                    urgent = problem == HomeProblem.ServiceOff && loaded.activeProfileName != null,
+                    onFix = { fix(problem) },
+                    onShowAll = { showingChecklist = true },
+                )
+            }
+            StatusCard(loaded, onUnlock = { context.startActivity(EscapeActivity.intent(context, fromBlockScreen = false)) })
+            StatsSection(loaded.period, loaded.stats, onPeriod = viewModel::setPeriod)
+            BlockListsSection(loaded.blockLists, onOpen = onOpenBlockList)
+        }
+
+        if (showingChecklist) {
+            val checklist = setupChecklist(nfcStatus, loaded.serviceEnabled, notificationsAllowed, loaded.hasProfileWithApps, loaded.hasLinkedTag)
+            ModalBottomSheet(onDismissRequest = { showingChecklist = false }) {
+                if (checklist != null) {
+                    Box(Modifier.padding(start = 20.dp, end = 20.dp, bottom = 32.dp)) {
+                        SetupCard(checklist, nfcStatus) { step ->
+                            showingChecklist = false
+                            when (step) {
+                                SetupStep.Nfc -> context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+                                SetupStep.Service -> explainingService = true
+                                SetupStep.Notifications -> allowNotifications()
+                                SetupStep.Profile -> onNewBlockList()
+                                SetupStep.Tag -> onAddTag()
+                            }
+                        }
                     }
                 }
             }
-            BlockingCard(loaded, onUnlock = { context.startActivity(EscapeActivity.intent(context, fromBlockScreen = false)) })
-            StatsSection(loaded.period, loaded.stats, onPeriod = viewModel::setPeriod)
-            BlockListsSection(loaded.blockLists, onOpen = onOpenBlockList)
         }
     }
 
@@ -175,6 +203,103 @@ fun HomeScreen(
         )
     }
 }
+
+/** The app's identity: the sage padlock and the name, with Settings at the side (D-045). */
+@Composable
+private fun Wordmark(onOpenSettings: () -> Unit) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Image(
+            painterResource(R.drawable.ic_launcher_foreground),
+            contentDescription = null,
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.primary),
+        )
+        Spacer(Modifier.width(10.dp))
+        Text(
+            stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier
+                .weight(1f)
+                .semantics { heading() },
+        )
+        IconButton(onClick = onOpenSettings) {
+            Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun Greeting(state: HomeState.Loaded) {
+    val hour = LocalTime.now().hour
+    val greeting = when (hour) {
+        in 5..11 -> R.string.home_greeting_morning
+        in 12..17 -> R.string.home_greeting_afternoon
+        in 18..23 -> R.string.home_greeting_evening
+        else -> R.string.home_greeting_night
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(stringResource(greeting), style = MaterialTheme.typography.headlineMedium)
+        Text(
+            if (state.activeProfileName != null) {
+                stringResource(R.string.home_line_blocking)
+            } else {
+                stringResource(R.string.home_line_free)
+            },
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/**
+ * The most urgent problem in one slim banner (D-046). [urgent] when blocking is on but not
+ * working; otherwise it's a gentle note. Tapping the text shows the full checklist.
+ */
+@Composable
+private fun ProblemBanner(problem: HomeProblem, urgent: Boolean, onFix: () -> Unit, onShowAll: () -> Unit) {
+    val container = if (urgent) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer
+    val content = if (urgent) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer
+    Surface(shape = RoundedCornerShape(16.dp), color = container, contentColor = content, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(Icons.Filled.Warning, contentDescription = null, modifier = Modifier.size(20.dp))
+            Text(
+                stringResource(problem.message),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onShowAll)
+                    .padding(vertical = 12.dp),
+            )
+            TextButton(
+                onClick = onFix,
+                colors = ButtonDefaults.textButtonColors(contentColor = content),
+                modifier = Modifier.heightIn(min = 48.dp),
+            ) { Text(stringResource(problem.action)) }
+        }
+    }
+}
+
+private val HomeProblem.message: Int
+    get() = when (this) {
+        HomeProblem.ServiceOff -> R.string.problem_service_off
+        HomeProblem.NfcOff -> R.string.problem_nfc_off
+        HomeProblem.NoBlockList -> R.string.problem_no_block_list
+        HomeProblem.NoTag -> R.string.problem_no_tag
+    }
+
+private val HomeProblem.action: Int
+    get() = when (this) {
+        HomeProblem.ServiceOff -> R.string.problem_fix
+        HomeProblem.NfcOff -> R.string.problem_fix
+        HomeProblem.NoBlockList -> R.string.problem_create
+        HomeProblem.NoTag -> R.string.problem_add
+    }
 
 @Composable
 private fun SetupCard(items: List<SetupItem>, nfcStatus: NfcStatus, onAction: (SetupStep) -> Unit) {
@@ -276,70 +401,83 @@ private fun ServiceDisclosure(onContinue: () -> Unit, onDismiss: () -> Unit) {
     )
 }
 
+
 private val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
 
+/** Quiet when nothing blocks; sage while blocking, with the time so far and "Unlock now". */
 @Composable
-private fun BlockingCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
-    SoftCard(Modifier.fillMaxWidth()) {
-        // Polite live region: TalkBack announces when blocking starts or stops while this is open.
-        Column(
-            modifier = Modifier
-                .padding(20.dp)
-                .semantics { liveRegion = LiveRegionMode.Polite },
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            if (state.activeProfileName == null) {
-                Text(stringResource(R.string.status_not_blocking), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
-                Text(stringResource(R.string.status_not_blocking_hint), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                return@Column
-            }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                // Decoration only: the heading says it in words.
+private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
+    // Polite live region: TalkBack announces when blocking starts or stops while this is open.
+    val announce = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+    val name = state.activeProfileName
+    if (name == null) {
+        SoftCard(Modifier.fillMaxWidth()) {
+            Row(
+                modifier = announce.padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
                 Box(
                     Modifier
-                        .size(10.dp)
+                        .size(44.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
-                )
-                Text(
-                    stringResource(R.string.status_blocking, state.activeProfileName),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.semantics { heading() },
-                )
-            }
-            if (!state.serviceEnabled) {
-                // The setup checklist above has the button to fix it.
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                    Text(
-                        stringResource(R.string.status_service_off_while_blocking),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error,
-                    )
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Filled.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Column {
+                    Text(stringResource(R.string.status_not_blocking), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.home_ready), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+            }
+        }
+        return
+    }
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(announce.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(Icons.Filled.Lock, contentDescription = null)
+                Text(stringResource(R.string.status_blocking, name), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
             }
             val since = state.since?.let { stringResource(R.string.status_since, timeFormat.format(it)) }
             val apps = state.blockedApps.joinToString(", ") { it.label }
             Text(
                 listOfNotNull(since, apps.takeIf { it.isNotEmpty() }).joinToString(" · "),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primaryContainer,
             )
-            Text(stringResource(R.string.status_blocking_hint), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            OutlinedButton(onClick = onUnlock, modifier = Modifier.heightIn(min = 48.dp)) {
-                Text(stringResource(R.string.escape_start))
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    state.blockingFor?.let { formatDuration(it) }.orEmpty(),
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                OutlinedButton(
+                    onClick = onUnlock,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onPrimary),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) { Text(stringResource(R.string.escape_start)) }
             }
         }
     }
 }
 
-/** The four numbers (D-044), with a switch between today, the last 7 days and all time. */
+/**
+ * Time blocked for the chosen period, large (D-046). The other three numbers fold out under
+ * "Details", so they're there without filling the screen.
+ */
 @Composable
 private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (StatsPeriod) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // Light pills rather than a segmented button: calmer, and the chosen one stands out by
         // its fill and by its selected state for TalkBack.
-        Row(Modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(Modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             StatsPeriod.entries.forEach { option ->
                 PeriodPill(
                     label = stringResource(
@@ -354,14 +492,53 @@ private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (Stat
                 )
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatTile(formatDuration(stats.timeBlocked), stringResource(R.string.stats_time_blocked), Modifier.weight(1f))
-            StatTile(stats.timesBlocked.toString(), stringResource(R.string.stats_times_blocked), Modifier.weight(1f))
+        SoftCard(Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(start = 20.dp, end = 8.dp, top = 20.dp, bottom = 8.dp)) {
+                Text(formatDuration(stats.timeBlocked), style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
+                Text(
+                    stringResource(
+                        when (period) {
+                            StatsPeriod.Today -> R.string.stats_rest_today
+                            StatsPeriod.Week -> R.string.stats_rest_week
+                            StatsPeriod.AllTime -> R.string.stats_rest_all
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                AnimatedVisibility(visible = expanded) {
+                    Column(Modifier.padding(top = 16.dp, end = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        DetailRow(Icons.Filled.Lock, stats.timesBlocked, stringResource(R.string.stats_times_blocked))
+                        DetailRow(Icons.Filled.Clear, stats.appsStopped, stringResource(R.string.stats_apps_stopped))
+                        DetailRow(Icons.Filled.Refresh, stats.stoppedWithoutTag, stringResource(R.string.stats_without_tag))
+                    }
+                }
+                TextButton(
+                    onClick = { expanded = !expanded },
+                    // Lines the label up with the number above; the button has its own padding.
+                    modifier = Modifier
+                        .offset(x = (-12).dp)
+                        .heightIn(min = 48.dp),
+                ) {
+                    Text(stringResource(if (expanded) R.string.stats_less else R.string.stats_details))
+                    Icon(if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
+                }
+            }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatTile(stats.appsStopped.toString(), stringResource(R.string.stats_apps_stopped), Modifier.weight(1f))
-            StatTile(stats.stoppedWithoutTag.toString(), stringResource(R.string.stats_without_tag), Modifier.weight(1f))
-        }
+    }
+}
+
+@Composable
+private fun DetailRow(icon: ImageVector, value: Int, label: String) {
+    Row(
+        modifier = Modifier.semantics(mergeDescendants = true) {},
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
+        Text(value.toString(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.width(36.dp))
+        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -382,17 +559,6 @@ private fun PeriodPill(label: String, selected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun StatTile(value: String, label: String, modifier: Modifier = Modifier) {
-    // Read as one item: "14 h 20 min, Time blocked".
-    SoftCard(modifier.semantics(mergeDescendants = true) {}) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(value, style = MaterialTheme.typography.headlineSmall)
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
 private fun formatDuration(duration: Duration): String {
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
@@ -401,19 +567,17 @@ private fun formatDuration(duration: Duration): String {
 
 @Composable
 private fun BlockListsSection(lists: List<BlockListSummary>, onOpen: (Long) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    if (lists.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
             stringResource(R.string.profiles_title),
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.semantics { heading() },
         )
-        if (lists.isEmpty()) {
-            Text(stringResource(R.string.profiles_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            return@Column
-        }
         SoftCard(Modifier.fillMaxWidth()) {
             lists.forEachIndexed { index, list ->
-                if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 BlockListRow(list, onClick = { onOpen(list.id) })
             }
         }
@@ -423,7 +587,7 @@ private fun BlockListsSection(lists: List<BlockListSummary>, onOpen: (Long) -> U
 @Composable
 private fun BlockListRow(list: BlockListSummary, onClick: () -> Unit) {
     val apps = pluralStringResource(R.plurals.profiles_app_count, list.appCount, list.appCount)
-    val tags = if (list.tagNames.isEmpty()) stringResource(R.string.home_no_tag) else stringResource(R.string.home_tags, list.tagNames.joinToString(", "))
+    val tags = if (list.tagNames.isEmpty()) stringResource(R.string.home_no_tag) else list.tagNames.joinToString(", ")
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -436,7 +600,7 @@ private fun BlockListRow(list: BlockListSummary, onClick: () -> Unit) {
             Text(list.name, style = MaterialTheme.typography.bodyLarge)
             Text(
                 listOfNotNull(apps, tags, if (list.active) stringResource(R.string.home_blocking_now) else null).joinToString(" · "),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

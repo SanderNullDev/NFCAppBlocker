@@ -22,6 +22,7 @@ import nl.nulldevelopment.nfcappblocker.data.history.UsageHistory
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
 import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import javax.inject.Inject
@@ -56,6 +57,8 @@ sealed interface HomeState {
         val blockLists: List<BlockListSummary>,
         val period: StatsPeriod,
         val stats: UsageStats,
+        /** How long the running session has been blocking, updated once a minute. */
+        val blockingFor: Duration?,
     ) : HomeState
 }
 
@@ -103,7 +106,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private val stats = combine(history.observeSessions(), history.observeBlockScreenViews(), period, now) { sessions, views, chosen, at ->
-        chosen to usageStats(sessions, views, chosen, at, ZoneId.systemDefault())
+        Triple(chosen, usageStats(sessions, views, chosen, at, ZoneId.systemDefault()), at)
     }
 
     val state: StateFlow<HomeState> = combine(
@@ -111,7 +114,7 @@ class HomeViewModel @Inject constructor(
         appsData,
         serviceEnabled,
         stats,
-    ) { (active, allProfiles, allTags), data, enabled, (chosen, numbers) ->
+    ) { (active, allProfiles, allTags), data, enabled, (chosen, numbers, at) ->
         if (data == null) return@combine HomeState.Loading
         val current = active.firstOrNull()
         val labels = data.installed.associate { it.packageName to it.label }
@@ -136,6 +139,7 @@ class HomeViewModel @Inject constructor(
             },
             period = chosen,
             stats = numbers,
+            blockingFor = current?.startedAt?.let { Duration.between(it, at).coerceAtLeast(Duration.ZERO) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState.Loading)
 }

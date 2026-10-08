@@ -13,27 +13,47 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Not blocking</string>
-    <string name="status_not_blocking_hint">Tap a linked tag to start blocking.</string>
     <string name="status_blocking">Blocking \u201c%1$s\u201d</string>
     <string name="status_since">Since %1$s</string>
-    <string name="status_blocking_hint">Tap one of its tags to stop.</string>
-    <string name="status_service_off_while_blocking">Blocking is on, but it isn\'t working: the accessibility service is off.</string>
     <string name="status_service_off_hint">Find TikStop under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
     <!-- Home (D-043, D-044) -->
     <string name="home_add">Add</string>
-    <string name="home_tags">Tag: %1$s</string>
     <string name="home_no_tag">No tag</string>
     <string name="home_blocking_now">Blocking now</string>
     <string name="stats_today">Today</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">All time</string>
-    <string name="stats_time_blocked">Time blocked</string>
     <string name="stats_times_blocked">Times blocked</string>
     <string name="stats_apps_stopped">Apps stopped</string>
     <string name="stats_without_tag">Stopped without tag</string>
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <string name="home_greeting_night">Good night</string>
+    <string name="home_line_free">Your phone is free. Tap your tag when you want to focus.</string>
+    <string name="home_line_blocking">A moment of calm. Your apps are blocked.</string>
+    <string name="home_ready">Ready when you are</string>
+    <string name="problem_service_off">Blocking doesn\'t work: the blocker service is off</string>
+    <string name="problem_nfc_off">NFC is off, so tags can\'t be read</string>
+    <string name="problem_no_block_list">Choose which apps to block</string>
+    <string name="problem_no_tag">Add a tag to start blocking</string>
+    <string name="problem_fix">Fix</string>
+    <string name="problem_create">Create</string>
+    <string name="problem_add">Add</string>
+    <string name="stats_rest_today">of calm today</string>
+    <string name="stats_rest_week">of calm this week</string>
+    <string name="stats_rest_all">of calm in total</string>
+    <string name="stats_details">Details</string>
+    <string name="stats_less">Less</string>
     <string name="stats_minutes">%1$d min</string>
     <string name="stats_hours_minutes">%1$d h %2$d min</string>
     <string name="settings_tags">Tags</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_notifications_on">On: a quiet notification shows while blocking</string>
+    <string name="settings_notifications_off">Off. Tap to allow them.</string>
+    <string name="settings_nfc">NFC</string>
+    <string name="settings_nfc_on">On</string>
+    <string name="settings_nfc_off">Off, so tags can\'t be read. Tap to turn it on.</string>
     <string name="settings_tags_body">Rename, forget or wipe your tags, also ones without a block list.</string>
     <string name="setup_title">Finish setting up</string>
     <plurals name="setup_progress">
@@ -131,7 +151,6 @@
 
     <!-- Block lists (profiles in the code, D-039) -->
     <string name="profiles_title">Block lists</string>
-    <string name="profiles_empty">No block lists yet. A block list is the set of apps a tag blocks.</string>
     <string name="profiles_new">New block list</string>
     <string name="profile_default_name">Block list %1$d</string>
     <string name="profile_new_title">New block list</string>

@@ -12,27 +12,47 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Niet aan het blokkeren</string>
-    <string name="status_not_blocking_hint">Tik met een gekoppelde tag om te beginnen met blokkeren.</string>
     <string name="status_blocking">\u201c%1$s\u201d blokkeert</string>
     <string name="status_since">Sinds %1$s</string>
-    <string name="status_blocking_hint">Tik met een van de tags om te stoppen.</string>
-    <string name="status_service_off_while_blocking">Blokkeren staat aan, maar werkt niet: de toegankelijkheidsservice staat uit.</string>
     <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
     <!-- Home -->
     <string name="home_add">Toevoegen</string>
-    <string name="home_tags">Tag: %1$s</string>
     <string name="home_no_tag">Geen tag</string>
     <string name="home_blocking_now">Blokkeert nu</string>
     <string name="stats_today">Vandaag</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">Altijd</string>
-    <string name="stats_time_blocked">Tijd geblokkeerd</string>
     <string name="stats_times_blocked">Keer geblokkeerd</string>
     <string name="stats_apps_stopped">Apps tegengehouden</string>
     <string name="stats_without_tag">Zonder tag gestopt</string>
+    <string name="home_greeting_morning">Goedemorgen</string>
+    <string name="home_greeting_afternoon">Goedemiddag</string>
+    <string name="home_greeting_evening">Goedenavond</string>
+    <string name="home_greeting_night">Goedenacht</string>
+    <string name="home_line_free">Je telefoon is vrij. Tik je tag als je wilt focussen.</string>
+    <string name="home_line_blocking">Even rust. Je apps zijn geblokkeerd.</string>
+    <string name="home_ready">Klaar voor gebruik</string>
+    <string name="problem_service_off">Blokkeren werkt niet: de blokkeerservice staat uit</string>
+    <string name="problem_nfc_off">NFC staat uit, dus tags worden niet gelezen</string>
+    <string name="problem_no_block_list">Kies welke apps je wilt blokkeren</string>
+    <string name="problem_no_tag">Voeg een tag toe om te beginnen</string>
+    <string name="problem_fix">Oplossen</string>
+    <string name="problem_create">Maken</string>
+    <string name="problem_add">Toevoegen</string>
+    <string name="stats_rest_today">rust vandaag</string>
+    <string name="stats_rest_week">rust deze week</string>
+    <string name="stats_rest_all">rust in totaal</string>
+    <string name="stats_details">Details</string>
+    <string name="stats_less">Minder</string>
     <string name="stats_minutes">%1$d min</string>
     <string name="stats_hours_minutes">%1$d u %2$d min</string>
     <string name="settings_tags">Tags</string>
+    <string name="settings_notifications">Meldingen</string>
+    <string name="settings_notifications_on">Aan: een stille melding zolang er geblokkeerd wordt</string>
+    <string name="settings_notifications_off">Uit. Tik om ze toe te staan.</string>
+    <string name="settings_nfc">NFC</string>
+    <string name="settings_nfc_on">Aan</string>
+    <string name="settings_nfc_off">Uit, dus tags worden niet gelezen. Tik om het aan te zetten.</string>
     <string name="settings_tags_body">Je tags hernoemen, vergeten of wissen, ook die zonder blokkeerlijst.</string>
     <string name="setup_title">Instellen afronden</string>
     <plurals name="setup_progress">
@@ -131,7 +151,6 @@
 
     <!-- Block lists -->
     <string name="profiles_title">Blokkeerlijsten</string>
-    <string name="profiles_empty">Nog geen blokkeerlijsten. Een blokkeerlijst is de set apps die een tag blokkeert.</string>
     <string name="profiles_new">Nieuwe blokkeerlijst</string>
     <string name="profile_default_name">Blokkeerlijst %1$d</string>
     <string name="profile_new_title">Nieuwe blokkeerlijst</string>
