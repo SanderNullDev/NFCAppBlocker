@@ -1,4 +1,4 @@
-package nl.nulldevelopment.nfcappblocker.feature.status
+package nl.nulldevelopment.nfcappblocker.feature.home
 
 import android.Manifest
 import android.content.Intent
@@ -34,6 +34,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.ui.draw.clip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,17 +73,19 @@ import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatus
 import nl.nulldevelopment.nfcappblocker.ui.components.ResumedEffect
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
+import java.time.Duration
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatusScreen(
-    onOpenProfiles: () -> Unit,
+fun HomeScreen(
     onOpenSettings: () -> Unit,
-    onOpenTags: () -> Unit,
-    viewModel: StatusViewModel = hiltViewModel(),
+    onOpenBlockList: (Long) -> Unit,
+    onNewBlockList: () -> Unit,
+    onAddTag: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -105,7 +119,7 @@ fun StatusScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.status_title)) },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title))
@@ -113,14 +127,15 @@ fun StatusScreen(
                 },
             )
         },
+        floatingActionButton = { AddButton(onNewBlockList = onNewBlockList, onAddTag = onAddTag) },
     ) { innerPadding ->
-        val loaded = state as? StatusState.Loaded ?: return@Scaffold
+        val loaded = state as? HomeState.Loaded ?: return@Scaffold
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 12.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             val checklist = setupChecklist(
@@ -136,12 +151,14 @@ fun StatusScreen(
                         SetupStep.Nfc -> context.startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
                         SetupStep.Service -> explainingService = true
                         SetupStep.Notifications -> allowNotifications()
-                        SetupStep.Profile -> onOpenProfiles()
-                        SetupStep.Tag -> onOpenTags()
+                        SetupStep.Profile -> onNewBlockList()
+                        SetupStep.Tag -> onAddTag()
                     }
                 }
             }
-            BlockingCard(loaded, onStopWithoutTag = { context.startActivity(EscapeActivity.intent(context, fromBlockScreen = false)) })
+            BlockingCard(loaded, onUnlock = { context.startActivity(EscapeActivity.intent(context, fromBlockScreen = false)) })
+            StatsSection(loaded.period, loaded.stats, onPeriod = viewModel::setPeriod)
+            BlockListsSection(loaded.blockLists, onOpen = onOpenBlockList)
         }
     }
 
@@ -259,7 +276,7 @@ private fun ServiceDisclosure(onContinue: () -> Unit, onDismiss: () -> Unit) {
 private val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
 
 @Composable
-private fun BlockingCard(state: StatusState.Loaded, onStopWithoutTag: () -> Unit) {
+private fun BlockingCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
     SoftCard(Modifier.fillMaxWidth()) {
         // Polite live region: TalkBack announces when blocking starts or stops while this is open.
         Column(
@@ -270,47 +287,174 @@ private fun BlockingCard(state: StatusState.Loaded, onStopWithoutTag: () -> Unit
         ) {
             if (state.activeProfileName == null) {
                 Text(stringResource(R.string.status_not_blocking), style = MaterialTheme.typography.headlineSmall, modifier = Modifier.semantics { heading() })
-                Text(stringResource(R.string.status_not_blocking_hint), style = MaterialTheme.typography.bodyLarge)
-            } else {
+                Text(stringResource(R.string.status_not_blocking_hint), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                return@Column
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                // Decoration only: the heading says it in words.
+                Box(
+                    Modifier
+                        .size(10.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary),
+                )
                 Text(
                     stringResource(R.string.status_blocking, state.activeProfileName),
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.semantics { heading() },
                 )
-                if (!state.serviceEnabled) {
-                    // The setup checklist above has the button to fix it.
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                        Text(
-                            stringResource(R.string.status_service_off_while_blocking),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                        )
-                    }
-                }
-                state.since?.let { Text(stringResource(R.string.status_since, timeFormat.format(it)), style = MaterialTheme.typography.bodyLarge) }
-                Text(stringResource(R.string.status_blocking_hint), style = MaterialTheme.typography.bodyLarge)
-                OutlinedButton(onClick = onStopWithoutTag, modifier = Modifier.heightIn(min = 48.dp)) {
-                    Text(stringResource(R.string.escape_start))
-                }
-                Text(
-                    pluralStringResource(R.plurals.status_blocked_apps, state.blockedApps.size, state.blockedApps.size),
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .semantics { heading() },
-                )
-                state.blockedApps.forEach { app ->
-                    Row(
-                        modifier = Modifier.heightIn(min = 48.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        AppIcon(app.packageName, size = 32.dp)
-                        Text(app.label, style = MaterialTheme.typography.bodyLarge)
-                    }
+            }
+            if (!state.serviceEnabled) {
+                // The setup checklist above has the button to fix it.
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(R.string.status_service_off_while_blocking),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error,
+                    )
                 }
             }
+            val since = state.since?.let { stringResource(R.string.status_since, timeFormat.format(it)) }
+            val apps = state.blockedApps.joinToString(", ") { it.label }
+            Text(
+                listOfNotNull(since, apps.takeIf { it.isNotEmpty() }).joinToString(" · "),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(stringResource(R.string.status_blocking_hint), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedButton(onClick = onUnlock, modifier = Modifier.heightIn(min = 48.dp)) {
+                Text(stringResource(R.string.escape_start))
+            }
+        }
+    }
+}
+
+/** The four numbers (D-044), with a switch between today, the last 7 days and all time. */
+@Composable
+private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (StatsPeriod) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+            StatsPeriod.entries.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = option == period,
+                    onClick = { onPeriod(option) },
+                    shape = SegmentedButtonDefaults.itemShape(index, StatsPeriod.entries.size),
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(
+                        stringResource(
+                            when (option) {
+                                StatsPeriod.Today -> R.string.stats_today
+                                StatsPeriod.Week -> R.string.stats_week
+                                StatsPeriod.AllTime -> R.string.stats_all_time
+                            },
+                        ),
+                    )
+                }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            StatTile(formatDuration(stats.timeBlocked), stringResource(R.string.stats_time_blocked), Modifier.weight(1f))
+            StatTile(stats.timesBlocked.toString(), stringResource(R.string.stats_times_blocked), Modifier.weight(1f))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            StatTile(stats.appsStopped.toString(), stringResource(R.string.stats_apps_stopped), Modifier.weight(1f))
+            StatTile(stats.stoppedWithoutTag.toString(), stringResource(R.string.stats_without_tag), Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun StatTile(value: String, label: String, modifier: Modifier = Modifier) {
+    // Read as one item: "14 h 20 min, Time blocked".
+    SoftCard(modifier.semantics(mergeDescendants = true) {}) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(value, style = MaterialTheme.typography.headlineSmall)
+            Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun formatDuration(duration: Duration): String {
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+    return if (hours == 0L) stringResource(R.string.stats_minutes, minutes) else stringResource(R.string.stats_hours_minutes, hours, minutes)
+}
+
+@Composable
+private fun BlockListsSection(lists: List<BlockListSummary>, onOpen: (Long) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(R.string.profiles_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.semantics { heading() },
+        )
+        if (lists.isEmpty()) {
+            Text(stringResource(R.string.profiles_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            return@Column
+        }
+        SoftCard(Modifier.fillMaxWidth()) {
+            lists.forEachIndexed { index, list ->
+                if (index > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                BlockListRow(list, onClick = { onOpen(list.id) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun BlockListRow(list: BlockListSummary, onClick: () -> Unit) {
+    val apps = pluralStringResource(R.plurals.profiles_app_count, list.appCount, list.appCount)
+    val tags = if (list.tagNames.isEmpty()) stringResource(R.string.home_no_tag) else stringResource(R.string.home_tags, list.tagNames.joinToString(", "))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .heightIn(min = 64.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(list.name, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                listOfNotNull(apps, tags, if (list.active) stringResource(R.string.home_blocking_now) else null).joinToString(" · "),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+    }
+}
+
+/** Add: a new block list, or a tag (D-043). */
+@Composable
+private fun AddButton(onNewBlockList: () -> Unit, onAddTag: () -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        ExtendedFloatingActionButton(
+            onClick = { open = true },
+            icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+            text = { Text(stringResource(R.string.home_add)) },
+        )
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.profiles_new)) },
+                onClick = {
+                    open = false
+                    onNewBlockList()
+                },
+                modifier = Modifier.heightIn(min = 48.dp),
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.tags_add)) },
+                onClick = {
+                    open = false
+                    onAddTag()
+                },
+                modifier = Modifier.heightIn(min = 48.dp),
+            )
         }
     }
 }

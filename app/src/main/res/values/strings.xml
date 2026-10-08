@@ -9,24 +9,32 @@
     <string name="tag_default_name">Tag %1$d</string>
 
     <!-- Navigation -->
-    <string name="tab_profiles">Block lists</string>
-    <string name="tab_tags">Tags</string>
 
-    <string name="tab_status">Status</string>
 
     <!-- Status -->
-    <string name="status_title">Status</string>
     <string name="status_not_blocking">Not blocking</string>
     <string name="status_not_blocking_hint">Tap a linked tag to start blocking.</string>
     <string name="status_blocking">Blocking \u201c%1$s\u201d</string>
     <string name="status_since">Since %1$s</string>
     <string name="status_blocking_hint">Tap one of its tags to stop.</string>
-    <plurals name="status_blocked_apps">
-        <item quantity="one">%1$d app blocked</item>
-        <item quantity="other">%1$d apps blocked</item>
-    </plurals>
     <string name="status_service_off_while_blocking">Blocking is on, but it isn\'t working: the accessibility service is off.</string>
     <string name="status_service_off_hint">Find TikStop under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
+    <!-- Home (D-043, D-044) -->
+    <string name="home_add">Add</string>
+    <string name="home_tags">Tag: %1$s</string>
+    <string name="home_no_tag">No tag</string>
+    <string name="home_blocking_now">Blocking now</string>
+    <string name="stats_today">Today</string>
+    <string name="stats_week">Week</string>
+    <string name="stats_all_time">All time</string>
+    <string name="stats_time_blocked">Time blocked</string>
+    <string name="stats_times_blocked">Times blocked</string>
+    <string name="stats_apps_stopped">Apps stopped</string>
+    <string name="stats_without_tag">Stopped without tag</string>
+    <string name="stats_minutes">%1$d min</string>
+    <string name="stats_hours_minutes">%1$d h %2$d min</string>
+    <string name="settings_tags">Tags</string>
+    <string name="settings_tags_body">Rename, forget or wipe your tags, also ones without a block list.</string>
     <string name="setup_title">Finish setting up</string>
     <plurals name="setup_progress">
         <item quantity="one">%1$d of %2$d step done</item>
@@ -46,10 +54,10 @@
     <string name="setup_notifications_action">Allow notifications</string>
     <string name="setup_profile_title">Create a block list</string>
     <string name="setup_profile_body">A block list is the set of apps a tag blocks.</string>
-    <string name="setup_profile_action">Go to block lists</string>
+    <string name="setup_profile_action">New block list</string>
     <string name="setup_tag_title">Link a tag to a block list</string>
     <string name="setup_tag_body">Tapping the tag then starts and stops blocking.</string>
-    <string name="setup_tag_action">Go to tags</string>
+    <string name="setup_tag_action">Add tag</string>
     <string name="disclosure_title">About the blocker service</string>
     <string name="disclosure_what">TikStop uses an accessibility service to notice when an app you chose to block comes to the front, and covers it with the block screen.</string>
     <string name="disclosure_not">It only looks at which app is open. It doesn\'t read what\'s on screen or what you type, and it sends nothing anywhere.</string>
@@ -95,7 +103,7 @@
     </plurals>
     <string name="onboarding_stopping_title">How to stop blocking</string>
     <string name="onboarding_stopping_tag">Tap \u201c%1$s\u201d again. Blocking stops straight away.</string>
-    <string name="onboarding_stopping_without">No tag at hand? Choose Stop without a tag in the app or on the block screen, and wait for a countdown to finish. Leaving the screen stops the countdown, but your block list stays active.</string>
+    <string name="onboarding_stopping_without">No tag at hand? Choose Unlock now in the app or on the block screen, and wait for a countdown to finish. Leaving the screen stops the countdown, but your block list stays active.</string>
     <string name="onboarding_stopping_length">Countdown length</string>
     <string name="onboarding_stopping_later">You can change this later in Settings.</string>
     <string name="onboarding_try_title">Try it</string>
@@ -113,7 +121,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_countdown_title">Stop without a tag</string>
+    <string name="settings_countdown_title">Unlock without a tag</string>
     <string name="settings_countdown_body">To stop blocking without a tag, you wait out a countdown on screen. Leaving the screen stops the countdown, but your block list stays active.</string>
     <string name="settings_countdown_locked">You can change this when nothing is blocking.</string>
     <plurals name="settings_minutes">
@@ -239,7 +247,7 @@
     <string name="block_title">%1$s is blocked</string>
     <string name="block_body">\u201c%1$s\u201d is blocking it. Scan a tag linked to \u201c%1$s\u201d to stop blocking.</string>
     <string name="block_go_home">Go to home screen</string>
-    <string name="escape_start">Stop without a tag</string>
+    <string name="escape_start">Unlock now</string>
     <string name="escape_title">Stop blocking \u201c%1$s\u201d?</string>
     <string name="escape_body">Blocking stops when the countdown ends. Leaving this screen or turning off the display stops the countdown, but your block list stays active.</string>
     <plurals name="escape_minutes_left">

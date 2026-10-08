@@ -1,4 +1,4 @@
-package nl.nulldevelopment.nfcappblocker.feature.status
+package nl.nulldevelopment.nfcappblocker.feature.home
 
 import nl.nulldevelopment.nfcappblocker.ui.components.NfcStatus
 import org.junit.jupiter.api.Assertions.assertEquals

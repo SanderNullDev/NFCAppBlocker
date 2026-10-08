@@ -6,7 +6,7 @@ import nl.nulldevelopment.nfcappblocker.blocking.BlockerServiceStatus
 import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingProgress
 import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingStep
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
-import nl.nulldevelopment.nfcappblocker.feature.status.BlockedApp
+import nl.nulldevelopment.nfcappblocker.feature.home.BlockedApp
 import nl.nulldevelopment.nfcappblocker.testing.FakeBlockingRepository
 import nl.nulldevelopment.nfcappblocker.testing.FakeInstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.testing.FakeOnboardingStore

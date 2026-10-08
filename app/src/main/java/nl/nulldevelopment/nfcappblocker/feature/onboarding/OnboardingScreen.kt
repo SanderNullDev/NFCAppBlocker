@@ -78,7 +78,7 @@ import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingStep
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingState
 import nl.nulldevelopment.nfcappblocker.feature.pairing.PairingStepContent
 import nl.nulldevelopment.nfcappblocker.feature.settings.CountdownSlider
-import nl.nulldevelopment.nfcappblocker.feature.status.BlockedApp
+import nl.nulldevelopment.nfcappblocker.feature.home.BlockedApp
 import nl.nulldevelopment.nfcappblocker.ui.components.AppIcon
 import nl.nulldevelopment.nfcappblocker.ui.components.AppPickerRow
 import nl.nulldevelopment.nfcappblocker.ui.components.AppSearchField

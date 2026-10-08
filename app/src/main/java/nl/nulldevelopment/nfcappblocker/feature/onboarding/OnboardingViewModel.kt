@@ -22,7 +22,7 @@ import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.settings.SettingsRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
 import nl.nulldevelopment.nfcappblocker.data.tags.TagRepository
-import nl.nulldevelopment.nfcappblocker.feature.status.BlockedApp
+import nl.nulldevelopment.nfcappblocker.feature.home.BlockedApp
 import java.util.UUID
 import javax.inject.Inject
 

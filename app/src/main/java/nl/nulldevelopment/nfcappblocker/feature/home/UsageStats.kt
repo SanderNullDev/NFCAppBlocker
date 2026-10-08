@@ -5,7 +5,6 @@ import nl.nulldevelopment.nfcappblocker.data.history.BlockSession
 import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 
 /** The period the home screen's numbers cover (D-044). */
@@ -33,7 +32,7 @@ fun usageStats(
     now: Instant,
     zone: ZoneId,
 ): UsageStats {
-    val today = LocalDate.ofInstant(now, zone)
+    val today = now.atZone(zone).toLocalDate()
     val from = when (period) {
         StatsPeriod.Today -> today.atStartOfDay(zone).toInstant()
         StatsPeriod.Week -> today.minusDays(6).atStartOfDay(zone).toInstant()

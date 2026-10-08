@@ -3,22 +3,18 @@ package nl.nulldevelopment.nfcappblocker.navigation
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-/** Tab: whether blocking is on, and what's needed to make it work. The start tab. */
+/** The one home screen (D-043); everything else opens on top of it. */
 @Serializable
-data object StatusRoute : NavKey
+data object HomeRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey
 
-/** Tab: block profiles. */
-@Serializable
-data object ProfilesRoute : NavKey
-
-/** [profileId] is null for a new profile, which is only created when saved (D-025). */
+/** [profileId] is null for a new block list, which is only created when saved (D-025). */
 @Serializable
 data class ProfileEditorRoute(val profileId: Long?) : NavKey
 
-/** Tab: paired tags. */
+/** All tags, also unlinked ones; reached from Settings (D-043). */
 @Serializable
 data object TagListRoute : NavKey
 

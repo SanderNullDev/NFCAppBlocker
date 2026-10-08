@@ -9,23 +9,31 @@
     <string name="tag_default_name">Tag %1$d</string>
 
     <!-- Navigation -->
-    <string name="tab_profiles">Blokkeerlijsten</string>
-    <string name="tab_tags">Tags</string>
-    <string name="tab_status">Status</string>
 
     <!-- Status -->
-    <string name="status_title">Status</string>
     <string name="status_not_blocking">Niet aan het blokkeren</string>
     <string name="status_not_blocking_hint">Tik met een gekoppelde tag om te beginnen met blokkeren.</string>
     <string name="status_blocking">\u201c%1$s\u201d blokkeert</string>
     <string name="status_since">Sinds %1$s</string>
     <string name="status_blocking_hint">Tik met een van de tags om te stoppen.</string>
-    <plurals name="status_blocked_apps">
-        <item quantity="one">%1$d app geblokkeerd</item>
-        <item quantity="other">%1$d apps geblokkeerd</item>
-    </plurals>
     <string name="status_service_off_while_blocking">Blokkeren staat aan, maar werkt niet: de toegankelijkheidsservice staat uit.</string>
     <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
+    <!-- Home -->
+    <string name="home_add">Toevoegen</string>
+    <string name="home_tags">Tag: %1$s</string>
+    <string name="home_no_tag">Geen tag</string>
+    <string name="home_blocking_now">Blokkeert nu</string>
+    <string name="stats_today">Vandaag</string>
+    <string name="stats_week">Week</string>
+    <string name="stats_all_time">Altijd</string>
+    <string name="stats_time_blocked">Tijd geblokkeerd</string>
+    <string name="stats_times_blocked">Keer geblokkeerd</string>
+    <string name="stats_apps_stopped">Apps tegengehouden</string>
+    <string name="stats_without_tag">Zonder tag gestopt</string>
+    <string name="stats_minutes">%1$d min</string>
+    <string name="stats_hours_minutes">%1$d u %2$d min</string>
+    <string name="settings_tags">Tags</string>
+    <string name="settings_tags_body">Je tags hernoemen, vergeten of wissen, ook die zonder blokkeerlijst.</string>
     <string name="setup_title">Instellen afronden</string>
     <plurals name="setup_progress">
         <item quantity="one">%1$d van %2$d stap klaar</item>
@@ -45,10 +53,10 @@
     <string name="setup_notifications_action">Meldingen toestaan</string>
     <string name="setup_profile_title">Maak een blokkeerlijst</string>
     <string name="setup_profile_body">Een blokkeerlijst is de set apps die een tag blokkeert.</string>
-    <string name="setup_profile_action">Naar blokkeerlijsten</string>
+    <string name="setup_profile_action">Nieuwe blokkeerlijst</string>
     <string name="setup_tag_title">Koppel een tag aan een blokkeerlijst</string>
     <string name="setup_tag_body">Tikken met de tag start en stopt dan het blokkeren.</string>
-    <string name="setup_tag_action">Naar tags</string>
+    <string name="setup_tag_action">Tag toevoegen</string>
     <string name="disclosure_title">Over de blokkeerservice</string>
     <string name="disclosure_what">TikStop gebruikt een toegankelijkheidsservice om te zien wanneer een app die je wilt blokkeren op de voorgrond komt, en legt daar het blokkeerscherm overheen.</string>
     <string name="disclosure_not">De app kijkt alleen welke app open is. Hij leest niet wat er op het scherm staat of wat je typt, en stuurt niets door.</string>
@@ -95,7 +103,7 @@
     </plurals>
     <string name="onboarding_stopping_title">Zo stop je met blokkeren</string>
     <string name="onboarding_stopping_tag">Tik nog een keer met \u201c%1$s\u201d. Het blokkeren stopt meteen.</string>
-    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Stoppen zonder tag in de app of op het blokkeerscherm, en wacht tot het aftellen klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
+    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Nu ontgrendelen in de app of op het blokkeerscherm, en wacht tot het aftellen klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
     <string name="onboarding_stopping_length">Hoe lang aftellen</string>
     <string name="onboarding_stopping_later">Je kunt dit later wijzigen in Instellingen.</string>
     <string name="onboarding_try_title">Probeer het</string>
@@ -113,7 +121,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Instellingen</string>
-    <string name="settings_countdown_title">Stoppen zonder tag</string>
+    <string name="settings_countdown_title">Ontgrendelen zonder tag</string>
     <string name="settings_countdown_body">Om zonder tag te stoppen met blokkeren, wacht je tot het aftellen op het scherm klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
     <string name="settings_countdown_locked">Je kunt dit wijzigen als er niets wordt geblokkeerd.</string>
     <plurals name="settings_minutes">
@@ -238,7 +246,7 @@
     <string name="block_title">%1$s is geblokkeerd</string>
     <string name="block_body">\u201c%1$s\u201d blokkeert deze app. Scan een tag die aan \u201c%1$s\u201d is gekoppeld om te stoppen met blokkeren.</string>
     <string name="block_go_home">Naar startscherm</string>
-    <string name="escape_start">Stoppen zonder tag</string>
+    <string name="escape_start">Nu ontgrendelen</string>
     <string name="escape_title">\u201c%1$s\u201d stoppen?</string>
     <string name="escape_body">Het blokkeren stopt als het aftellen klaar is. Verlaat je dit scherm of zet je het scherm uit, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
     <plurals name="escape_minutes_left">

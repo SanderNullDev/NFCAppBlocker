@@ -1,4 +1,4 @@
-package nl.nulldevelopment.nfcappblocker.feature.status
+package nl.nulldevelopment.nfcappblocker.feature.home
 
 import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
@@ -15,12 +15,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
+import java.time.Clock
+import java.time.Duration
 import java.time.Instant
+import java.time.ZoneOffset
 import java.util.UUID
 
-class StatusViewModelTest {
+class HomeViewModelTest {
 
     @JvmField
     @RegisterExtension
@@ -47,12 +51,15 @@ class StatusViewModelTest {
         }
     }
 
-    private fun viewModel() = StatusViewModel(blocking, profiles, tags, apps, service, notifications)
+    private val now = Instant.parse("2026-10-08T10:00:00Z")
+    private val clock = Clock.fixed(now, ZoneOffset.UTC)
 
-    private suspend fun StatusViewModel.loaded(): StatusState.Loaded {
-        var result: StatusState.Loaded? = null
+    private fun viewModel() = HomeViewModel(blocking, profiles, tags, apps, service, notifications, history = blocking, clock = clock)
+
+    private suspend fun HomeViewModel.loaded(): HomeState.Loaded {
+        var result: HomeState.Loaded? = null
         state.test {
-            while (result == null) result = awaitItem() as? StatusState.Loaded
+            while (result == null) result = awaitItem() as? HomeState.Loaded
             cancelAndIgnoreRemainingEvents()
         }
         return result!!
@@ -111,5 +118,45 @@ class StatusViewModelTest {
 
         assertFalse(vm.loaded().serviceEnabled)
         assertEquals(1, refreshes)
+    }
+
+    @Test
+    fun `lists every block list with its app count, tags and whether it's blocking`() = runTest {
+        val focus = profiles.create("Focus", setOf("com.instagram.android", "com.android.chrome"))
+        val empty = profiles.create("Empty", emptySet())
+        tags.tags.value = listOf(
+            PairedTag(UUID.randomUUID(), "Desk", null, Instant.EPOCH, profileId = focus),
+            PairedTag(UUID.randomUUID(), "bed", null, Instant.EPOCH, profileId = focus),
+        )
+        blocking.activate(focus)
+
+        assertEquals(
+            listOf(
+                BlockListSummary(empty, "Empty", 0, emptyList(), active = false),
+                BlockListSummary(focus, "Focus", 2, listOf("bed", "Desk"), active = true),
+            ),
+            viewModel().loaded().blockLists.sortedBy { it.name },
+        )
+    }
+
+    @Test
+    fun `numbers come from the history, for the chosen period`() = runTest {
+        val focus = profiles.create("Focus", setOf("com.instagram.android"))
+        // One session 30 days ago, and two hours this morning that ended by unlocking.
+        blocking.now = now.minus(Duration.ofDays(30))
+        blocking.activate(focus)
+        blocking.deactivate(focus, SessionEnd.Tag)
+        blocking.now = now.minus(Duration.ofHours(3))
+        blocking.activate(focus)
+        blocking.recordBlockScreen("com.instagram.android", focus)
+        blocking.now = now.minus(Duration.ofHours(1))
+        blocking.deactivate(focus, SessionEnd.Unlock)
+        val vm = viewModel()
+
+        assertEquals(StatsPeriod.Week, vm.loaded().period)
+        assertEquals(UsageStats(Duration.ofHours(2), 1, 1, 1), vm.loaded().stats)
+
+        vm.setPeriod(StatsPeriod.AllTime)
+        assertEquals(2, vm.loaded().stats.timesBlocked)
     }
 }

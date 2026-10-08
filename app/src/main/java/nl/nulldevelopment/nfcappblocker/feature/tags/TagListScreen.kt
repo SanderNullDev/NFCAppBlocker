@@ -28,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.nulldevelopment.nfcappblocker.R
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
+import nl.nulldevelopment.nfcappblocker.ui.components.BackButton
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -36,6 +37,7 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagListScreen(
+    onBack: () -> Unit,
     onAddTag: () -> Unit,
     onOpenTag: (UUID) -> Unit,
     viewModel: TagListViewModel = hiltViewModel(),
@@ -46,6 +48,7 @@ fun TagListScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.tags_title)) },
+                navigationIcon = { BackButton(onBack) },
             )
         },
         floatingActionButton = {

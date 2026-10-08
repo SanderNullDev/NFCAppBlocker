@@ -1,6 +1,7 @@
 package nl.nulldevelopment.nfcappblocker.feature.profiles
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -75,6 +76,8 @@ fun ProfileEditorScreen(
     /** Null for a new profile, which is only created when saved. */
     profileId: Long?,
     onBack: () -> Unit,
+    /** Opens a linked tag's details (D-043): tags are managed from here and from Settings. */
+    onOpenTag: (UUID) -> Unit,
     viewModel: ProfileEditorViewModel = hiltViewModel<ProfileEditorViewModel, ProfileEditorViewModel.Factory>(
         creationCallback = { factory -> factory.create(profileId) },
     ),
@@ -138,7 +141,7 @@ fun ProfileEditorScreen(
                 item { Hint(stringResource(R.string.profile_no_tags)) }
             }
             items(loaded.linkedTags, key = { "tag-${it.uuid}" }) { tag ->
-                LinkedTagRow(tag, onUnlink = { viewModel.unlinkTag(tag.uuid) })
+                LinkedTagRow(tag, onOpen = { onOpenTag(tag.uuid) }, onUnlink = { viewModel.unlinkTag(tag.uuid) })
             }
             item {
                 Row(
@@ -243,9 +246,10 @@ private fun Hint(text: String) {
 }
 
 @Composable
-private fun LinkedTagRow(tag: PairedTag, onUnlink: () -> Unit) {
+private fun LinkedTagRow(tag: PairedTag, onOpen: () -> Unit, onUnlink: () -> Unit) {
     ListItem(
         headlineContent = { Text(tag.name) },
+        modifier = Modifier.clickable(onClick = onOpen),
         trailingContent = {
             TextButton(onClick = onUnlink, modifier = Modifier.heightIn(min = 48.dp)) {
                 Text(stringResource(R.string.profile_unlink_tag))
