@@ -195,7 +195,7 @@ Goal: one calm screen that shows whether blocking is on and whether it helps (D-
 
 1. [x] Decisions and this plan.
 2. [x] Recording history: database version 4 (blocking sessions, block screen views) with a migration and device test; record sessions and block screens as they happen.
-3. [ ] The numbers per period (today, last 7 days, all time), pure and tested.
+3. [x] The numbers per period (today, last 7 days, all time), pure and tested.
 4. [ ] The home screen without the tab bar: checklist, blocking card with "Unlock now", the numbers, block lists, gear, Add menu.
 5. [ ] Tags in Settings, and opening a tag from the block list editor.
 6. [ ] Dutch texts; checks on the emulator and the phone.
