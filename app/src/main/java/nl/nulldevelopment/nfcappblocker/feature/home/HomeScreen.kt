@@ -42,10 +42,13 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -334,24 +337,21 @@ private fun BlockingCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
 @Composable
 private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (StatsPeriod) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            StatsPeriod.entries.forEachIndexed { index, option ->
-                SegmentedButton(
+        // Light pills rather than a segmented button: calmer, and the chosen one stands out by
+        // its fill and by its selected state for TalkBack.
+        Row(Modifier.selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatsPeriod.entries.forEach { option ->
+                PeriodPill(
+                    label = stringResource(
+                        when (option) {
+                            StatsPeriod.Today -> R.string.stats_today
+                            StatsPeriod.Week -> R.string.stats_week
+                            StatsPeriod.AllTime -> R.string.stats_all_time
+                        },
+                    ),
                     selected = option == period,
                     onClick = { onPeriod(option) },
-                    shape = SegmentedButtonDefaults.itemShape(index, StatsPeriod.entries.size),
-                    modifier = Modifier.heightIn(min = 48.dp),
-                ) {
-                    Text(
-                        stringResource(
-                            when (option) {
-                                StatsPeriod.Today -> R.string.stats_today
-                                StatsPeriod.Week -> R.string.stats_week
-                                StatsPeriod.AllTime -> R.string.stats_all_time
-                            },
-                        ),
-                    )
-                }
+                )
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -361,6 +361,22 @@ private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (Stat
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             StatTile(stats.appsStopped.toString(), stringResource(R.string.stats_apps_stopped), Modifier.weight(1f))
             StatTile(stats.stoppedWithoutTag.toString(), stringResource(R.string.stats_without_tag), Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun PeriodPill(label: String, selected: Boolean, onClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+        contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier
+            .heightIn(min = 48.dp)
+            .selectable(selected = selected, onClick = onClick, role = Role.RadioButton),
+    ) {
+        Box(Modifier.padding(horizontal = 18.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+            Text(label, style = MaterialTheme.typography.labelLarge)
         }
     }
 }

@@ -1,30 +1,30 @@
 package nl.nulldevelopment.nfcappblocker.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 /**
- * A light card for the calm look (D-038): white with a hairline on the broken-white background,
- * and one step lighter than the background in dark mode. Used instead of Material's Card, whose
- * default fill is the darkest surface shade.
+ * The app's card (D-038): a Material card lifted off the broken-white background by a soft
+ * shadow instead of a border. Shadows barely show in dark mode, so there the card is one step
+ * lighter than the background instead.
  */
 @Composable
 fun SoftCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val dark = isSystemInDarkTheme()
-    Surface(
+    Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        color = if (dark) MaterialTheme.colorScheme.surfaceContainerLow else MaterialTheme.colorScheme.surfaceContainerLowest,
-        border = if (dark) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Column(content = content)
-    }
+        colors = CardDefaults.cardColors(
+            containerColor = if (dark) MaterialTheme.colorScheme.surfaceContainerHigh else MaterialTheme.colorScheme.surfaceContainerLowest,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (dark) 0.dp else 2.dp),
+        content = content,
+    )
 }
