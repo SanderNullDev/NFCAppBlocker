@@ -13,13 +13,16 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Not blocking</string>
-    <string name="status_since">Since %1$s</string>
     <string name="status_service_off_hint">Find TikStop under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
     <!-- Home (D-043, D-044) -->
     <string name="home_add">Add</string>
     <string name="home_no_tag">No tag</string>
     <string name="home_blocking_now">Active now</string>
     <string name="home_active">%1$s is active</string>
+    <plurals name="home_apps_more">
+        <item quantity="one">and %1$d other</item>
+        <item quantity="other">and %1$d others</item>
+    </plurals>
     <string name="home_show_all">Show all (%1$d)</string>
     <string name="stats_today">Today</string>
     <string name="stats_week">Week</string>

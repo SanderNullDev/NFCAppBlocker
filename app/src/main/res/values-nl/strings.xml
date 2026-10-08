@@ -12,13 +12,16 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Niet aan het blokkeren</string>
-    <string name="status_since">Sinds %1$s</string>
     <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
     <!-- Home -->
     <string name="home_add">Toevoegen</string>
     <string name="home_no_tag">Geen tag</string>
     <string name="home_blocking_now">Nu actief</string>
     <string name="home_active">%1$s is actief</string>
+    <plurals name="home_apps_more">
+        <item quantity="one">en %1$d andere</item>
+        <item quantity="other">en %1$d andere</item>
+    </plurals>
     <string name="home_show_all">Toon alle (%1$d)</string>
     <string name="stats_today">Vandaag</string>
     <string name="stats_week">Week</string>

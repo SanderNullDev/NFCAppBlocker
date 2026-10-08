@@ -56,6 +56,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,9 +94,6 @@ import nl.nulldevelopment.nfcappblocker.ui.components.SoftCard
 import nl.nulldevelopment.nfcappblocker.ui.components.rememberNfcStatus
 import java.time.Duration
 import java.time.LocalTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 /**
  * The one home screen (D-043, D-046): the wordmark and a greeting, at most one problem, the
@@ -385,8 +387,6 @@ private fun ServiceDisclosure(onContinue: () -> Unit, onDismiss: () -> Unit) {
 }
 
 
-private val timeFormat = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
-
 /** Quiet when nothing blocks; sage while blocking, with the time so far and "Unlock now". */
 @Composable
 private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
@@ -426,10 +426,9 @@ private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
                 Icon(Icons.Filled.Lock, contentDescription = null)
                 Text(stringResource(R.string.home_active, name), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
             }
-            val since = state.since?.let { stringResource(R.string.status_since, timeFormat.format(it)) }
-            val apps = state.blockedApps.joinToString(", ") { it.label }
-            Text(
-                listOfNotNull(since, apps.takeIf { it.isNotEmpty() }).joinToString(" · "),
+            // No start time: the counter below already says how long it has been running.
+            AppNamesThatFit(
+                names = state.blockedApps.map { it.label },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primaryContainer,
             )
@@ -447,6 +446,32 @@ private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
                 ) { Text(stringResource(R.string.escape_start)) }
             }
         }
+    }
+}
+
+/**
+ * The blocked apps' names, as many as fit in [maxLines] at the current width and font size,
+ * ending with "and N others" for the rest, so a long block list doesn't fill the card.
+ */
+@Composable
+private fun AppNamesThatFit(names: List<String>, style: TextStyle, color: Color, maxLines: Int = 3) {
+    if (names.isEmpty()) return
+    val measurer = rememberTextMeasurer()
+    val others = names.indices.associateWith { shown -> pluralStringResource(R.plurals.home_apps_more, names.size - shown, names.size - shown) }
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
+        val width = constraints.maxWidth
+        val text = remember(names, width, style, others) {
+            fun label(shown: Int) = if (shown == names.size) {
+                names.joinToString(", ")
+            } else {
+                names.take(shown).joinToString(", ") + " " + others.getValue(shown)
+            }
+            // Most names first; fall back to fewer until it fits, and at least one.
+            (names.size downTo 1).map(::label).firstOrNull { candidate ->
+                !measurer.measure(candidate, style, maxLines = maxLines, constraints = Constraints(maxWidth = width)).hasVisualOverflow
+            } ?: label(1)
+        }
+        Text(text, style = style, color = color, maxLines = maxLines, overflow = TextOverflow.Ellipsis)
     }
 }
 
