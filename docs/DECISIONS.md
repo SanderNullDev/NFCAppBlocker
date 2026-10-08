@@ -260,7 +260,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-029 — Status tab as the start screen
 
 - **Date:** 2026-10-07
-- **Status:** Accepted
+- **Status:** Superseded by D-043
 - **Supersedes:** D-024
 - **Decision:** The bottom bar has three tabs: Status (the start tab), Profiles and Tags, each with its own back stack; the user leaves the app through Status. Status shows whether blocking is on, which profile, since when and which apps, warns when the accessibility service is off (urgently while a profile is active), asks for notification permission, and points to what still needs setting up.
 - **Why:** Whether blocking is on is the first thing to see when opening the app (plan: "the user can always see whether blocking is active").
@@ -333,7 +333,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-037 — First-run onboarding, with the checklist as a safety net
 
 - **Date:** 2026-10-07
-- **Status:** Accepted
+- **Status:** Superseded by D-042
 - **Supersedes:** D-034
 - **Decision:** On first launch the app shows full-screen onboarding steps with a progress bar: welcome; switch on the blocker service (with the explanation, and help for Android's "restricted settings" on apps not installed from the Play Store; can't be skipped); add a tag (checking NFC first; naming is optional); notifications (can be skipped); choose the apps to block, which creates a block list linked to that tag; try it by tapping the tag (can be skipped). Progress is saved, so leaving halfway resumes at the same step. Onboarding is skipped when the app is already set up (the service is on and a tag is linked to a block list with apps). The Status checklist from D-034 stays as a safety net for steps undone later, such as the service turned off by a force stop.
 - **Why:** The app should be set up correctly by someone who isn't technical. One task per screen, in a fixed order, with the most important step first, is easier to follow than a checklist with several open steps.
@@ -376,3 +376,32 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Short and easy to say in both languages, it says what you do, and it fits the main use, cutting down TikTok.
 - **Alternatives:** PauseTap, Tapaway, Stil, Rust, Slot.
 - **Consequences:** Changing the package name would install a separate app and lose existing data, so it stays. Check the Play Store and trademarks before any release.
+
+## D-042 — Onboarding has seven steps
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-037
+- **Decision:** Everything in D-037 stays, with one step added before "Try it": "How to stop blocking". It explains tapping the tag again and unlocking without a tag (the countdown, which leaving cancels while the block list stays active), and sets the countdown length. "Try it" lists the apps that will be blocked. The steps: welcome, switch on blocking, add your tag, notifications, choose apps to block, how to stop blocking, try it.
+- **Why:** The user should know how to get out of a block before starting one. The countdown length can't be set during "Try it", because it's locked while blocking (D-032).
+- **Alternatives:** Explain stopping and set the length on the "Try it" step.
+- **Consequences:** The Status checklist from D-034 still serves as the safety net.
+
+## D-043 — One home screen instead of tabs
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-029
+- **Decision:** The app has one home screen and no tab bar. Top to bottom: the setup checklist (only while something isn't done), the blocking card, four numbers with a Today / Week / All time switch (D-044), and the block lists, each showing its apps and tags, which open the editor when tapped. A gear at the top right opens Settings. An Add button offers "New block list" and "Add tag". Tags are managed from the editor (tapping a linked tag opens its details) and from "Tags" in Settings, which lists all tags, also unlinked ones. The button that starts the countdown is called "Unlock now" ("Nu ontgrendelen"); other texts refer to it by that name.
+- **Why:** A single screen is easier to follow for someone who isn't technical, and tags are rarely managed once set up.
+- **Alternatives:** Keep the three tabs (D-029); a Tags section on the home screen; an Add button for block lists only.
+- **Consequences:** Back from any screen returns to the home screen. The labels of D-029's Status tab carry over to the home screen.
+
+## D-044 — Usage history and the numbers on the home screen
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Decision:** The app records blocking sessions (block list, start, end, and how it ended: tag, unlock without a tag, switching lists, or the list deleted) and each time the block screen is shown (when, which app), in the database, on the phone only. The home screen shows, for today, the last 7 days or all time: time blocked (a running session counts up to now), times blocked (sessions started), apps stopped (block screens shown) and stopped without a tag (countdowns that finished). History starts when this is installed; nothing is filled in from before.
+- **Why:** Seeing the numbers shows whether the app helps, which is the point of using it.
+- **Alternatives:** All time only; today only; storing counters instead of events.
+- **Consequences:** The database moves to version 4 with a migration. The history grows over time; it's small (one row per session or block screen), so there's no clean-up for now.

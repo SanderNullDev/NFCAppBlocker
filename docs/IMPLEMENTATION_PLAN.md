@@ -185,10 +185,20 @@ Steps, one at a time:
 4. [x] Onboarding, part 1: first-launch detection, saved progress, welcome, blocker service with the restricted-settings guide.
 5. [x] Onboarding, part 2: tag, notifications, apps to block, how to stop (with the countdown length), try it (with the apps that will be blocked).
 6. [x] Existing screens restyled: light cards (white with a hairline; one step lighter in dark mode), more space on Status, the bottom bar in the background colour, and the onboarding app list lined up with its text.
-   - Next session (2026-10-07): a redesign of the Status (home) screen, beyond this restyle.
-   - Still to record: onboarding has seven steps, with "How to stop" (countdown length) added before "Try it"; D-037 lists six, so it needs a new entry.
+   - Onboarding ended up with seven steps (D-042). The Status screen redesign became Phase 8.
 7. [~] Dutch translations done (informal "je", Samsung's Dutch terms); still to do: the language setting in Settings (D-040), and a read-through by both users.
 8. [ ] Checks in both languages on the emulator, then on the phones.
+
+## Phase 8 — One home screen with numbers
+
+Goal: one calm screen that shows whether blocking is on and whether it helps (D-043, D-044).
+
+1. [x] Decisions and this plan.
+2. [ ] Recording history: database version 4 (blocking sessions, block screen views) with a migration and device test; record sessions and block screens as they happen.
+3. [ ] The numbers per period (today, last 7 days, all time), pure and tested.
+4. [ ] The home screen without the tab bar: checklist, blocking card with "Unlock now", the numbers, block lists, gear, Add menu.
+5. [ ] Tags in Settings, and opening a tag from the block list editor.
+6. [ ] Dutch texts; checks on the emulator and the phone.
 
 ## Testing strategy (all phases)
 
