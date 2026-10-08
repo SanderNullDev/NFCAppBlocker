@@ -200,6 +200,15 @@ Goal: one calm screen that shows whether blocking is on and whether it helps (D-
 5. [x] Tags in Settings, and opening a tag from the block list editor.
 6. [~] Dutch texts done; checked on the emulator (2026-10-08: the numbers after blocking, a block screen and an unlock, the Add menu, editor to tag details, Settings to Tags). Still to do: the phone. Dates in the tag list follow the phone's language, not the app's.
 
+## Phase 9 — Calm home and identity
+
+1. [x] Decisions (D-045, D-046).
+2. [ ] Figtree bundled, type scale, softer card shadows.
+3. [ ] Wordmark and greeting, scrolling with the screen.
+4. [ ] Problem banner; NFC and notifications moved to Settings.
+5. [ ] Status card and time blocked with folding details.
+6. [ ] Check on the emulator, light and dark; review the texts.
+
 ## Testing strategy (all phases)
 
 - **Unit tests:** JUnit 5 (Jupiter, without the android-junit5 plugin, D-014), MockK, Turbine — toggle logic, profile resolution, debounce, escape-hatch countdown — driven through the fake tag source.

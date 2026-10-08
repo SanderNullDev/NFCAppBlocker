@@ -343,7 +343,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-038 — Visual design: broken white with a sage accent
 
 - **Date:** 2026-10-07
-- **Status:** Accepted
+- **Status:** Superseded by D-045
 - **Supersedes:** D-035
 - **Decision:** A light, minimal look: a broken-white background with a sage green accent, dynamic colour off so the app looks the same on every phone, and a muted dark version with a warm charcoal background that follows the system setting. The system font stays. Existing screens get the palette, more whitespace and fewer heavy cards, with the same layout and navigation. The app icon (D-035's padlock with the NFC symbol) moves to the sage accent; the dark window from D-035 stays.
 - **Why:** The app is meant to reduce phone use, so it should feel calm and quiet rather than busy. Sage was the calmest of the three accents tried (sage, terracotta, dusty blue).
@@ -390,7 +390,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-043 — One home screen instead of tabs
 
 - **Date:** 2026-10-08
-- **Status:** Accepted
+- **Status:** Superseded by D-046
 - **Supersedes:** D-029
 - **Decision:** The app has one home screen and no tab bar. Top to bottom: the setup checklist (only while something isn't done), the blocking card, four numbers with a Today / Week / All time switch (D-044), and the block lists, each showing its apps and tags, which open the editor when tapped. A gear at the top right opens Settings. An Add button offers "New block list" and "Add tag". Tags are managed from the editor (tapping a linked tag opens its details) and from "Tags" in Settings, which lists all tags, also unlinked ones. The button that starts the countdown is called "Unlock now" ("Nu ontgrendelen"); other texts refer to it by that name.
 - **Why:** A single screen is easier to follow for someone who isn't technical, and tags are rarely managed once set up.
@@ -405,3 +405,23 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Seeing the numbers shows whether the app helps, which is the point of using it.
 - **Alternatives:** All time only; today only; storing counters instead of events.
 - **Consequences:** The database moves to version 4 with a migration. The history grows over time; it's small (one row per session or block screen), so there's no clean-up for now.
+
+## D-045 — Figtree, soft cards and an app identity
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-038
+- **Decision:** D-038's colours stay (broken white, sage, warm charcoal in dark mode, no dynamic colour). The text uses Figtree, bundled with the app (SIL Open Font License). Cards are Material cards without a border, lifted by a soft, low-contrast shadow; in dark mode they're one step lighter than the background instead. The home screen starts with a wordmark: the sage padlock and "TikStop" in Figtree. It scrolls with the rest of the screen rather than staying fixed.
+- **Why:** The system font and bordered cards made the app look generic and busy. A friendly, readable typeface and soft cards suit an app about calm. A fixed header while the content scrolls felt jarring.
+- **Alternatives:** Nunito (rounder, more playful), DM Sans (more businesslike), the system font; a fixed top bar.
+- **Consequences:** The font adds about 100 KB to the app. Screens other than home keep their top bars for now.
+
+## D-046 — A calm home screen
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-043
+- **Decision:** D-043's structure stays: one screen, no tab bar, the gear, the Add button, block lists that open the editor, tags in Settings, and "Unlock now". What changes: a greeting with one sentence on how things stand; problems show as one slim banner with the most urgent issue and a fix button, which opens the full checklist; a missing NFC chip and notifications don't show on the home screen, because the app can't fix the first and works without the second; the status card is quiet when nothing blocks and sage while blocking, with the time so far; of the numbers, only time blocked shows by default, and "Details" folds out the other three inside the same card. Hint texts that repeat aren't shown.
+- **Why:** The home screen showed everything at once, worst when something was wrong (on the emulator, a checklist for NFC it can't have). One status, one number and one problem at a time is easier to take in.
+- **Alternatives:** Keep the checklist and four equal tiles (D-043); drop the other three numbers from the screen.
+- **Consequences:** Notifications and NFC status move to Settings. The texts will be reviewed once the layout runs on the emulator.
