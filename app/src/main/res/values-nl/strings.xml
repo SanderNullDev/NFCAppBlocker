@@ -187,10 +187,6 @@
     </plurals>
     <string name="profile_search_apps">Apps zoeken</string>
     <string name="profile_app_not_installed">Niet geïnstalleerd</string>
-    <string name="never_block_this_app">Kan niet worden geblokkeerd: deze app</string>
-    <string name="never_block_phone">Kan niet worden geblokkeerd: telefoon-app</string>
-    <string name="never_block_settings">Kan niet worden geblokkeerd: Instellingen</string>
-    <string name="never_block_launcher">Kan niet worden geblokkeerd: startscherm</string>
     <string name="never_block_always_allowed">Altijd toegestaan</string>
     <plurals name="profiles_app_count">
         <item quantity="one">%1$d app</item>

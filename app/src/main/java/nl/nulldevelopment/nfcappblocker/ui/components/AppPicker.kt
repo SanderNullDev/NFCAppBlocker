@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import nl.nulldevelopment.nfcappblocker.R
 import nl.nulldevelopment.nfcappblocker.apps.AppPickerItem
-import nl.nulldevelopment.nfcappblocker.apps.NeverBlockReason
 
 // The app picker's search field and rows, shared by the block list editor and onboarding.
 
@@ -75,16 +74,14 @@ fun AppPickerRow(app: AppPickerItem, onToggle: (Boolean) -> Unit, sidePadding: D
     }
 }
 
-/** Why an app is unavailable or unusual, in words, so it's not shown by colour alone. */
+/**
+ * Why an app is unavailable or unusual, in words, so it's not shown by colour alone. Every app
+ * that can't be blocked reads the same, "Always allowed": the reason (phone, Settings, launcher)
+ * doesn't help when choosing.
+ */
 @Composable
 private fun appNote(app: AppPickerItem): String? = when {
     !app.installed -> stringResource(R.string.profile_app_not_installed)
-    else -> when (app.neverBlockReason) {
-        NeverBlockReason.THIS_APP -> stringResource(R.string.never_block_this_app)
-        NeverBlockReason.PHONE -> stringResource(R.string.never_block_phone)
-        NeverBlockReason.SETTINGS -> stringResource(R.string.never_block_settings)
-        NeverBlockReason.LAUNCHER -> stringResource(R.string.never_block_launcher)
-        NeverBlockReason.ALWAYS_ALLOWED -> stringResource(R.string.never_block_always_allowed)
-        null -> null
-    }
+    app.neverBlockReason != null -> stringResource(R.string.never_block_always_allowed)
+    else -> null
 }

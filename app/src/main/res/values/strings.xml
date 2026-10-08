@@ -187,10 +187,6 @@
     </plurals>
     <string name="profile_search_apps">Search apps</string>
     <string name="profile_app_not_installed">Not installed</string>
-    <string name="never_block_this_app">Can\'t be blocked: this app</string>
-    <string name="never_block_phone">Can\'t be blocked: phone app</string>
-    <string name="never_block_settings">Can\'t be blocked: Settings</string>
-    <string name="never_block_launcher">Can\'t be blocked: home screen</string>
     <string name="never_block_always_allowed">Always allowed</string>
     <plurals name="profiles_app_count">
         <item quantity="one">%1$d app</item>
