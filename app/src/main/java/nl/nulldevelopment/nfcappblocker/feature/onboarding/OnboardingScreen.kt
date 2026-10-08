@@ -304,7 +304,7 @@ private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit, on
         primaryEnabled = count > 0,
         scrolls = false,
     ) {
-        BodyText(stringResource(R.string.onboarding_apps_body, tag.name) + " " + stringResource(R.string.onboarding_apps_later))
+        BodyText(stringResource(R.string.onboarding_apps_body) + " " + stringResource(R.string.onboarding_apps_later))
         val loaded = apps ?: return@StepFrame
         // No extra indent: the frame already has its side margin.
         AppSearchField(loaded.query, appsViewModel::setQuery, sidePadding = 0.dp)

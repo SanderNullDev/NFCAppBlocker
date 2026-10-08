@@ -116,7 +116,7 @@
     <string name="onboarding_notifications_on_title">Meldingen staan aan</string>
     <string name="onboarding_notifications_body">Zolang er een blokkeerlijst actief is zie je dat aan een melding in je notificatiebalk. Klik op de melding om terug te komen in deze applicatie.</string>
     <string name="onboarding_apps_title">Kies apps om te blokkeren</string>
-    <string name="onboarding_apps_body">Tikken met \u201c%1$s\u201d blokkeert deze apps, en nog een keer tikken geeft ze weer vrij.</string>
+    <string name="onboarding_apps_body">Zodra je met je tag een pauze start, houdt TikStop je weg uit de apps die je hieronder kiest: open je er een, dan verschijnt er een scherm overheen. In de volgende stap lees je hoe je weer stopt.</string>
     <string name="onboarding_apps_later">Je kunt dit ook later doen vanaf het startscherm.</string>
     <string name="onboarding_apps_none">Kies minstens één app</string>
     <plurals name="onboarding_apps_next">
