@@ -114,7 +114,7 @@
     <string name="onboarding_tag_name_hint">Give it a name if you like, for example where it is.</string>
     <string name="onboarding_notifications_title">See when blocking is on</string>
     <string name="onboarding_notifications_on_title">Notifications are on</string>
-    <string name="onboarding_notifications_body">While blocking is on, a quiet notification shows it, also outside the app.</string>
+    <string name="onboarding_notifications_body">While a block list is active, a notification in your notification bar shows it. Tap the notification to come back to this app.</string>
     <string name="onboarding_apps_title">Choose apps to block</string>
     <string name="onboarding_apps_body">Tapping \u201c%1$s\u201d blocks these apps, and tapping it again unblocks them.</string>
     <string name="onboarding_apps_none">Choose at least one app</string>

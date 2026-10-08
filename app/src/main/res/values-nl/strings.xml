@@ -114,7 +114,7 @@
     <string name="onboarding_tag_name_hint">Geef hem een naam als je wilt, bijvoorbeeld waar hij ligt.</string>
     <string name="onboarding_notifications_title">Zien wanneer blokkeren aan staat</string>
     <string name="onboarding_notifications_on_title">Meldingen staan aan</string>
-    <string name="onboarding_notifications_body">Zolang blokkeren aan staat, zie je dat aan een stille melding, ook buiten de app.</string>
+    <string name="onboarding_notifications_body">Zolang er een blokkeerlijst actief is zie je dat aan een melding in je notificatiebalk. Klik op de melding om terug te komen in deze applicatie.</string>
     <string name="onboarding_apps_title">Kies apps om te blokkeren</string>
     <string name="onboarding_apps_body">Tikken met \u201c%1$s\u201d blokkeert deze apps, en nog een keer tikken geeft ze weer vrij.</string>
     <string name="onboarding_apps_none">Kies minstens één app</string>
