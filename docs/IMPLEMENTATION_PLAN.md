@@ -203,7 +203,7 @@ Goal: one calm screen that shows whether blocking is on and whether it helps (D-
 ## Phase 9 — Calm home and identity
 
 1. [x] Decisions (D-045, D-046).
-2. [ ] Figtree bundled, type scale, softer card shadows.
+2. [x] Figtree bundled, type scale, softer card shadows.
 3. [ ] Wordmark and greeting, scrolling with the screen.
 4. [ ] Problem banner; NFC and notifications moved to Settings.
 5. [ ] Status card and time blocked with folding details.
