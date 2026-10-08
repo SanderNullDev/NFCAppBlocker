@@ -26,9 +26,6 @@
     <string name="stats_today">Vandaag</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">Altijd</string>
-    <string name="stats_times_blocked">Keer geblokkeerd</string>
-    <string name="stats_apps_stopped">Apps tegengehouden</string>
-    <string name="stats_without_tag">Zonder tag gestopt</string>
     <string name="home_greeting_morning">Goedemorgen</string>
     <string name="home_greeting_afternoon">Goedemiddag</string>
     <string name="home_greeting_evening">Goedenavond</string>
@@ -48,6 +45,18 @@
     <string name="stats_rest_all">rust in totaal</string>
     <string name="stats_details">Details</string>
     <string name="stats_less">Minder</string>
+    <plurals name="stats_breaks_started">
+        <item quantity="one">%1$d pauze gestart</item>
+        <item quantity="other">%1$d pauzes gestart</item>
+    </plurals>
+    <plurals name="stats_temptations_caught">
+        <item quantity="one">%1$d verleiding tegengehouden</item>
+        <item quantity="other">%1$d verleidingen tegengehouden</item>
+    </plurals>
+    <plurals name="stats_ended_early">
+        <item quantity="one">%1$d pauze eerder beëindigd</item>
+        <item quantity="other">%1$d pauzes eerder beëindigd</item>
+    </plurals>
     <string name="stats_minutes">%1$d min</string>
     <string name="stats_hours_minutes">%1$d u %2$d min</string>
     <string name="settings_tags">Tags</string>

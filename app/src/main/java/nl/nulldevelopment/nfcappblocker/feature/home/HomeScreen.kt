@@ -61,6 +61,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
+import androidx.annotation.PluralsRes
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +75,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -515,11 +518,11 @@ private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (Stat
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 AnimatedVisibility(visible = expanded) {
-                    Column(Modifier.padding(top = 16.dp, end = 12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                        DetailRow(Icons.Filled.Lock, stats.timesBlocked, stringResource(R.string.stats_times_blocked))
-                        DetailRow(Icons.Filled.Clear, stats.appsStopped, stringResource(R.string.stats_apps_stopped))
-                        DetailRow(Icons.Filled.Refresh, stats.stoppedWithoutTag, stringResource(R.string.stats_without_tag))
+                    Column(Modifier.padding(top = 16.dp, end = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        HorizontalDivider(Modifier.padding(bottom = 4.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                        DetailLine(stats.timesBlocked, R.plurals.stats_breaks_started)
+                        DetailLine(stats.appsStopped, R.plurals.stats_temptations_caught)
+                        DetailLine(stats.stoppedWithoutTag, R.plurals.stats_ended_early)
                     }
                 }
                 TextButton(
@@ -537,17 +540,22 @@ private fun StatsSection(period: StatsPeriod, stats: UsageStats, onPeriod: (Stat
     }
 }
 
+/** One number as a short sentence, the number in bold: "7 pauzes gestart" (D-046). */
 @Composable
-private fun DetailRow(icon: ImageVector, value: Int, label: String) {
-    Row(
-        modifier = Modifier.semantics(mergeDescendants = true) {},
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.outline, modifier = Modifier.size(18.dp))
-        Text(value.toString(), style = MaterialTheme.typography.titleMedium, modifier = Modifier.width(36.dp))
-        Text(label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
+private fun DetailLine(value: Int, @PluralsRes text: Int) {
+    val sentence = pluralStringResource(text, value, value)
+    val number = value.toString()
+    Text(
+        buildAnnotatedString {
+            append(sentence)
+            val at = sentence.indexOf(number)
+            if (at >= 0) {
+                addStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface), at, at + number.length)
+            }
+        },
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Composable

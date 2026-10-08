@@ -27,9 +27,6 @@
     <string name="stats_today">Today</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">All time</string>
-    <string name="stats_times_blocked">Times blocked</string>
-    <string name="stats_apps_stopped">Apps stopped</string>
-    <string name="stats_without_tag">Stopped without tag</string>
     <string name="home_greeting_morning">Good morning</string>
     <string name="home_greeting_afternoon">Good afternoon</string>
     <string name="home_greeting_evening">Good evening</string>
@@ -49,6 +46,18 @@
     <string name="stats_rest_all">of calm in total</string>
     <string name="stats_details">Details</string>
     <string name="stats_less">Less</string>
+    <plurals name="stats_breaks_started">
+        <item quantity="one">%1$d break started</item>
+        <item quantity="other">%1$d breaks started</item>
+    </plurals>
+    <plurals name="stats_temptations_caught">
+        <item quantity="one">%1$d temptation caught</item>
+        <item quantity="other">%1$d temptations caught</item>
+    </plurals>
+    <plurals name="stats_ended_early">
+        <item quantity="one">%1$d break ended early</item>
+        <item quantity="other">%1$d breaks ended early</item>
+    </plurals>
     <string name="stats_minutes">%1$d min</string>
     <string name="stats_hours_minutes">%1$d h %2$d min</string>
     <string name="settings_tags">Tags</string>
