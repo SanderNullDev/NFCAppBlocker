@@ -11,7 +11,6 @@
     <!-- Navigation -->
 
     <!-- Status -->
-    <string name="status_not_blocking">Niet aan het blokkeren</string>
     <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
     <!-- Home -->
     <string name="home_add">Toevoegen</string>
@@ -30,9 +29,10 @@
     <string name="home_greeting_afternoon">Goedemiddag</string>
     <string name="home_greeting_evening">Goedenavond</string>
     <string name="home_greeting_night">Goedenacht</string>
-    <string name="home_line_free">Je telefoon is vrij. Tik je tag als je wilt focussen.</string>
+    <string name="home_line_free">Je telefoon is vrij.</string>
+    <string name="home_line_free_tag">Je telefoon is vrij. Houd \u201c%1$s\u201d tegen je telefoon als je even wilt focussen.</string>
+    <string name="home_line_free_tags">Je telefoon is vrij. Houd een van je tags tegen je telefoon als je even wilt focussen.</string>
     <string name="home_line_blocking">Leg je telefoon even weg en geef je hoofd wat ruimte. Je apps wachten wel.</string>
-    <string name="home_ready">Klaar voor gebruik</string>
     <string name="problem_service_off">Blokkeren werkt niet: de blokkeerservice staat uit</string>
     <string name="problem_nfc_off">NFC staat uit, dus tags worden niet gelezen</string>
     <string name="problem_no_block_list">Kies welke apps je wilt blokkeren</string>

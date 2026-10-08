@@ -56,6 +56,8 @@ sealed interface HomeState {
         val hasProfileWithApps: Boolean,
         /** At least one tag is linked to a profile. */
         val hasLinkedTag: Boolean,
+        /** Names of the tags that start a block list with apps, for the greeting. */
+        val tagNames: List<String>,
         val blockLists: List<BlockListSummary>,
         val period: StatsPeriod,
         val stats: UsageStats,
@@ -137,6 +139,8 @@ class HomeViewModel @Inject constructor(
             serviceEnabled = enabled,
             hasProfileWithApps = allProfiles.any { it.packageNames.isNotEmpty() },
             hasLinkedTag = allTags.any { it.profileId != null },
+            tagNames = allProfiles.filter { it.packageNames.isNotEmpty() }.map { it.id }.toSet()
+                .let { withApps -> allTags.filter { it.profileId in withApps }.map { it.name } },
             blockLists = allProfiles.map { profile ->
                 BlockListSummary(
                     id = profile.id,

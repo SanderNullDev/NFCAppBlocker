@@ -12,7 +12,6 @@
 
 
     <!-- Status -->
-    <string name="status_not_blocking">Not blocking</string>
     <string name="status_service_off_hint">Find TikStop under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
     <!-- Home (D-043, D-044) -->
     <string name="home_add">Add</string>
@@ -31,9 +30,10 @@
     <string name="home_greeting_afternoon">Good afternoon</string>
     <string name="home_greeting_evening">Good evening</string>
     <string name="home_greeting_night">Good night</string>
-    <string name="home_line_free">Your phone is free. Tap your tag when you want to focus.</string>
+    <string name="home_line_free">Your phone is free.</string>
+    <string name="home_line_free_tag">Your phone is free. Hold \u201c%1$s\u201d against your phone when you want to focus for a while.</string>
+    <string name="home_line_free_tags">Your phone is free. Hold one of your tags against your phone when you want to focus for a while.</string>
     <string name="home_line_blocking">Put your phone down for a while and give your mind some room. Your apps will wait.</string>
-    <string name="home_ready">Ready when you are</string>
     <string name="problem_service_off">Blocking doesn\'t work: the blocker service is off</string>
     <string name="problem_nfc_off">NFC is off, so tags can\'t be read</string>
     <string name="problem_no_block_list">Choose which apps to block</string>

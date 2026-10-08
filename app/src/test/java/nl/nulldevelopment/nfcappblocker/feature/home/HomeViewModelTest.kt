@@ -177,4 +177,17 @@ class HomeViewModelTest {
         assertEquals(listOf("Focus", "Evening", "Work", "Another"), viewModel().loaded().blockLists.map { it.name })
         assertEquals(null, viewModel().loaded().blockLists.single { it.id == never }.lastUsed)
     }
+
+    @Test
+    fun `the greeting gets the names of tags that start a block list with apps`() = runTest {
+        val focus = profiles.create("Focus", setOf("com.instagram.android"))
+        val empty = profiles.create("Empty", emptySet())
+        tags.tags.value = listOf(
+            PairedTag(UUID.randomUUID(), "Desk", null, Instant.EPOCH, profileId = focus),
+            PairedTag(UUID.randomUUID(), "Drawer", null, Instant.EPOCH, profileId = empty),
+            PairedTag(UUID.randomUUID(), "Loose", null, Instant.EPOCH),
+        )
+
+        assertEquals(listOf("Desk"), viewModel().loaded().tagNames)
+    }
 }

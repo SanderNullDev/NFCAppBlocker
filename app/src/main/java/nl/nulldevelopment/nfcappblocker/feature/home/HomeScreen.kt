@@ -229,15 +229,14 @@ private fun Greeting(state: HomeState.Loaded, onOpenSettings: () -> Unit) {
                 Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title), tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        Text(
-            if (state.activeProfileName != null) {
-                stringResource(R.string.home_line_blocking)
-            } else {
-                stringResource(R.string.home_line_free)
-            },
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        // The line names the tag to use, so there's no separate "not blocking" card (D-046).
+        val line = when {
+            state.activeProfileName != null -> stringResource(R.string.home_line_blocking)
+            state.tagNames.size == 1 -> stringResource(R.string.home_line_free_tag, state.tagNames.single())
+            state.tagNames.size > 1 -> stringResource(R.string.home_line_free_tags)
+            else -> stringResource(R.string.home_line_free)
+        }
+        Text(line, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -390,34 +389,13 @@ private fun ServiceDisclosure(onContinue: () -> Unit, onDismiss: () -> Unit) {
 }
 
 
-/** Quiet when nothing blocks; sage while blocking, with the time so far and "Unlock now". */
+/** Only while blocking: sage, with the apps, the time so far and "Unlock now". */
 @Composable
 private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
     // Polite live region: TalkBack announces when blocking starts or stops while this is open.
     val announce = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
-    val name = state.activeProfileName
-    if (name == null) {
-        SoftCard(Modifier.fillMaxWidth()) {
-            Row(
-                modifier = announce.padding(20.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Box(
-                    Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Filled.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant) }
-                Column {
-                    Text(stringResource(R.string.status_not_blocking), style = MaterialTheme.typography.titleMedium)
-                    Text(stringResource(R.string.home_ready), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-            }
-        }
-        return
-    }
+    // Only while blocking: when nothing blocks, the greeting's line says so (D-046).
+    val name = state.activeProfileName ?: return
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.primary,
