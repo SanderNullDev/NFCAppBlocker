@@ -5,6 +5,10 @@ import android.content.Intent
 import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import nl.nulldevelopment.nfcappblocker.ui.components.PredictiveBackFrame
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ContentTransform
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
@@ -98,39 +102,51 @@ class MainActivity : ComponentActivity() {
         }
         val entryProvider = entryProvider {
             entry<HomeRoute> {
-                HomeScreen(
-                    onOpenSettings = { navigator.navigate(SettingsRoute) },
-                    onOpenBlockList = { id -> navigator.navigate(ProfileEditorRoute(id)) },
-                    onNewBlockList = { navigator.navigate(ProfileEditorRoute(null)) },
-                    onAddTag = { navigator.navigate(AddTagRoute) },
-                )
+                PredictiveBackFrame {
+                    HomeScreen(
+                        onOpenSettings = { navigator.navigate(SettingsRoute) },
+                        onOpenBlockList = { id -> navigator.navigate(ProfileEditorRoute(id)) },
+                        onNewBlockList = { navigator.navigate(ProfileEditorRoute(null)) },
+                        onAddTag = { navigator.navigate(AddTagRoute) },
+                    )
+                }
             }
             entry<SettingsRoute> {
-                SettingsScreen(onBack = navigator::goBack, onOpenTags = { navigator.navigate(TagListRoute) })
+                PredictiveBackFrame {
+                    SettingsScreen(onBack = navigator::goBack, onOpenTags = { navigator.navigate(TagListRoute) })
+                }
             }
             entry<ProfileEditorRoute> { route ->
-                ProfileEditorScreen(
-                    profileId = route.profileId,
-                    onBack = navigator::goBack,
-                    onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
-                )
+                PredictiveBackFrame {
+                    ProfileEditorScreen(
+                        profileId = route.profileId,
+                        onBack = navigator::goBack,
+                        onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
+                    )
+                }
             }
             entry<TagListRoute> {
-                TagListScreen(
-                    onBack = navigator::goBack,
-                    onAddTag = { navigator.navigate(AddTagRoute) },
-                    onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
-                )
+                PredictiveBackFrame {
+                    TagListScreen(
+                        onBack = navigator::goBack,
+                        onAddTag = { navigator.navigate(AddTagRoute) },
+                        onOpenTag = { uuid -> navigator.navigate(TagDetailsRoute(uuid.toString())) },
+                    )
+                }
             }
             entry<AddTagRoute> {
-                AddTagScreen(
-                    onBack = navigator::goBack,
-                    // Replace "add tag" so Back from the details returns to where it was opened.
-                    onOpenTag = { uuid -> navigator.replace(TagDetailsRoute(uuid.toString())) },
-                )
+                PredictiveBackFrame {
+                    AddTagScreen(
+                        onBack = navigator::goBack,
+                        // Replace "add tag" so Back from the details returns to where it was opened.
+                        onOpenTag = { uuid -> navigator.replace(TagDetailsRoute(uuid.toString())) },
+                    )
+                }
             }
             entry<TagDetailsRoute> { route ->
-                TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
+                PredictiveBackFrame {
+                    TagDetailsScreen(uuid = UUID.fromString(route.uuid), onBack = navigator::goBack)
+                }
             }
         }
         NavDisplay(
@@ -143,6 +159,15 @@ class MainActivity : ComponentActivity() {
                 entryProvider = entryProvider,
             ),
             onBack = navigator::goBack,
+            // The leaving screen shrinks a little and gets rounded corners (PredictiveBackFrame)
+            // over the steady screen behind it, instead of the default 70% shrink over a fade-in.
+            predictivePopTransitionSpec = {
+                ContentTransform(
+                    targetContentEnter = EnterTransition.None,
+                    initialContentExit = scaleOut(targetScale = 0.9f),
+                    targetContentZIndex = -1f,
+                )
+            },
         )
     }
 
