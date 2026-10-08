@@ -2,6 +2,7 @@ package nl.nulldevelopment.nfcappblocker.data.blocking
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import java.time.Clock
 import java.time.Instant
@@ -23,7 +24,5 @@ class RoomBlockingRepository @Inject constructor(
 
     override suspend fun activate(profileId: Long): ActivateResult = dao.activateExclusively(profileId, clock.millis())
 
-    override suspend fun deactivate(profileId: Long) = dao.delete(profileId)
-
-    override suspend fun deactivateAll() = dao.deleteAll()
+    override suspend fun deactivate(profileId: Long, reason: SessionEnd) = dao.deactivate(profileId, clock.millis(), reason)
 }

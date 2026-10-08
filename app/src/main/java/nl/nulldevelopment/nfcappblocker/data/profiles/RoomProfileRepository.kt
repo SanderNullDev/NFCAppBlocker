@@ -29,7 +29,7 @@ class RoomProfileRepository @Inject constructor(
 
     override suspend fun setApps(id: Long, packageNames: Set<String>) = dao.replaceApps(id, packageNames)
 
-    override suspend fun delete(id: Long) = dao.delete(id)
+    override suspend fun delete(id: Long) = dao.delete(id, clock.millis())
 
     private fun ProfileWithApps.toDomain() = Profile(
         id = profile.id,

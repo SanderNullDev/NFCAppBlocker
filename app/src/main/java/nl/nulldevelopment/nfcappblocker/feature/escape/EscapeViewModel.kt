@@ -18,6 +18,7 @@ import nl.nulldevelopment.nfcappblocker.blocking.EscapeCountdown
 import nl.nulldevelopment.nfcappblocker.blocking.ScanFeedback
 import nl.nulldevelopment.nfcappblocker.blocking.ScanOutcome
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import nl.nulldevelopment.nfcappblocker.data.settings.SettingsRepository
 import nl.nulldevelopment.nfcappblocker.util.ElapsedRealtime
 import javax.inject.Inject
@@ -87,7 +88,7 @@ class EscapeViewModel @Inject constructor(
                     watcher.cancel()
                     // The time was waited out; leaving now mustn't undo that halfway.
                     withContext(NonCancellable) {
-                        blocking.deactivate(profile.id)
+                        blocking.deactivate(profile.id, SessionEnd.Unlock)
                         feedback.show(ScanOutcome.Stopped(profile))
                     }
                     return close()

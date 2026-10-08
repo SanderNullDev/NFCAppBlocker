@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
 import nl.nulldevelopment.nfcappblocker.data.profiles.RoomProfileRepository
+import nl.nulldevelopment.nfcappblocker.data.history.BlockSession
+import nl.nulldevelopment.nfcappblocker.data.history.RoomUsageHistory
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,6 +36,7 @@ class RoomBlockingRepositoryTest {
     private lateinit var database: AppDatabase
     private lateinit var profiles: RoomProfileRepository
     private lateinit var blocking: RoomBlockingRepository
+    private lateinit var history: RoomUsageHistory
 
     private val instagram = "com.instagram.android"
 
@@ -42,6 +46,7 @@ class RoomBlockingRepositoryTest {
         database = Room.inMemoryDatabaseBuilder<AppDatabase>(context).setDriver(AndroidSQLiteDriver()).build()
         profiles = RoomProfileRepository(database.profileDao(), clock)
         blocking = RoomBlockingRepository(database.activeProfileDao(), profiles, clock)
+        history = RoomUsageHistory(database.historyDao(), clock)
     }
 
     @After
@@ -94,7 +99,7 @@ class RoomBlockingRepositoryTest {
         val focus = profiles.create("Focus", setOf(instagram))
         blocking.activate(focus)
 
-        blocking.deactivate(focus)
+        blocking.deactivate(focus, SessionEnd.Tag)
 
         assertTrue(blocking.observeActive().first().isEmpty())
     }
@@ -119,5 +124,51 @@ class RoomBlockingRepositoryTest {
             profiles.setApps(focus, setOf(instagram, "com.android.chrome"))
             assertEquals(setOf(instagram, "com.android.chrome"), awaitItem().single().profile.packageNames)
         }
+    }
+
+    @Test
+    fun sessionsRecordHowBlockingStartedAndEnded() = runTest {
+        val focus = profiles.create("Focus", setOf(instagram))
+        val evening = profiles.create("Evening", setOf(instagram))
+        val t1 = start.plusSeconds(60)
+        val t2 = start.plusSeconds(120)
+        val t3 = start.plusSeconds(180)
+
+        blocking.activate(focus)
+        clock.now = t1
+        blocking.activate(evening)
+        clock.now = t2
+        blocking.deactivate(evening, SessionEnd.Unlock)
+        clock.now = t3
+        blocking.activate(focus)
+
+        assertEquals(
+            listOf(
+                BlockSession(focus, start, t1, SessionEnd.Switch),
+                BlockSession(evening, t1, t2, SessionEnd.Unlock),
+                BlockSession(focus, t3, null, null),
+            ),
+            history.observeSessions().first(),
+        )
+    }
+
+    @Test
+    fun deletingTheActiveProfileEndsItsSessionButKeepsTheHistory() = runTest {
+        val focus = profiles.create("Focus", setOf(instagram))
+        blocking.activate(focus)
+        clock.now = start.plusSeconds(60)
+
+        profiles.delete(focus)
+
+        assertEquals(listOf(BlockSession(focus, start, start.plusSeconds(60), SessionEnd.Deleted)), history.observeSessions().first())
+    }
+
+    @Test
+    fun blockScreensAreRecorded() = runTest {
+        history.recordBlockScreen(instagram, profileId = 7)
+
+        val view = history.observeBlockScreenViews().first().single()
+        assertEquals(instagram, view.packageName)
+        assertEquals(start, view.shownAt)
     }
 }

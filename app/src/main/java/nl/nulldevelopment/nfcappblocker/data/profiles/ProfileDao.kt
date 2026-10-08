@@ -23,7 +23,17 @@ abstract class ProfileDao {
     abstract suspend fun rename(id: Long, name: String)
 
     @Query("DELETE FROM profiles WHERE id = :id")
-    abstract suspend fun delete(id: Long)
+    protected abstract suspend fun deleteProfile(id: Long)
+
+    @Query("UPDATE block_sessions SET ended_at = :endedAt, ended_by = 'Deleted' WHERE profile_id = :profileId AND ended_at IS NULL")
+    protected abstract suspend fun endOpenSessionsOf(profileId: Long, endedAt: Long)
+
+    /** Deletes the profile; a running session ends as deleted (D-044). Blocking stops by cascade. */
+    @Transaction
+    open suspend fun delete(id: Long, nowEpochMillis: Long) {
+        endOpenSessionsOf(id, nowEpochMillis)
+        deleteProfile(id)
+    }
 
     @Query("DELETE FROM profile_apps WHERE profile_id = :profileId")
     protected abstract suspend fun deleteApps(profileId: Long)

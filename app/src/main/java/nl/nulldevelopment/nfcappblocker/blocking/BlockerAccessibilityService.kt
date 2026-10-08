@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
+import nl.nulldevelopment.nfcappblocker.data.history.UsageHistory
 import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import javax.inject.Inject
 
@@ -24,6 +25,7 @@ class BlockerAccessibilityService : AccessibilityService() {
     @Inject lateinit var blocking: BlockingRepository
     @Inject lateinit var apps: InstalledAppsSource
     @Inject lateinit var notifier: BlockingNotifier
+    @Inject lateinit var history: UsageHistory
 
     private val scope = MainScope()
     private lateinit var decider: BlockDecider
@@ -52,6 +54,7 @@ class BlockerAccessibilityService : AccessibilityService() {
         val profile = blocked[foreground] ?: return
         // A bound accessibility service may start activities from the background.
         startActivity(BlockActivity.intent(this, foreground, profile.name))
+        scope.launch { history.recordBlockScreen(foreground, profile.id) }
     }
 
     override fun onInterrupt() = Unit

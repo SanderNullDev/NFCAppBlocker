@@ -85,6 +85,27 @@ class AppDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun activeBlockingSurvivesVersion4WithAnEmptyHistory() = runTest {
+        helper.createDatabase(3).use { connection ->
+            connection.execSQL("INSERT INTO profiles (id, name, created_at) VALUES (1, 'Focus', 1000)")
+            connection.execSQL("INSERT INTO profile_apps (profile_id, package_name) VALUES (1, 'com.instagram.android')")
+            connection.execSQL("INSERT INTO active_profiles (profile_id, started_at) VALUES (1, 2000)")
+        }
+
+        helper.runMigrationsAndValidate(4).use { connection ->
+            connection.prepare("SELECT profile_id, started_at FROM active_profiles").use { row ->
+                assertTrue(row.step())
+                assertEquals(1L, row.getLong(0))
+                assertEquals(2000L, row.getLong(1))
+            }
+            connection.prepare("SELECT (SELECT COUNT(*) FROM block_sessions) + (SELECT COUNT(*) FROM block_screen_views)").use { row ->
+                assertTrue(row.step())
+                assertEquals(0L, row.getLong(0))
+            }
+        }
+    }
+
     private companion object {
         const val DATABASE = "migration-test.db"
     }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import nl.nulldevelopment.nfcappblocker.data.blocking.ActivateResult
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import nl.nulldevelopment.nfcappblocker.data.profiles.ProfileRepository
 import nl.nulldevelopment.nfcappblocker.data.tags.PairedTag
@@ -72,7 +73,7 @@ class ScanToggle(
 
         val active = blocking.observeActive().first()
         if (active.any { it.profile.id == profileId }) {
-            blocking.deactivate(profileId)
+            blocking.deactivate(profileId, SessionEnd.Tag)
             return ScanOutcome.Stopped(profile)
         }
         return when (blocking.activate(profileId)) {

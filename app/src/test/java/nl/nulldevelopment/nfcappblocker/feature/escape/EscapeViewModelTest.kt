@@ -9,6 +9,7 @@ import nl.nulldevelopment.nfcappblocker.testing.FakeProfileRepository
 import nl.nulldevelopment.nfcappblocker.testing.FakeSettingsRepository
 import nl.nulldevelopment.nfcappblocker.testing.MainDispatcherExtension
 import nl.nulldevelopment.nfcappblocker.util.ElapsedRealtime
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -103,7 +104,7 @@ class EscapeViewModelTest {
         val focus = startBlocking()
         vm.state.value
 
-        blocking.deactivate(focus)
+        blocking.deactivate(focus, SessionEnd.Tag)
         advanceBy(10 * 60_000)
 
         assertEquals(EscapeState.Closed, vm.state.value)

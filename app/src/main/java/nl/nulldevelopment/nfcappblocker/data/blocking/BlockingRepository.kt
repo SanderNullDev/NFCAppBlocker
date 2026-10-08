@@ -1,6 +1,7 @@
 package nl.nulldevelopment.nfcappblocker.data.blocking
 
 import kotlinx.coroutines.flow.Flow
+import nl.nulldevelopment.nfcappblocker.data.history.SessionEnd
 import nl.nulldevelopment.nfcappblocker.data.profiles.Profile
 import java.time.Instant
 
@@ -16,7 +17,6 @@ interface BlockingRepository {
     /** Starts blocking with [profileId], replacing any other active profile (D-004). */
     suspend fun activate(profileId: Long): ActivateResult
 
-    suspend fun deactivate(profileId: Long)
-
-    suspend fun deactivateAll()
+    /** Stops [profileId]; [reason] is recorded in the usage history (D-044). */
+    suspend fun deactivate(profileId: Long, reason: SessionEnd)
 }

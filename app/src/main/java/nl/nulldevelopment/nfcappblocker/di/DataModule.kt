@@ -23,6 +23,9 @@ import nl.nulldevelopment.nfcappblocker.data.blocking.ActiveProfileDao
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.blocking.RoomBlockingRepository
 import nl.nulldevelopment.nfcappblocker.data.db.AppDatabase
+import nl.nulldevelopment.nfcappblocker.data.history.HistoryDao
+import nl.nulldevelopment.nfcappblocker.data.history.RoomUsageHistory
+import nl.nulldevelopment.nfcappblocker.data.history.UsageHistory
 import nl.nulldevelopment.nfcappblocker.data.settings.DataStoreSettingsRepository
 import nl.nulldevelopment.nfcappblocker.data.onboarding.DataStoreOnboardingStore
 import nl.nulldevelopment.nfcappblocker.data.onboarding.OnboardingStore
@@ -61,6 +64,9 @@ object DataModule {
 
     @Provides
     fun activeProfileDao(database: AppDatabase): ActiveProfileDao = database.activeProfileDao()
+
+    @Provides
+    fun historyDao(database: AppDatabase): HistoryDao = database.historyDao()
 
     @Provides
     fun clock(): Clock = Clock.systemUTC()
@@ -108,6 +114,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract fun blockingNotifications(impl: BlockingNotifier): BlockingNotifications
+
+    @Binds
+    @Singleton
+    abstract fun usageHistory(impl: RoomUsageHistory): UsageHistory
 
     @Binds
     abstract fun scanFeedback(impl: AndroidScanFeedback): ScanFeedback
