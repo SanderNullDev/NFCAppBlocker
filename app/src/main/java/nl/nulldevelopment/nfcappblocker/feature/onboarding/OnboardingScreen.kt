@@ -8,7 +8,6 @@ import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,18 +26,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -56,9 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -109,16 +99,6 @@ fun OnboardingScreen(state: OnboardingState.Showing, viewModel: OnboardingViewMo
 private fun WelcomeStep(state: OnboardingState.Showing, onNext: () -> Unit) {
     StepFrame(
         state = state,
-        illustration = {
-            Image(
-                painterResource(R.drawable.ic_launcher_foreground),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
-            )
-        },
         title = stringResource(R.string.onboarding_welcome_title),
         primary = stringResource(R.string.onboarding_get_started) to onNext,
     ) {
@@ -138,7 +118,6 @@ private fun ServiceStep(state: OnboardingState.Showing, onNext: () -> Unit) {
     if (state.serviceEnabled) {
         StepFrame(
             state = state,
-            illustration = { StepIcon(Icons.Filled.Check) },
             title = stringResource(R.string.onboarding_service_on_title),
             primary = stringResource(R.string.onboarding_next) to onNext,
         ) {
@@ -149,7 +128,6 @@ private fun ServiceStep(state: OnboardingState.Showing, onNext: () -> Unit) {
 
     StepFrame(
         state = state,
-        illustration = { StepIcon(Icons.Filled.Lock) },
         title = stringResource(R.string.onboarding_service_title),
         primary = stringResource(R.string.onboarding_open_settings) to {
             openedSettings = true
@@ -224,7 +202,6 @@ private fun TagStep(state: OnboardingState.Showing, onChosen: (UUID, String) -> 
         var name by rememberSaveable(found.uuid) { mutableStateOf(found.name) }
         StepFrame(
             state = state,
-            illustration = { StepIcon(Icons.Filled.Check) },
             title = stringResource(if (pairing is PairingState.Paired) R.string.onboarding_tag_added else R.string.onboarding_tag_known),
             primary = stringResource(R.string.onboarding_next) to { onChosen(found.uuid, name) },
         ) {
@@ -243,7 +220,6 @@ private fun TagStep(state: OnboardingState.Showing, onChosen: (UUID, String) -> 
 
     StepFrame(
         state = state,
-        illustration = { AppMark() },
         title = stringResource(R.string.onboarding_tag_title),
         primary = null,
     ) {
@@ -287,7 +263,6 @@ private fun NotificationsStep(state: OnboardingState.Showing, onNext: () -> Unit
     if (allowed) {
         StepFrame(
             state = state,
-            illustration = { StepIcon(Icons.Filled.Check) },
             title = stringResource(R.string.onboarding_notifications_on_title),
             primary = stringResource(R.string.onboarding_next) to onNext,
         ) {
@@ -297,7 +272,6 @@ private fun NotificationsStep(state: OnboardingState.Showing, onNext: () -> Unit
     }
     StepFrame(
         state = state,
-        illustration = { StepIcon(Icons.Filled.Notifications) },
         title = stringResource(R.string.onboarding_notifications_title),
         primary = stringResource(R.string.setup_notifications_action) to {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -322,7 +296,6 @@ private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit) {
 
     StepFrame(
         state = state,
-        illustration = null,
         title = stringResource(R.string.onboarding_apps_title),
         primary = (if (count == 0) stringResource(R.string.onboarding_apps_none) else pluralStringResource(R.plurals.onboarding_apps_next, count, count)) to {
             appsViewModel.save(tag.uuid, state.profile?.id, onSaved)
@@ -346,7 +319,6 @@ private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit) {
 private fun StoppingStep(state: OnboardingState.Showing, onChange: (Int) -> Unit, onNext: () -> Unit) {
     StepFrame(
         state = state,
-        illustration = { StepIcon(Icons.Filled.Refresh) },
         title = stringResource(R.string.onboarding_stopping_title),
         primary = stringResource(R.string.onboarding_next) to onNext,
     ) {
@@ -373,7 +345,6 @@ private fun TryItStep(state: OnboardingState.Showing, onFinish: () -> Unit) {
     val tagName = state.tag?.name.orEmpty()
     StepFrame(
         state = state,
-        illustration = { if (state.blocking) StepIcon(Icons.Filled.Check) else AppMark() },
         title = stringResource(if (state.blocking) R.string.onboarding_try_blocking_title else R.string.onboarding_try_title),
         primary = if (state.blocking) stringResource(R.string.onboarding_finish) to onFinish else null,
         secondary = if (state.blocking) null else stringResource(R.string.onboarding_skip) to onFinish,
@@ -414,14 +385,13 @@ private fun BlockedAppList(heading: String, apps: List<BlockedApp>) {
 }
 
 /**
- * One onboarding step: progress at the top, an illustration, a heading and text, and the main
- * action at the bottom. The text scrolls when it doesn't fit, e.g. at large font sizes; a step
- * with its own list passes [scrolls] false and gives the list the remaining height.
+ * One onboarding step: a heading and text, then the progress and the main action at the bottom.
+ * The text scrolls when it doesn't fit, e.g. at large font sizes; a step with its own list passes
+ * [scrolls] false and gives the list the remaining height.
  */
 @Composable
 private fun StepFrame(
     state: OnboardingState.Showing,
-    illustration: (@Composable () -> Unit)?,
     title: String,
     primary: Pair<String, () -> Unit>?,
     secondary: Pair<String, () -> Unit>? = null,
@@ -435,18 +405,13 @@ private fun StepFrame(
             .safeDrawingPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
-        StepProgress(state.index, state.total)
         Column(
             modifier = Modifier
                 .weight(1f)
                 .then(if (scrolls) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-                .padding(top = if (illustration != null) 40.dp else 24.dp, bottom = 16.dp),
+                .padding(top = 32.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            if (illustration != null) {
-                illustration()
-                Spacer(Modifier.height(8.dp))
-            }
             Text(
                 title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -454,22 +419,30 @@ private fun StepFrame(
             )
             content()
         }
+        StepProgress(state.index, state.total)
+        Spacer(Modifier.height(16.dp))
+        // Both button slots always take their space, so the progress stays at the same height on
+        // every step, also while a step has no main button yet or no second one.
         if (primary != null) {
             Button(
                 onClick = primary.second,
                 enabled = primaryEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 56.dp),
+                    .height(56.dp),
             ) { Text(primary.first, style = MaterialTheme.typography.titleMedium) }
+        } else {
+            Spacer(Modifier.height(56.dp))
         }
         if (secondary != null) {
             TextButton(
                 onClick = secondary.second,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
+                    .height(48.dp),
             ) { Text(secondary.first) }
+        } else {
+            Spacer(Modifier.height(48.dp))
         }
     }
 }
@@ -494,32 +467,6 @@ private fun StepProgress(index: Int, total: Int) {
             )
         }
     }
-}
-
-@Composable
-private fun StepIcon(icon: ImageVector) {
-    Box(
-        Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primaryContainer),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(32.dp))
-    }
-}
-
-/** The app's padlock with the NFC symbol, for the steps about the tag. */
-@Composable
-private fun AppMark() {
-    Image(
-        painterResource(R.drawable.ic_launcher_foreground),
-        contentDescription = null,
-        modifier = Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary),
-    )
 }
 
 @Composable
