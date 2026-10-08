@@ -124,8 +124,9 @@
         <item quantity="other">Block %1$d apps</item>
     </plurals>
     <string name="onboarding_stopping_title">How to stop blocking</string>
-    <string name="onboarding_stopping_tag">Tap \u201c%1$s\u201d again. Blocking stops straight away.</string>
-    <string name="onboarding_stopping_without">No tag at hand? Choose Unlock now in the app or on the block screen, and wait for a countdown to finish. Leaving the screen stops the countdown, but your block list stays active.</string>
+    <string name="onboarding_stopping_tag">Starting and stopping is simple: tap \u201c%1$s\u201d once to start a break, and tap it again to stop.</string>
+    <string name="onboarding_stopping_without">No tag nearby? Tap Unlock now on the home screen, or on the screen that covers a blocked app.</string>
+    <string name="onboarding_stopping_think">Take a moment before you do: unlocking without a tag means waiting out the countdown below. Leave it early, and your block list simply stays on.</string>
     <string name="onboarding_stopping_length">Countdown length</string>
     <string name="onboarding_stopping_later">You can change this later in Settings.</string>
     <string name="onboarding_try_title">Try it</string>

@@ -325,6 +325,7 @@ private fun StoppingStep(state: OnboardingState.Showing, onChange: (Int) -> Unit
     ) {
         BodyText(stringResource(R.string.onboarding_stopping_tag, state.tag?.name.orEmpty()))
         BodyText(stringResource(R.string.onboarding_stopping_without))
+        BodyText(stringResource(R.string.onboarding_stopping_think))
         Panel {
             Text(
                 stringResource(R.string.onboarding_stopping_length),

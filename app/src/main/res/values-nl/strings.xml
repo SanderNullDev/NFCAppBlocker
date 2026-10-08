@@ -124,8 +124,9 @@
         <item quantity="other">%1$d apps blokkeren</item>
     </plurals>
     <string name="onboarding_stopping_title">Zo stop je met blokkeren</string>
-    <string name="onboarding_stopping_tag">Tik nog een keer met \u201c%1$s\u201d. Het blokkeren stopt meteen.</string>
-    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Nu ontgrendelen in de app of op het blokkeerscherm, en wacht tot het aftellen klaar is. Verlaat je het scherm, dan stopt het aftellen maar blijft je blokkeerlijst actief.</string>
+    <string name="onboarding_stopping_tag">Beginnen en stoppen is eenvoudig: tik één keer met \u201c%1$s\u201d om een pauze te starten, en nog een keer om te stoppen.</string>
+    <string name="onboarding_stopping_without">Geen tag bij de hand? Kies Nu ontgrendelen op het startscherm, of op het scherm dat over een geblokkeerde app verschijnt.</string>
+    <string name="onboarding_stopping_think">Sta er wel even bij stil: zonder tag wacht je eerst het aftellen hieronder af. Ga je eerder weg, dan blijft je blokkeerlijst gewoon actief.</string>
     <string name="onboarding_stopping_length">Hoe lang aftellen</string>
     <string name="onboarding_stopping_later">Je kunt dit later wijzigen in Instellingen.</string>
     <string name="onboarding_try_title">Probeer het</string>

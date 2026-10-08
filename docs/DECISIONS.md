@@ -205,7 +205,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-023 — Apps that can never be blocked
 
 - **Date:** 2026-10-06
-- **Status:** Accepted
+- **Status:** Superseded by D-048
 - **Decision:** One shared rule (`NeverBlockPolicy`) says which apps are never blocked: this app, the default phone app, Settings, and every launcher, plus Google Maps, Gmail and Samsung Email, which the user wants available at all times. The phone app and launchers are read live. The picker lists these apps disabled, with the reason in words; an app that's already selected can still be removed.
 - **Why:** The phone app keeps emergency calls possible, and Settings and the launcher mean the user is never trapped (plan, Phase 3: "never trap the user"). Showing the reason instead of hiding the app makes clear why it can't be picked.
 - **Alternatives:** Hiding protected apps from the picker; a user-editable allow list (possible later).
@@ -435,3 +435,13 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** Not everyone knows which apps to block during setup; being stuck on that step until something is ticked is worse than coming back to it later.
 - **Alternatives:** Keep the step required (D-042).
 - **Consequences:** The tag paired during onboarding stays without a block list until one is made.
+
+## D-048 — Protected apps read "Always allowed"
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-023
+- **Decision:** D-023's rule stays: this app, the default phone app, Settings, every launcher, Google Maps, Gmail and Samsung Email are never blocked, the phone app and launchers are read live, and the blocker uses the same rule. What changes is the picker: every one of these apps shows disabled with the same note, "Always allowed" ("Altijd toegestaan"), instead of its own reason. An app that's already selected can still be removed.
+- **Why:** The reason (phone, Settings, launcher) doesn't help when choosing apps, and two kinds of note read as two kinds of rule.
+- **Alternatives:** Keep the reason per app (D-023); hide protected apps from the picker.
+- **Consequences:** Why an app is always allowed is no longer explained in the app.
