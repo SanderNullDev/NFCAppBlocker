@@ -130,10 +130,11 @@
     <string name="onboarding_stopping_length">Countdown length</string>
     <string name="onboarding_stopping_later">You can change this later in Settings.</string>
     <string name="onboarding_try_title">Try it</string>
-    <string name="onboarding_try_body">Hold \u201c%1$s\u201d against your phone to start blocking.</string>
+    <string name="onboarding_try_body">Hold \u201c%1$s\u201d against your phone to start blocking. Then you can tap an app below to see what happens.</string>
     <string name="onboarding_try_will_block">These apps will be blocked</string>
     <string name="onboarding_try_blocking_title">Blocking is on</string>
-    <string name="onboarding_try_blocking_body">Open one of these apps to see what happens. Tap \u201c%1$s\u201d again to stop.</string>
+    <string name="onboarding_try_blocking_body">Tap an app below to see what happens. Then tap \u201c%1$s\u201d again to stop.</string>
+    <string name="onboarding_try_open_app">Open</string>
     <string name="onboarding_try_blocked_now">Blocked now</string>
     <string name="notification_channel_name">Blocking status</string>
     <string name="notification_channel_description">Shows while apps are being blocked, and warns when blocking isn\'t working.</string>

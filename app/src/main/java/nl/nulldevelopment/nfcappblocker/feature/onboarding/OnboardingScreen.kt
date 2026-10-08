@@ -37,6 +37,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.ui.semantics.Role
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -362,25 +367,47 @@ private fun TryItStep(state: OnboardingState.Showing, onFinish: () -> Unit) {
                 BodyText(stringResource(R.string.onboarding_try_body, tagName))
             }
         }
+        val context = LocalContext.current
         BlockedAppList(
             heading = stringResource(if (state.blocking) R.string.onboarding_try_blocked_now else R.string.onboarding_try_will_block),
             apps = state.blockedApps,
+            // Only while blocking: then opening an app shows the block screen straight away. Before
+            // that, it would only open the app the user wants to spend less time in.
+            onOpen = if (state.blocking) {
+                { packageName -> context.packageManager.getLaunchIntentForPackage(packageName)?.let(context::startActivity) }
+            } else {
+                null
+            },
         )
     }
 }
 
+/** The block list's apps; with [onOpen], each row opens its app, marked with an arrow. */
 @Composable
-private fun BlockedAppList(heading: String, apps: List<BlockedApp>) {
+private fun BlockedAppList(heading: String, apps: List<BlockedApp>, onOpen: ((String) -> Unit)? = null) {
     Panel {
         Text(heading, style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
         apps.forEach { app ->
+            val openLabel = stringResource(R.string.onboarding_try_open_app)
             Row(
-                modifier = Modifier.heightIn(min = 48.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (onOpen != null) {
+                            Modifier.clickable(onClickLabel = openLabel, role = Role.Button) { onOpen(app.packageName) }
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .heightIn(min = 48.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 AppIcon(app.packageName, size = 32.dp)
-                Text(app.label, style = MaterialTheme.typography.bodyLarge)
+                Text(app.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                if (onOpen != null) {
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+                }
             }
         }
     }

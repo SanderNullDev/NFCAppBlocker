@@ -130,10 +130,11 @@
     <string name="onboarding_stopping_length">Hoe lang aftellen</string>
     <string name="onboarding_stopping_later">Je kunt dit later wijzigen in Instellingen.</string>
     <string name="onboarding_try_title">Probeer het</string>
-    <string name="onboarding_try_body">Houd \u201c%1$s\u201d tegen je telefoon om te beginnen met blokkeren.</string>
-    <string name="onboarding_try_will_block">Deze apps worden geblokkeerd</string>
+    <string name="onboarding_try_body">Houd \u201c%1$s\u201d tegen je telefoon om te beginnen met blokkeren. Daarna kun je hieronder op een app tikken om te zien wat er gebeurt.</string>
+    <string name="onboarding_try_will_block">Deze apps zullen worden geblokkeerd</string>
     <string name="onboarding_try_blocking_title">Blokkeren staat aan</string>
-    <string name="onboarding_try_blocking_body">Open een van deze apps om te zien wat er gebeurt. Tik nog een keer met \u201c%1$s\u201d om te stoppen.</string>
+    <string name="onboarding_try_blocking_body">Tik hieronder op een app om te zien wat er gebeurt. Tik daarna nog een keer met \u201c%1$s\u201d om te stoppen.</string>
+    <string name="onboarding_try_open_app">Openen</string>
     <string name="onboarding_try_blocked_now">Nu geblokkeerd</string>
     <string name="notification_channel_name">Blokkeerstatus</string>
     <string name="notification_channel_description">Zichtbaar zolang apps worden geblokkeerd, en waarschuwt als blokkeren niet werkt.</string>
