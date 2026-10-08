@@ -50,7 +50,7 @@ Status (2026-10-06):
   - Opaque with a fade-in: the fade had no visible effect for an activity started from the accessibility service; it looked like an instant cut.
   - **Chosen:** translucent, with the blocked app dimmed behind a solid card. Covering the app reads as deliberate. The app is paused rather than stopped, so it could keep playing audio; accepted.
   - Not tried: blurring a screenshot taken by the accessibility service. It would need the "take screenshots" capability, so it's only worth it if the dimmed look disappoints in daily use.
-- [ ] Survival after a long idle period (several hours or overnight). Assumed fine for now, since reboot survival works; to be confirmed.
+- [x] Survival after a long idle period: blocking still worked in the morning after the phone slept for 7+ hours (2026-10-08, with the real blocker from Phase 3).
 
 Findings:
 - Force-stopping the app (App info → Force stop, or Android Studio's Run button, which force-stops before installing) makes Android remove the service from the enabled accessibility services. Blocking silently stops until the user turns the service on again. Accepted under D-007, but Phase 5 must detect this and tell the user, also outside the app. During development, install with `./gradlew :app:installDebug`, which updates the app without a force stop and keeps the service enabled.
@@ -71,7 +71,7 @@ Status (2026-10-06):
 - [x] Sticker test, part 2: with the app closed, a tap opens `ScanActivity` through tag dispatch with the right UUID. The process was usually still running, because the enabled accessibility service keeps it alive, so a truly cold start is rare.
 - [x] New-intent path: a second tap while `ScanActivity` is open reaches the open screen (confirmed with a physical tap, 2026-10-06). The first try opened a new screen on every tap, because the NFC service starts each scan in a new task; `ScanActivity` now has its own task (`singleTask`).
 
-**Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end. Met on 2026-10-06, except for the long-idle survival check under spike A.
+**Exit criteria:** enforcement latency and survival are acceptable on the reference device (D-016), and the NFC launch flow works end to end. Met on 2026-10-06; the long-idle survival check under spike A followed on 2026-10-08.
 
 ## Phase 1 — Tag pairing
 
@@ -126,8 +126,8 @@ Status (2026-10-07):
 - [x] Editing an active profile allowed, with a note in the editor (D-027).
 - Checked on an emulator with simulated tags (toggling, debounce, routing, Status updates).
 - [x] Checked on the Samsung (2026-10-07): blocking a real app, tapping the sticker with the app open and closed, the block screen, the notification, switching the service on from the Status tab.
-- [ ] Long-idle test with the real blocker (overnight).
-- [ ] Battery onboarding: only if the long-idle test shows Samsung stopping the service.
+- [x] Long-idle test with the real blocker (2026-10-08): still blocking after 7+ hours of sleep.
+- [-] Battery onboarding: not needed, Samsung didn't stop the service in the long-idle test.
 
 ## Phase 4 — Scan to toggle
 
