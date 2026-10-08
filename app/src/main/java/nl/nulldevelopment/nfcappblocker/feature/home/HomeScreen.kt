@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,7 +68,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -157,8 +155,7 @@ fun HomeScreen(
                 .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Wordmark(onOpenSettings)
-            Greeting(loaded)
+            Greeting(loaded, onOpenSettings)
             homeProblem(loaded.serviceEnabled, nfcStatus, loaded.hasProfileWithApps, loaded.hasLinkedTag)?.let { problem ->
                 ProblemBanner(
                     problem = problem,
@@ -204,34 +201,9 @@ fun HomeScreen(
     }
 }
 
-/** The app's identity: the sage padlock and the name, with Settings at the side (D-045). */
+/** The greeting is the screen's only title, with Settings beside it; it scrolls with the rest (D-045). */
 @Composable
-private fun Wordmark(onOpenSettings: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Image(
-            painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = null,
-            modifier = Modifier
-                .size(36.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-        )
-        Spacer(Modifier.width(10.dp))
-        Text(
-            stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .weight(1f)
-                .semantics { heading() },
-        )
-        IconButton(onClick = onOpenSettings) {
-            Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
-private fun Greeting(state: HomeState.Loaded) {
+private fun Greeting(state: HomeState.Loaded, onOpenSettings: () -> Unit) {
     val hour = LocalTime.now().hour
     val greeting = when (hour) {
         in 5..11 -> R.string.home_greeting_morning
@@ -239,8 +211,19 @@ private fun Greeting(state: HomeState.Loaded) {
         in 18..23 -> R.string.home_greeting_evening
         else -> R.string.home_greeting_night
     }
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(stringResource(greeting), style = MaterialTheme.typography.headlineMedium)
+    Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                stringResource(greeting),
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { heading() },
+            )
+            IconButton(onClick = onOpenSettings) {
+                Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.settings_title), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
         Text(
             if (state.activeProfileName != null) {
                 stringResource(R.string.home_line_blocking)
@@ -441,7 +424,7 @@ private fun StatusCard(state: HomeState.Loaded, onUnlock: () -> Unit) {
         Column(announce.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Icon(Icons.Filled.Lock, contentDescription = null)
-                Text(stringResource(R.string.status_blocking, name), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
+                Text(stringResource(R.string.home_active, name), style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics { heading() })
             }
             val since = state.since?.let { stringResource(R.string.status_since, timeFormat.format(it)) }
             val apps = state.blockedApps.joinToString(", ") { it.label }
@@ -565,9 +548,12 @@ private fun formatDuration(duration: Duration): String {
     return if (hours == 0L) stringResource(R.string.stats_minutes, minutes) else stringResource(R.string.stats_hours_minutes, hours, minutes)
 }
 
+/** The two most recently used block lists, the rest behind "Show all" (most people use one or two). */
 @Composable
 private fun BlockListsSection(lists: List<BlockListSummary>, onOpen: (Long) -> Unit) {
     if (lists.isEmpty()) return
+    var showAll by rememberSaveable { mutableStateOf(false) }
+    val shown = if (showAll) lists else lists.take(SHOWN_BLOCK_LISTS)
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(
             stringResource(R.string.profiles_title),
@@ -576,13 +562,21 @@ private fun BlockListsSection(lists: List<BlockListSummary>, onOpen: (Long) -> U
             modifier = Modifier.semantics { heading() },
         )
         SoftCard(Modifier.fillMaxWidth()) {
-            lists.forEachIndexed { index, list ->
+            shown.forEachIndexed { index, list ->
                 if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.outlineVariant)
                 BlockListRow(list, onClick = { onOpen(list.id) })
             }
         }
+        if (lists.size > SHOWN_BLOCK_LISTS) {
+            TextButton(onClick = { showAll = !showAll }, modifier = Modifier.offset(x = (-12).dp).heightIn(min = 48.dp)) {
+                Text(if (showAll) stringResource(R.string.stats_less) else stringResource(R.string.home_show_all, lists.size))
+                Icon(if (showAll) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown, contentDescription = null)
+            }
+        }
     }
 }
+
+private const val SHOWN_BLOCK_LISTS = 2
 
 @Composable
 private fun BlockListRow(list: BlockListSummary, onClick: () -> Unit) {

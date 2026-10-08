@@ -12,11 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import nl.nulldevelopment.nfcappblocker.MainActivity
 import nl.nulldevelopment.nfcappblocker.R
-import nl.nulldevelopment.nfcappblocker.apps.InstalledAppsSource
 import nl.nulldevelopment.nfcappblocker.data.blocking.BlockingRepository
 import nl.nulldevelopment.nfcappblocker.di.ApplicationScope
 import java.time.ZoneId
@@ -46,7 +44,6 @@ interface BlockingNotifications {
 class BlockingNotifier @Inject constructor(
     @ApplicationContext private val context: Context,
     private val blocking: BlockingRepository,
-    private val apps: InstalledAppsSource,
     private val serviceStatus: BlockerServiceStatus,
     @ApplicationScope private val scope: CoroutineScope,
 ) : BlockingNotifications {
@@ -70,9 +67,8 @@ class BlockingNotifier @Inject constructor(
     fun start() {
         createChannel()
         scope.launch {
-            val labels = flow { emit(apps.launcherApps().associate { it.packageName to it.label }) }
-            combine(blocking.observeActive(), labels, serviceEnabled, refreshes) { active, names, enabled, _ ->
-                blockingNotice(active.firstOrNull(), enabled, names)
+            combine(blocking.observeActive(), serviceEnabled, refreshes) { active, enabled, _ ->
+                blockingNotice(active.firstOrNull(), enabled)
             }.collect { notice -> if (notice == null) cancel() else show(notice) }
         }
     }
@@ -88,7 +84,7 @@ class BlockingNotifier @Inject constructor(
         )
         val (title, text) = when (notice) {
             is BlockingNotice.Blocking -> context.getString(R.string.notification_blocking_title, notice.profileName) to
-                context.getString(R.string.notification_blocking_text, timeFormat.format(notice.since), notice.appNames.joinToString(", "))
+                context.resources.getQuantityString(R.plurals.notification_blocking_text, notice.appCount, notice.appCount, timeFormat.format(notice.since))
             is BlockingNotice.NotWorking -> context.getString(R.string.notification_not_working_title, notice.profileName) to
                 context.getString(R.string.notification_not_working_text)
         }

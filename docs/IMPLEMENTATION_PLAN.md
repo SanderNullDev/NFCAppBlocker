@@ -207,7 +207,7 @@ Goal: one calm screen that shows whether blocking is on and whether it helps (D-
 3. [x] Wordmark and greeting, scrolling with the screen.
 4. [x] Problem banner; NFC and notifications moved to Settings.
 5. [x] Status card and time blocked with folding details.
-6. [~] Checked on the emulator (2026-10-08), light and dark: wordmark and greeting scroll along, the blocking card, folding details, the urgent banner with the service off. Still to do: review the texts, and the phone.
+6. [~] Checked on the emulator (2026-10-08), light and dark: wordmark and greeting scroll along, the blocking card, folding details, the urgent banner with the service off. Follow-up (2026-10-08): no separate wordmark, the greeting is the title with the gear beside it; the two most recently used block lists with "Show all"; "<name> is active" on the card and in the notification, which counts the apps instead of listing them. Still to do: the phone; the notification shows in English while the app is set to Dutch on Android's per-app language (the notifier uses the application's resources).
 
 ## Testing strategy (all phases)
 

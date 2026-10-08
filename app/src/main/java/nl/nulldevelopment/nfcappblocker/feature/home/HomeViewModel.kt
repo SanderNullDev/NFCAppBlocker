@@ -39,6 +39,8 @@ data class BlockListSummary(
     val tagNames: List<String>,
     /** It's blocking right now. */
     val active: Boolean,
+    /** When it last started blocking; null if it never has (since history began). */
+    val lastUsed: Instant?,
 )
 
 sealed interface HomeState {
@@ -105,8 +107,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private class StatsBundle(val period: StatsPeriod, val stats: UsageStats, val at: Instant, val lastUsed: Map<Long, Instant>)
+
     private val stats = combine(history.observeSessions(), history.observeBlockScreenViews(), period, now) { sessions, views, chosen, at ->
-        Triple(chosen, usageStats(sessions, views, chosen, at, ZoneId.systemDefault()), at)
+        StatsBundle(
+            period = chosen,
+            stats = usageStats(sessions, views, chosen, at, ZoneId.systemDefault()),
+            at = at,
+            lastUsed = sessions.groupBy { it.profileId }.mapValues { (_, list) -> list.maxOf { it.startedAt } },
+        )
     }
 
     val state: StateFlow<HomeState> = combine(
@@ -114,7 +123,7 @@ class HomeViewModel @Inject constructor(
         appsData,
         serviceEnabled,
         stats,
-    ) { (active, allProfiles, allTags), data, enabled, (chosen, numbers, at) ->
+    ) { (active, allProfiles, allTags), data, enabled, bundle ->
         if (data == null) return@combine HomeState.Loading
         val current = active.firstOrNull()
         val labels = data.installed.associate { it.packageName to it.label }
@@ -135,11 +144,17 @@ class HomeViewModel @Inject constructor(
                     appCount = profile.packageNames.size,
                     tagNames = allTags.filter { it.profileId == profile.id }.map { it.name }.sortedBy { it.lowercase() },
                     active = profile.id in activeIds,
+                    lastUsed = bundle.lastUsed[profile.id],
                 )
-            },
-            period = chosen,
-            stats = numbers,
-            blockingFor = current?.startedAt?.let { Duration.between(it, at).coerceAtLeast(Duration.ZERO) },
+            }.sortedWith(
+                // The active one first, then most recently used, then the rest by name.
+                compareByDescending<BlockListSummary> { it.active }
+                    .thenByDescending { it.lastUsed }
+                    .thenBy { it.name.lowercase() },
+            ),
+            period = bundle.period,
+            stats = bundle.stats,
+            blockingFor = current?.startedAt?.let { Duration.between(it, bundle.at).coerceAtLeast(Duration.ZERO) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState.Loading)
 }

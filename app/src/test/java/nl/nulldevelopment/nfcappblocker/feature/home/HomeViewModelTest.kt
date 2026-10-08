@@ -132,10 +132,10 @@ class HomeViewModelTest {
 
         assertEquals(
             listOf(
-                BlockListSummary(empty, "Empty", 0, emptyList(), active = false),
-                BlockListSummary(focus, "Focus", 2, listOf("bed", "Desk"), active = true),
+                BlockListSummary(focus, "Focus", 2, listOf("bed", "Desk"), active = true, lastUsed = Instant.EPOCH),
+                BlockListSummary(empty, "Empty", 0, emptyList(), active = false, lastUsed = null),
             ),
-            viewModel().loaded().blockLists.sortedBy { it.name },
+            viewModel().loaded().blockLists,
         )
     }
 
@@ -158,5 +158,23 @@ class HomeViewModelTest {
 
         vm.setPeriod(StatsPeriod.AllTime)
         assertEquals(2, vm.loaded().stats.timesBlocked)
+    }
+
+    @Test
+    fun `block lists come active first, then most recently used, then by name`() = runTest {
+        val apps = setOf("com.instagram.android")
+        val work = profiles.create("Work", apps)
+        val evening = profiles.create("Evening", apps)
+        val never = profiles.create("Another", apps)
+        val focus = profiles.create("Focus", apps)
+        blocking.now = now.minus(Duration.ofDays(2))
+        blocking.activate(work)
+        blocking.now = now.minus(Duration.ofDays(1))
+        blocking.activate(evening)
+        blocking.now = now.minus(Duration.ofHours(1))
+        blocking.activate(focus)
+
+        assertEquals(listOf("Focus", "Evening", "Work", "Another"), viewModel().loaded().blockLists.map { it.name })
+        assertEquals(null, viewModel().loaded().blockLists.single { it.id == never }.lastUsed)
     }
 }

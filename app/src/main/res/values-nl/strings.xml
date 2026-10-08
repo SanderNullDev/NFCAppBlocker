@@ -12,13 +12,14 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Niet aan het blokkeren</string>
-    <string name="status_blocking">\u201c%1$s\u201d blokkeert</string>
     <string name="status_since">Sinds %1$s</string>
     <string name="status_service_off_hint">Zoek TikStop onder Geïnstalleerde apps. Is de schakelaar grijs? Sta dan eerst beperkte instellingen toe in de app-info.</string>
     <!-- Home -->
     <string name="home_add">Toevoegen</string>
     <string name="home_no_tag">Geen tag</string>
-    <string name="home_blocking_now">Blokkeert nu</string>
+    <string name="home_blocking_now">Nu actief</string>
+    <string name="home_active">%1$s is actief</string>
+    <string name="home_show_all">Toon alle (%1$d)</string>
     <string name="stats_today">Vandaag</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">Altijd</string>
@@ -30,7 +31,7 @@
     <string name="home_greeting_evening">Goedenavond</string>
     <string name="home_greeting_night">Goedenacht</string>
     <string name="home_line_free">Je telefoon is vrij. Tik je tag als je wilt focussen.</string>
-    <string name="home_line_blocking">Even rust. Je apps zijn geblokkeerd.</string>
+    <string name="home_line_blocking">Leg je telefoon even weg en geef je hoofd wat ruimte. Je apps wachten wel.</string>
     <string name="home_ready">Klaar voor gebruik</string>
     <string name="problem_service_off">Blokkeren werkt niet: de blokkeerservice staat uit</string>
     <string name="problem_nfc_off">NFC staat uit, dus tags worden niet gelezen</string>
@@ -134,8 +135,11 @@
     <string name="onboarding_try_blocked_now">Nu geblokkeerd</string>
     <string name="notification_channel_name">Blokkeerstatus</string>
     <string name="notification_channel_description">Zichtbaar zolang apps worden geblokkeerd, en waarschuwt als blokkeren niet werkt.</string>
-    <string name="notification_blocking_title">\u201c%1$s\u201d blokkeert</string>
-    <string name="notification_blocking_text">Sinds %1$s: %2$s</string>
+    <string name="notification_blocking_title">%1$s is actief</string>
+    <plurals name="notification_blocking_text">
+        <item quantity="one">Sinds %2$s · %1$d app geblokkeerd</item>
+        <item quantity="other">Sinds %2$s · %1$d apps geblokkeerd</item>
+    </plurals>
     <string name="notification_not_working_title">\u201c%1$s\u201d blokkeert niets</string>
     <string name="notification_not_working_text">De toegankelijkheidsservice staat uit. Tik om de app te openen en zet hem weer aan.</string>
 

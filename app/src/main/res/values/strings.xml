@@ -13,13 +13,14 @@
 
     <!-- Status -->
     <string name="status_not_blocking">Not blocking</string>
-    <string name="status_blocking">Blocking \u201c%1$s\u201d</string>
     <string name="status_since">Since %1$s</string>
     <string name="status_service_off_hint">Find TikStop under Installed apps. If it\'s greyed out, allow restricted settings in the app\'s info screen first.</string>
     <!-- Home (D-043, D-044) -->
     <string name="home_add">Add</string>
     <string name="home_no_tag">No tag</string>
-    <string name="home_blocking_now">Blocking now</string>
+    <string name="home_blocking_now">Active now</string>
+    <string name="home_active">%1$s is active</string>
+    <string name="home_show_all">Show all (%1$d)</string>
     <string name="stats_today">Today</string>
     <string name="stats_week">Week</string>
     <string name="stats_all_time">All time</string>
@@ -31,7 +32,7 @@
     <string name="home_greeting_evening">Good evening</string>
     <string name="home_greeting_night">Good night</string>
     <string name="home_line_free">Your phone is free. Tap your tag when you want to focus.</string>
-    <string name="home_line_blocking">A moment of calm. Your apps are blocked.</string>
+    <string name="home_line_blocking">Put your phone down for a while and give your mind some room. Your apps will wait.</string>
     <string name="home_ready">Ready when you are</string>
     <string name="problem_service_off">Blocking doesn\'t work: the blocker service is off</string>
     <string name="problem_nfc_off">NFC is off, so tags can\'t be read</string>
@@ -134,8 +135,11 @@
     <string name="onboarding_try_blocked_now">Blocked now</string>
     <string name="notification_channel_name">Blocking status</string>
     <string name="notification_channel_description">Shows while apps are being blocked, and warns when blocking isn\'t working.</string>
-    <string name="notification_blocking_title">Blocking \u201c%1$s\u201d</string>
-    <string name="notification_blocking_text">Since %1$s: %2$s</string>
+    <string name="notification_blocking_title">%1$s is active</string>
+    <plurals name="notification_blocking_text">
+        <item quantity="one">Since %2$s · %1$d app blocked</item>
+        <item quantity="other">Since %2$s · %1$d apps blocked</item>
+    </plurals>
     <string name="notification_not_working_title">\u201c%1$s\u201d isn\'t blocking anything</string>
     <string name="notification_not_working_text">The accessibility service is off. Tap to open the app and switch it back on.</string>
 
