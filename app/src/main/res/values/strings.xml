@@ -117,6 +117,7 @@
     <string name="onboarding_notifications_body">While a block list is active, a notification in your notification bar shows it. Tap the notification to come back to this app.</string>
     <string name="onboarding_apps_title">Choose apps to block</string>
     <string name="onboarding_apps_body">Tapping \u201c%1$s\u201d blocks these apps, and tapping it again unblocks them.</string>
+    <string name="onboarding_apps_later">You can also do this later from the home screen.</string>
     <string name="onboarding_apps_none">Choose at least one app</string>
     <plurals name="onboarding_apps_next">
         <item quantity="one">Block %1$d app</item>

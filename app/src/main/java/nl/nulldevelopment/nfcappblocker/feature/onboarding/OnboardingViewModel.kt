@@ -81,7 +81,9 @@ class OnboardingViewModel @Inject constructor(
                 val step = when {
                     progress.step !in STEPS -> STEPS.first()
                     progress.step > OnboardingStep.Tag && tag == null -> OnboardingStep.Tag
-                    progress.step > OnboardingStep.Apps && profile == null -> OnboardingStep.Apps
+                    // "How to stop" works without a block list (the apps step can be skipped);
+                    // "Try it" doesn't.
+                    progress.step == OnboardingStep.TryIt && profile == null -> OnboardingStep.Apps
                     else -> progress.step
                 }
                 OnboardingState.Showing(
@@ -123,8 +125,16 @@ class OnboardingViewModel @Inject constructor(
     }
 
     fun next() {
-        val current = (state.value as? OnboardingState.Showing)?.step ?: return
-        viewModelScope.launch { moveOn(current) }
+        val showing = state.value as? OnboardingState.Showing ?: return
+        viewModelScope.launch {
+            // Without a block list there's nothing to try, so onboarding ends after "How to stop".
+            if (showing.step == OnboardingStep.Stopping && showing.profile == null) store.finish() else moveOn(showing.step)
+        }
+    }
+
+    /** From the apps step: no block list for now; the home screen asks for one later (D-046). */
+    fun skipApps() {
+        viewModelScope.launch { store.setStep(OnboardingStep.Stopping) }
     }
 
     fun back() {

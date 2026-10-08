@@ -107,7 +107,7 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `can't get past the tag step without a tag, or past the apps step without a block list`() = runTest {
+    fun `can't get past the tag step without a tag, or try it without a block list`() = runTest {
         val store = FakeOnboardingStore(OnboardingProgress.InProgress(OnboardingStep.TryIt))
         val vm = viewModel(store)
         assertEquals(OnboardingStep.Tag, vm.showing().step)
@@ -115,6 +115,19 @@ class OnboardingViewModelTest {
         pairDesk()
         store.setTag(desk)
         assertEquals(OnboardingStep.Apps, vm.showing().step)
+    }
+
+    @Test
+    fun `skipping the apps step still explains stopping, then finishes without try it`() = runTest {
+        pairDesk()
+        val store = FakeOnboardingStore(OnboardingProgress.InProgress(OnboardingStep.Apps, tagUuid = desk))
+        val vm = viewModel(store)
+
+        vm.skipApps()
+        assertEquals(OnboardingStep.Stopping, vm.showing().step)
+
+        vm.next()
+        assertEquals(OnboardingState.Hidden, vm.state.value)
     }
 
     @Test

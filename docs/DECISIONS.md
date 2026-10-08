@@ -380,7 +380,7 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 ## D-042 — Onboarding has seven steps
 
 - **Date:** 2026-10-08
-- **Status:** Accepted
+- **Status:** Superseded by D-047
 - **Supersedes:** D-037
 - **Decision:** Everything in D-037 stays, with one step added before "Try it": "How to stop blocking". It explains tapping the tag again and unlocking without a tag (the countdown, which leaving cancels while the block list stays active), and sets the countdown length. "Try it" lists the apps that will be blocked. The steps: welcome, switch on blocking, add your tag, notifications, choose apps to block, how to stop blocking, try it.
 - **Why:** The user should know how to get out of a block before starting one. The countdown length can't be set during "Try it", because it's locked while blocking (D-032).
@@ -425,3 +425,13 @@ Status values: **Accepted**, **Superseded by D-xxx**, **Deferred**.
 - **Why:** The home screen showed everything at once, worst when something was wrong (on the emulator, a checklist for NFC it can't have). One status, one number and one problem at a time is easier to take in.
 - **Alternatives:** Keep the checklist and four equal tiles (D-043); drop the other three numbers from the screen.
 - **Consequences:** Notifications and NFC status move to Settings. The texts will be reviewed once the layout runs on the emulator.
+
+## D-047 — The apps step of onboarding can be skipped
+
+- **Date:** 2026-10-08
+- **Status:** Accepted
+- **Supersedes:** D-042
+- **Decision:** D-042's seven steps stay, and choosing apps to block can now be skipped too ("Voor nu overslaan"). The step says it can also be done later from the home screen. After skipping, "How to stop blocking" still shows, and onboarding ends there: "Try it" needs a block list. The home screen then asks for one with its problem banner (D-046). The skip buttons on the other steps use the same wording.
+- **Why:** Not everyone knows which apps to block during setup; being stuck on that step until something is ticked is worse than coming back to it later.
+- **Alternatives:** Keep the step required (D-042).
+- **Consequences:** The tag paired during onboarding stays without a block list until one is made.

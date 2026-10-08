@@ -104,7 +104,7 @@
     <string name="onboarding_restricted_step3">Tik op Beperkte instellingen toestaan en bevestig.</string>
     <string name="onboarding_restricted_step4">Kom hier terug en tik opnieuw op Instellingen openen.</string>
     <string name="onboarding_open_app_info">App-info openen</string>
-    <string name="onboarding_skip">Nu overslaan</string>
+    <string name="onboarding_skip">Voor nu overslaan</string>
     <string name="onboarding_finish">Klaar</string>
     <string name="onboarding_tag_title">Voeg je tag toe</string>
     <string name="onboarding_tag_body">Houd de tag tegen de achterkant van je telefoon, bovenaan, en houd hem even stil.</string>
@@ -117,6 +117,7 @@
     <string name="onboarding_notifications_body">Zolang er een blokkeerlijst actief is zie je dat aan een melding in je notificatiebalk. Klik op de melding om terug te komen in deze applicatie.</string>
     <string name="onboarding_apps_title">Kies apps om te blokkeren</string>
     <string name="onboarding_apps_body">Tikken met \u201c%1$s\u201d blokkeert deze apps, en nog een keer tikken geeft ze weer vrij.</string>
+    <string name="onboarding_apps_later">Je kunt dit ook later doen vanaf het startscherm.</string>
     <string name="onboarding_apps_none">Kies minstens één app</string>
     <plurals name="onboarding_apps_next">
         <item quantity="one">%1$d app blokkeren</item>

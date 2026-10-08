@@ -88,7 +88,7 @@ fun OnboardingScreen(state: OnboardingState.Showing, viewModel: OnboardingViewMo
             OnboardingStep.Service -> ServiceStep(state, onNext = viewModel::next)
             OnboardingStep.Tag -> TagStep(state, onChosen = viewModel::tagChosen)
             OnboardingStep.Notifications -> NotificationsStep(state, onNext = viewModel::next)
-            OnboardingStep.Apps -> AppsStep(state, onSaved = viewModel::appsSaved)
+            OnboardingStep.Apps -> AppsStep(state, onSaved = viewModel::appsSaved, onSkip = viewModel::skipApps)
             OnboardingStep.Stopping -> StoppingStep(state, onChange = viewModel::setCountdownMinutes, onNext = viewModel::next)
             OnboardingStep.TryIt -> TryItStep(state, onFinish = viewModel::next)
         }
@@ -287,7 +287,7 @@ private fun NotificationsStep(state: OnboardingState.Showing, onNext: () -> Unit
 }
 
 @Composable
-private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit) {
+private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit, onSkip: () -> Unit) {
     val appsViewModel: OnboardingAppsViewModel = hiltViewModel()
     val apps by appsViewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.profile?.id) { appsViewModel.load(state.profile?.id) }
@@ -300,10 +300,11 @@ private fun AppsStep(state: OnboardingState.Showing, onSaved: (Long) -> Unit) {
         primary = (if (count == 0) stringResource(R.string.onboarding_apps_none) else pluralStringResource(R.plurals.onboarding_apps_next, count, count)) to {
             appsViewModel.save(tag.uuid, state.profile?.id, onSaved)
         },
+        secondary = stringResource(R.string.onboarding_skip) to onSkip,
         primaryEnabled = count > 0,
         scrolls = false,
     ) {
-        BodyText(stringResource(R.string.onboarding_apps_body, tag.name))
+        BodyText(stringResource(R.string.onboarding_apps_body, tag.name) + " " + stringResource(R.string.onboarding_apps_later))
         val loaded = apps ?: return@StepFrame
         // No extra indent: the frame already has its side margin.
         AppSearchField(loaded.query, appsViewModel::setQuery, sidePadding = 0.dp)
