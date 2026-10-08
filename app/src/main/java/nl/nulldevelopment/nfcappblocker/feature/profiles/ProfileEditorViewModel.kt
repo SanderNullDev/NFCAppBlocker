@@ -155,7 +155,8 @@ class ProfileEditorViewModel @AssistedInject constructor(
                 ProfileEditorState.Loaded(
                     isNew = profileId == null,
                     name = draft.name,
-                    apps = appPickerItems(data.installed, draft.packageNames, data.policy, query),
+                    // The saved apps on top; ticking more doesn't reorder the list while editing.
+                    apps = appPickerItems(data.installed, draft.packageNames, data.policy, query, pinnedFirst = saved.packageNames),
                     selectedCount = draft.packageNames.size,
                     query = query,
                     linkedTags = allTags.filter { it.uuid in draft.tagUuids },

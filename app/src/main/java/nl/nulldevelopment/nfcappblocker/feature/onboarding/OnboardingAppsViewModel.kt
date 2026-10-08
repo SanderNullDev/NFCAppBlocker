@@ -39,10 +39,13 @@ class OnboardingAppsViewModel @Inject constructor(
     private val appsData = MutableStateFlow<AppsData?>(null)
     private val selected = MutableStateFlow<Set<String>>(emptySet())
     private val query = MutableStateFlow("")
+
+    /** The apps already chosen when the step opened (after going back), listed first. */
+    private val pinned = MutableStateFlow<Set<String>>(emptySet())
     private var loadedFor: Long? = null
 
-    val state: StateFlow<OnboardingAppsState?> = combine(appsData, selected, query) { data, chosen, text ->
-        data?.let { OnboardingAppsState(appPickerItems(it.installed, chosen, it.policy, text), chosen.size, text) }
+    val state: StateFlow<OnboardingAppsState?> = combine(appsData, selected, query, pinned) { data, chosen, text, first ->
+        data?.let { OnboardingAppsState(appPickerItems(it.installed, chosen, it.policy, text, pinnedFirst = first), chosen.size, text) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     init {
@@ -54,7 +57,10 @@ class OnboardingAppsViewModel @Inject constructor(
         if (profileId == null || profileId == loadedFor) return
         loadedFor = profileId
         viewModelScope.launch {
-            profiles.observe(profileId).first()?.let { selected.value = it.packageNames }
+            profiles.observe(profileId).first()?.let {
+                selected.value = it.packageNames
+                pinned.value = it.packageNames
+            }
         }
     }
 

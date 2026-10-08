@@ -23,8 +23,8 @@ class AppPickerItemsTest {
         InstalledApp("com.google.android.youtube", "youtube"),
     )
 
-    private fun items(selected: Set<String> = emptySet(), query: String = "") =
-        appPickerItems(installed, selected, policy, query, Locale.ENGLISH)
+    private fun items(selected: Set<String> = emptySet(), query: String = "", pinned: Set<String> = emptySet()) =
+        appPickerItems(installed, selected, policy, query, Locale.ENGLISH, pinnedFirst = pinned)
 
     @Test
     fun `sorts by name ignoring case and accents`() {
@@ -71,5 +71,14 @@ class AppPickerItemsTest {
     @Test
     fun `an empty search shows everything`() {
         assertEquals(installed.size, items(query = "   ").size)
+    }
+
+    @Test
+    fun `pinned apps come first, by name, and stay put when the selection changes`() {
+        val pinned = setOf("com.zhiliaoapp.musically", "com.android.chrome")
+
+        val rows = items(selected = setOf("com.instagram.android"), pinned = pinned)
+
+        assertEquals(listOf("Chrome", "TikTok", "École", "Instagram", "Settings", "youtube"), rows.map { it.label })
     }
 }

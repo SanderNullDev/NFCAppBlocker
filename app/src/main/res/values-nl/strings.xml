@@ -167,7 +167,7 @@
     <string name="profile_delete_title">\u201c%1$s\u201d verwijderen?</string>
     <string name="profile_delete_body">De tags blijven gekoppeld aan de app en kun je aan een andere blokkeerlijst koppelen.</string>
     <string name="profile_delete_body_active">Deze blokkeerlijst blokkeert nu; verwijderen stopt het blokkeren. De tags blijven gekoppeld aan de app en kun je aan een andere blokkeerlijst koppelen.</string>
-    <string name="profile_active_note">Deze blokkeerlijst blokkeert nu. Opgeslagen wijzigingen gelden meteen.</string>
+    <string name="profile_active_note">Deze blokkeerlijst is nu actief. Opgeslagen wijzigingen gelden meteen.</string>
     <string name="profile_name_required">Voer een naam in</string>
     <string name="profile_tags_heading">Tags</string>
     <string name="profile_no_tags">Geen tags gekoppeld. Tikken met een gekoppelde tag zet deze blokkeerlijst aan of uit.</string>

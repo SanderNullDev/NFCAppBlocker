@@ -134,7 +134,8 @@ class ProfileEditorViewModelTest {
             val state = editor(id).loaded()
 
             assertEquals("Focus", state.name)
-            assertEquals(listOf("Chrome", "Instagram", "Settings"), state.apps.map { it.label })
+            // The saved app first, then the rest by name.
+            assertEquals(listOf("Instagram", "Chrome", "Settings"), state.apps.map { it.label })
             assertEquals(1, state.selectedCount)
             assertEquals(listOf("Desk"), state.linkedTags.map { it.name })
             assertFalse(state.hasChanges)
