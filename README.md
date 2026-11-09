@@ -1,6 +1,6 @@
-# 📵 NFC App Blocker
+# 📵 NFC App Blocker (TikStop)
 
-An Android app that blocks a chosen set of apps until you tap a paired NFC tag, so getting back to them takes a deliberate physical step.
+TikStop is an Android app that blocks a chosen set of apps until you tap a paired NFC tag, so getting back to them takes a deliberate physical step.
 
 ## 🛠️ Dev setup
 
@@ -38,6 +38,16 @@ Notes:
 - Built for personal use. Play Store publication isn't planned, but the design doesn't rule it out.
 - UI in English and Dutch.
 
+### Screenshots
+
+| Welcome | How to stop | Choosing apps |
+|---|---|---|
+| <img src="docs/screenshots/onboarding-welcome.png" alt="Onboarding welcome screen: Less time on your phone" width="240"> | <img src="docs/screenshots/onboarding-how-to-stop.png" alt="Onboarding step explaining how to stop blocking, with the countdown length slider" width="240"> | <img src="docs/screenshots/app-picker.png" alt="App picker with Chrome selected" width="240"> |
+
+| Home | Block screen |
+|---|---|
+| <img src="docs/screenshots/home.png" alt="Home screen with an active block list and minutes of calm this week" width="240"> | <img src="docs/screenshots/block-screen.png" alt="Block screen covering Chrome" width="240"> |
+
 ## 📁 Project structure
 
 | Module | Responsibility |
@@ -45,7 +55,7 @@ Notes:
 | `:app` | The blocker app (`nl.nulldevelopment.nfcappblocker`, minSdk 30): tag pairing, block lists, the accessibility service, block screen, onboarding and settings. Kotlin, Jetpack Compose, Material 3, Hilt, Navigation 3, Room 3. |
 | `:core:tag-format` | Pure Kotlin/JVM library defining the tag MIME type, payload and NDEF encoding. Shared by both apps so the format lives in one place. |
 | `:hce-emulator` | Test app for a second phone that emulates an NFC Forum Type 4 tag over Host Card Emulation and serves our NDEF message. |
-| `docs/` | Implementation plan, decision log and setup guide. |
+| `docs/` | Implementation plan, decision log, setup guide and README screenshots. |
 | `third_party/` | License for the bundled Figtree font. |
 
 ## 🗄️ Database
